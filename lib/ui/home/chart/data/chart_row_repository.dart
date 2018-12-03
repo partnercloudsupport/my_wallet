@@ -31,8 +31,8 @@ class _ChartDatabaseRepository {
       });
     }
 
-    income.sort((a, b) => b.month.millisecond - a.month.millisecond);
-    expense.sort((a, b) => b.month.millisecond - a.month.millisecond);
+    income.sort((a, b) => b.month.millisecondsSinceEpoch - a.month.millisecondsSinceEpoch);
+    expense.sort((a, b) => b.month.millisecondsSinceEpoch - a.month.millisecondsSinceEpoch);
 
     return ChartEntity(income, expense);
   }

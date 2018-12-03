@@ -49,9 +49,14 @@ Lock _lock = Lock();
 // ------------------------------------------------------------------------------------------------------------------------
 // other SQL helper methods
 Future<double> sumAllTransactionBetweenDateByType(DateTime from, DateTime to, TransactionType type) async {
-  var sum = await db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN ${from.millisecondsSinceEpoch} AND ${to.millisecondsSinceEpoch}) AND $_transType = ${type.index}");
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN ${from.millisecondsSinceEpoch} AND ${to.millisecondsSinceEpoch}) AND $_transType = ${type.index}"));
 
-  print("Sum $sum and ${sum[0].values.first}");
+  return sum[0].values.first;
+}
+
+Future<double> sumAllAccountBalance() async {
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_accBalance) FROM $_tableAccounts"));
+
   return sum[0].values.first;
 }
 // ------------------------------------------------------------------------------------------------------------------------
@@ -382,8 +387,6 @@ class _Database {
     Database db = await _openDatabase();
 
     var result = await db.rawQuery(sql);
-
-    print("$sql ==> result: $result");
 
     db.close();
 

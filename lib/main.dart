@@ -43,6 +43,9 @@ class _MyAppState extends State<MyApp> {
       title: 'Flutter Demo',
       theme: theme.appTheme,
       home: MyWalletHome(),
+      debugShowCheckedModeBanner: false,
+      showPerformanceOverlay: false,
+      showSemanticsDebugger: false,
       onGenerateRoute: (settings) {
         return MaterialPageRoute(builder: (context) {
           switch (settings.name) {
