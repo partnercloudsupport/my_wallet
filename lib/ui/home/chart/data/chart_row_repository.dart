@@ -13,26 +13,25 @@ class ChartRepository {
 
 class _ChartDatabaseRepository {
   Future<ChartEntity> loadChartData() async {
-    List<AppTransaction> transactions = await db.queryTransactionsBetweenDates(Utils.firstMomentOfMonth(DateTime.now()), Utils.lastDayOfMonth(DateTime.now()));
+    var end = Utils.lastDayOfMonth(DateTime.now());
+
+    var day = Utils.firstMomentOfMonth(DateTime.now());
 
     List<TransactionEntity> income = [];
     List<TransactionEntity> expense = [];
 
-    if (transactions != null) {
-      transactions.forEach((f) {
-        switch(f.type) {
-          case TransactionType.Income:
-            income.add(TransactionEntity(f.dateTime, f.amount));
-            break;
-          case TransactionType.Expenses:
-            expense.add(TransactionEntity(f.dateTime, f.amount));
-            break;
-        }
-      });
-    }
+    while(day.isBefore(end)) {
+      var incomeByDay = await db.sumTransactionsByDay(day, TransactionType.Income);
+      var expensesByDay = await db.sumTransactionsByDay(day, TransactionType.Expenses);
 
-    income.sort((a, b) => b.month.millisecondsSinceEpoch - a.month.millisecondsSinceEpoch);
-    expense.sort((a, b) => b.month.millisecondsSinceEpoch - a.month.millisecondsSinceEpoch);
+      if (incomeByDay != null) income.add(TransactionEntity(day, incomeByDay));
+      else income.add(TransactionEntity(day, 0));
+
+      if (expensesByDay != null) expense.add(TransactionEntity(day, expensesByDay));
+      else expense.add(TransactionEntity(day, 0));
+
+      day = day.add(Duration(days: 1));
+    }
 
     return ChartEntity(income, expense);
   }

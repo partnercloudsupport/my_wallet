@@ -59,6 +59,17 @@ Future<double> sumAllAccountBalance() async {
 
   return sum[0].values.first;
 }
+
+Future<double> sumTransactionsByDay(DateTime day, TransactionType type) async {
+    var startOfDay = DateTime(day.year, day.month, day.day).millisecondsSinceEpoch;
+    var endOfDay = DateTime(day.year, day.month, day.day + 1).millisecondsSinceEpoch;
+
+    var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startOfDay AND $endOfDay) AND $_transType = ${type.index}"));
+
+    print("Sum transactions by day $day is $sum");
+    return sum[0].values.first;
+}
+
 // ------------------------------------------------------------------------------------------------------------------------
 // Queries
 Future<List<Account>> queryAccounts({int id, AccountType type}) async {
