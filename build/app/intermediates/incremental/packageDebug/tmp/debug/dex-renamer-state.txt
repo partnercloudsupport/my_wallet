@@ -1,0 +1,4 @@
+#Mon Dec 03 17:03:44 AEDT 2018
+base.0=/Users/744486/AndroidStudioProjects/my_wallet/build/app/intermediates/transforms/dexMerger/debug/0
+path.0=classes.dex
+renamed.0=classes.dex

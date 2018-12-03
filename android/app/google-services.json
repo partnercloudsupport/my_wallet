@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "990274208221",
+    "firebase_url": "https://my-wallet-9438d.firebaseio.com",
+    "project_id": "my-wallet-9438d",
+    "storage_bucket": "my-wallet-9438d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:990274208221:android:c528bc0846681362",
+        "android_client_info": {
+          "package_name": "com.nartus.mywallet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "990274208221-1jt3n3v6unqs5ri6toarmnclm08hf30v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMD86ZwWgl_NwTA76mP1aq7TFSbgEYPdI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
