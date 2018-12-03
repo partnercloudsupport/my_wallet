@@ -1,0 +1,6 @@
+.idea/
+.flutter-plugins
+.gitignore
+.packages
+lib/database/firebase_config.dart
+build

@@ -26,6 +26,7 @@ const _desc = "desc";
 void init() async {
   if (_isInit) return;
 
+  _isInit = true;
   FirebaseApp _app = await FirebaseApp.configure(
       name: Platform.isIOS ? "MyWallet" : "My Wallet",
       options: Platform.isIOS
