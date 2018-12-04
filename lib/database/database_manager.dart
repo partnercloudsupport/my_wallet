@@ -107,8 +107,12 @@ Future<List<AppTransaction>> queryTransactions() async {
   return null;
 }
 
-Future<List<AppTransaction>> queryTransactionsBetweenDates(DateTime from, DateTime to) async {
+Future<List<AppTransaction>> queryTransactionsBetweenDates(DateTime from, DateTime to, {TransactionType type}) async {
   String where = from != null && to != null ? "$_transDateTime BETWEEN ${from.millisecondsSinceEpoch} AND ${to.millisecondsSinceEpoch}" : null;
+
+  if(type != null) {
+    where = "($where) AND $_transType = ${type.index}";
+  }
 
   List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: where));
 
@@ -137,7 +141,7 @@ Future<List<AppCategory>> queryCategory({int id, int transactionType}) async {
   return null;
 }
 
-Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime to, bool filterZero}) async {
+Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime to, TransactionType type, bool filterZero}) async {
   String where;
   int _from = 0;
   int _to = DateTime.now().millisecondsSinceEpoch;
@@ -150,6 +154,10 @@ Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime 
     _to = to.millisecondsSinceEpoch;
   }
   where = "$_transDateTime BETWEEN $_from AND $_to";
+
+  if(type != null) {
+    where = "($where) AND $_transType = ${type.index}";
+  }
 
   List<Map<String, dynamic>> catMaps = await _lock.synchronized(() => db._query(_tableCategory));
 

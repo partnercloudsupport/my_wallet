@@ -4,7 +4,7 @@ import 'package:my_wallet/my_wallet_view.dart';
 import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ui/home/overview/presentation/view/overview_view.dart';
 import 'package:my_wallet/ui/home/monthydetail/presentation/view/monthly_detail_view.dart';
-import 'package:my_wallet/ui/home/chart/presentation/view/chart_row_view.dart';
+import 'package:my_wallet/ui/home/chart/chart_row_view.dart';
 import 'package:my_wallet/ui/home/expenses/presentation/view/expenses_view.dart';
 import 'package:my_wallet/routes.dart' as routes;
 import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_view.dart';
