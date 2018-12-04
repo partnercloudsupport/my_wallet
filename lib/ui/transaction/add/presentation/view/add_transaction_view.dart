@@ -120,7 +120,7 @@ class _AddTransactionState extends State<AddTransaction> {
       _date,
       _desc
     ).then((_) {
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }).catchError((e) {
       print(e.toString());
       showDialog(context: context, builder: (context) => AlertDialog(

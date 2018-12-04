@@ -7,6 +7,7 @@ import 'package:my_wallet/ui/home/monthydetail/presentation/view/monthly_detail_
 import 'package:my_wallet/ui/home/chart/presentation/view/chart_row_view.dart';
 import 'package:my_wallet/ui/home/expenses/presentation/view/expenses_view.dart';
 import 'package:my_wallet/routes.dart' as routes;
+import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_view.dart';
 
 class MyWalletHome extends StatefulWidget {
   @override
@@ -59,17 +60,20 @@ class _MyWalletState extends State<MyWalletHome> {
         padding: EdgeInsets.all(platform == TargetPlatform.iOS ? 10.0 : 0.0),
       child: RaisedButton(
         onPressed: () =>  Navigator.pushNamed(context, routes.AddTransaction)
-            .then((_) {
-          // refresh all views
-          overviewKey.currentState.refresh();
-          monthlyDetailKey.currentState.refresh();
-          expensesKey.currentState.refresh();
-          chartKey.currentState.refresh();
+            .then((updated) {
+              if (updated == true) {
+                // refresh all views
+                overviewKey.currentState.refresh();
+                monthlyDetailKey.currentState.refresh();
+                expensesKey.currentState.refresh();
+                chartKey.currentState.refresh();
+              }
         }),
         child: Container(
           margin: EdgeInsets.all(10.0),
           child: Text("Add Transaction",),
         ),
+
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
         color: theme.pinkAccent,
       ),),
@@ -78,15 +82,8 @@ class _MyWalletState extends State<MyWalletHome> {
   }
 }
 
-class _LeftDrawer extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _LeftDrawerState();
-  }
-}
-
-class _LeftDrawerState extends State<_LeftDrawer> {
-  var drawerListItems = {
+class _LeftDrawer extends StatelessWidget {
+  final drawerListItems = {
     "Categories": routes.ListCategories,
     "Accounts": routes.ListAccounts
   };
@@ -95,7 +92,7 @@ class _LeftDrawerState extends State<_LeftDrawer> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColorDark
+          color: Theme.of(context).primaryColorDark
       ),
       width: MediaQuery.of(context).size.width * 0.85,
       alignment: Alignment.center,
