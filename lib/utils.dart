@@ -7,3 +7,11 @@ DateTime lastDayOfMonth(DateTime day) {
 
   return lastDayDateTime;
 }
+
+DateTime startOfDay(DateTime day) {
+  return DateTime(day.year, day.month, day.day);
+}
+
+DateTime endOfDay(DateTime day) {
+  return DateTime(day.year, day.month, day.day).add(Duration(days: 1));
+}

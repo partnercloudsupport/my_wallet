@@ -6,6 +6,7 @@ import 'package:my_wallet/database/data.dart';
 import 'package:intl/intl.dart';
 import 'package:my_wallet/ui/account/list/presentation/presenter/list_accounts_presenter.dart';
 import 'package:my_wallet/routes.dart' as routes;
+import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
 
 class ListAccounts extends StatefulWidget {
   final String _title;
@@ -62,7 +63,7 @@ class _ListAccountsState extends State<ListAccounts> {
                 },
                 icon: Icon(Icons.close, color: theme.pinkAccent,),
               ) : null,
-              onTap: () => widget.selectionMode ? Navigator.pop(context, _accounts[index]) : print("account ${_accounts[index].name} is tapped"),
+              onTap: () => widget.selectionMode ? Navigator.pop(context, _accounts[index]) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(_accounts[index].name, accountId: _accounts[index].id,))),
             ),
             decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: theme.blueGrey)),

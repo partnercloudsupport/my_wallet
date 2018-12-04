@@ -102,9 +102,7 @@ Future<List<Account>> queryAccounts({int id, AccountType type}) async {
 Future<List<AppTransaction>> queryTransactions() async {
   List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions));
 
-  if (map != null) return map.map((f) => _toTransaction(f)).toList();
-
-  return null;
+  return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
 }
 
 Future<List<AppTransaction>> queryTransactionsBetweenDates(DateTime from, DateTime to, {TransactionType type}) async {
@@ -116,8 +114,19 @@ Future<List<AppTransaction>> queryTransactionsBetweenDates(DateTime from, DateTi
 
   List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: where));
 
-  if (map != null) return map.map((f) => _toTransaction(f)).toList();
-  return null;
+  return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
+}
+
+Future<List<AppTransaction>> queryTransactionForCategory(int categoryId) async {
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: "$_transCategory = ?", whereArgs: [categoryId]));
+
+  return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
+}
+
+Future<List<AppTransaction>> queryTransactionForAccount(int accountId) async {
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: "$_transAcc = ?", whereArgs: [ accountId]));
+
+  return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
 }
 
 Future<List<AppCategory>> queryCategory({int id, int transactionType}) async {

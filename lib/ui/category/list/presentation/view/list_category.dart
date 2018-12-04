@@ -8,6 +8,7 @@ import 'package:my_wallet/routes.dart' as routes;
 import 'package:my_wallet/ui/category/list/presentation/presenter/list_category_presenter.dart';
 
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
 
 class CategoryList extends StatefulWidget {
   final String _title;
@@ -81,7 +82,7 @@ class _CategoryListState extends State<CategoryList> {
         ),
         alignment: Alignment.center,
       ),
-      onTap: () => widget._type != null ? Navigator.pop(context, category) : print("${category.name} is tapped") ,
+      onTap: () => widget._type != null ? Navigator.pop(context, category) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(category.name, categoryId: category.id,))) ,
     );
   }
 

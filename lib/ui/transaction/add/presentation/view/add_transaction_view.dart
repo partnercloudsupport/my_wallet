@@ -111,7 +111,6 @@ class _AddTransactionState extends State<AddTransaction> {
   }
 
   void _saveTransaction() {
-    print("save transaction for date $_date with milliseconds ${_date.millisecondsSinceEpoch}");
     _presenter.saveTransaction(
       _type,
       _account,

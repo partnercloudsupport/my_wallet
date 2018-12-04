@@ -64,6 +64,7 @@ class ChartRowState extends State<ChartRow> with TickerProviderStateMixin {
               ],
               controller: _tabController,
               indicatorWeight: 2.0,
+              indicatorColor: theme.darkBlue,
             ),
             Container(
               height: MediaQuery.of(context).size.height * 0.3,
