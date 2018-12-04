@@ -3,7 +3,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:my_wallet/database/data.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:my_wallet/database/database_watcher.dart';
+import 'package:my_wallet/data_observer.dart';
 
 // #############################################################################################################################
 // database manager
@@ -11,7 +11,7 @@ import 'package:my_wallet/database/database_watcher.dart';
 final _id = "_id";
 
 // table Account
-final _tableAccounts = "table_accounts";
+final _tableAccounts = tableAccount;
 final _accID = _id;
 final _accName = "_name";
 final _accBalance = "_balance";
@@ -19,7 +19,7 @@ final _accType = "_type";
 final _accCurrency = "_currency";
 
 // table transaction
-final _tableTransactions = "table_transactions";
+final _tableTransactions = tableTransactions;
 final _transID = _id;
 final _transDateTime = "_dateTime";
 final _transAcc = "_accountId";
@@ -29,14 +29,14 @@ final _transDesc = "transactionDescription";
 final _transType = "transactionType";
 
 // table category
-final _tableCategory = "table_categories";
+final _tableCategory = tableCategory;
 final _catId = _id;
 final _catName = "_name";
 final _catTransactionType = "_transactionType";
 final _catColorHex = "_colorHex";
 
 // table budget
-final _tableBudget = "table_budget";
+final _tableBudget = tableBudget;
 final _budgetId = _id;
 final _budgetCategoryId = "_catId";
 final _budgetPerMonth = "_budgetPerMonth";
@@ -45,6 +45,17 @@ final _budgetEnd = "_budgetEnd";
 
 _Database db = _Database();
 Lock _lock = Lock();
+
+void registerDatabaseObservable(String table, DatabaseObservable observable) {
+  _watchers.update(table,
+          (curObservers) {
+        curObservers.add(observable);
+      }, ifAbsent: () => [observable]);
+}
+
+void unregisterDatabaseObservable(String table, DatabaseObservable observable) {
+  _watchers[table] ?? _watchers[table].remove(observable);
+}
 
 // ------------------------------------------------------------------------------------------------------------------------
 // other SQL helper methods
@@ -498,3 +509,5 @@ class _Database {
     }
   }
 }
+
+

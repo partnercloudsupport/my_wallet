@@ -8,6 +8,8 @@ import 'package:my_wallet/ui/home/chart/chart_row_view.dart';
 import 'package:my_wallet/ui/home/expenses/presentation/view/expenses_view.dart';
 import 'package:my_wallet/routes.dart' as routes;
 
+import 'package:my_wallet/data_observer.dart' as observer;
+
 class MyWalletHome extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -15,13 +17,35 @@ class MyWalletHome extends StatefulWidget {
   }
 }
 
-class _MyWalletState extends State<MyWalletHome> {
+class _MyWalletState extends State<MyWalletHome> with observer.DatabaseObservable {
   TextStyle titleSTyle = TextStyle(color: theme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
 
   GlobalKey<ExpensesState> expensesKey = GlobalKey();
   GlobalKey<HomeMonthlyDetailState> monthlyDetailKey = GlobalKey();
   GlobalKey<HomeOverviewState> overviewKey = GlobalKey();
   GlobalKey<ChartRowState> chartKey = GlobalKey();
+
+  void onDatabaseUpdate() {
+    refreshAllView();
+  }
+  
+  @override
+  void initState() {
+    super.initState();
+
+    observer.registerDatabaseObservable(observer.tableAccount, this);
+    observer.registerDatabaseObservable(observer.tableTransactions, this);
+    observer.registerDatabaseObservable(observer.tableCategory, this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    observer.unregisterDatabaseObservable(observer.tableAccount, this);
+    observer.unregisterDatabaseObservable(observer.tableTransactions, this);
+    observer.unregisterDatabaseObservable(observer.tableCategory, this);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,11 +78,7 @@ class _MyWalletState extends State<MyWalletHome> {
         child: RaisedButton(
           onPressed: () => Navigator.pushNamed(context, routes.AddTransaction).then((updated) {
                 if (updated == true) {
-                  // refresh all views
-                  overviewKey.currentState.refresh();
-                  monthlyDetailKey.currentState.refresh();
-                  expensesKey.currentState.refresh();
-                  chartKey.currentState.refresh();
+                  refreshAllView();
                 }
               }),
           child: Container(
@@ -73,6 +93,14 @@ class _MyWalletState extends State<MyWalletHome> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  void refreshAllView() {
+    // refresh all views
+    overviewKey.currentState.refresh();
+    monthlyDetailKey.currentState.refresh();
+    expensesKey.currentState.refresh();
+    chartKey.currentState.refresh();
   }
 }
 

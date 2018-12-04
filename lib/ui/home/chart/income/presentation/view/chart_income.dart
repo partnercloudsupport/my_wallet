@@ -31,19 +31,19 @@ class IncomeChartState extends State<IncomeChart> {
     return incomes == null || incomes.isEmpty
         ? Center(child: Text("No Income found", style: Theme.of(context).textTheme.title,),)
         : PieChart(
-      [
-        Series<IncomeEntity, double>(
-            data: incomes,
-            measureFn: (data, index) => data.amount,
-            domainFn: (data, index) => data.amount,
-            colorFn: (data, index) => Color.fromHex(code: data.color),
-            labelAccessorFn: (data, index) => "${data.category}"
-        ),
-      ],
-      animate: false,
-      defaultRenderer: ArcRendererConfig(
-          arcRendererDecorators: [ ArcLabelDecorator() ]
-      ),
+          [
+            Series<IncomeEntity, double>(
+                data: incomes,
+                measureFn: (data, index) => data.amount,
+                domainFn: (data, index) => data.amount,
+                colorFn: (data, index) => Color.fromHex(code: data.color),
+                labelAccessorFn: (data, index) => "${data.category}"
+            ),
+          ],
+          animate: false,
+          defaultRenderer: ArcRendererConfig(
+              arcRendererDecorators: [ ArcLabelDecorator() ]
+          ),
     );
   }
 
