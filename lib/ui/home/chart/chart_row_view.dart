@@ -35,36 +35,42 @@ class ChartRowState extends State<ChartRow> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     var textStyle = Theme.of(context).textTheme.title;
-    return Container(
-      color: Colors.white,
-      alignment: Alignment.center,
-      child: Column(
-        children: <Widget>[
-          TabBar(
-            tabs: <Widget>[
-              Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text(
-                  "Income",
-                  style: textStyle.apply(color: theme.tealAccent),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        alignment: Alignment.center,
+        child: Column(
+          children: <Widget>[
+            TabBar(
+              tabs: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    "Income",
+                    style: textStyle.apply(color: theme.tealAccent),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text(
-                  "Expenses",
-                  style: textStyle.apply(color: theme.pinkAccent),
-                ),
-              )
-            ],
-            controller: _tabController,
-            indicatorWeight: 2.0,
-          ),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.3,
-            child: TabBarView(controller: _tabController, children: [IncomeChart(_incomeState), ExpenseChart(_expenseState)]),
-          )
-        ],
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    "Expenses",
+                    style: textStyle.apply(color: theme.pinkAccent),
+                  ),
+                )
+              ],
+              controller: _tabController,
+              indicatorWeight: 2.0,
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.3,
+              child: TabBarView(controller: _tabController, children: [IncomeChart(_incomeState), ExpenseChart(_expenseState)]),
+            )
+          ],
+        ),
       ),
     );
   }
