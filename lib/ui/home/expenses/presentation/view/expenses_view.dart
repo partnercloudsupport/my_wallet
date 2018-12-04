@@ -6,25 +6,29 @@ import 'package:my_wallet/ui/home/expenses/presentation/presenter/expenses_prese
 import 'package:my_wallet/app_theme.dart' as theme;
 import 'dart:math';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
+import 'package:my_wallet/data_observer.dart' as observer;
 
 class Expenses extends StatefulWidget {
 
-  Expenses(key) : super(key : key);
-
   @override
   State<StatefulWidget> createState() {
-    return ExpensesState();
+    return _ExpensesState();
   }
 }
 
-class ExpensesState extends State<Expenses> {
-  ExpensesRepositoryPresenter _presenter = ExpensesRepositoryPresenter();
+class _ExpensesState extends State<Expenses> implements observer.DatabaseObservable {
+  final databaseWatch = [
+    observer.tableCategory,
+    observer.tableTransactions
+  ];
+
+  final ExpensesRepositoryPresenter _presenter = ExpensesRepositoryPresenter();
 
   List<ExpeneseEntity> _expensesList = [];
   
   var random = Random();
 
-  void refresh() {
+  void onDatabaseUpdate(String table) {
     _loadExpenses();
   }
 
@@ -42,7 +46,15 @@ class ExpensesState extends State<Expenses> {
   void initState() {
     super.initState();
 
+    observer.registerDatabaseObservable(databaseWatch, this);
     _loadExpenses();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    observer.unregisterDatabaseObservable(databaseWatch, this);
   }
 
   @override

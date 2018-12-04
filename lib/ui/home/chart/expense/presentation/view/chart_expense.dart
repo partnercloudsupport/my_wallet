@@ -2,18 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart';
 import 'package:my_wallet/ui/home/chart/expense/data/expense_entity.dart';
 import 'package:my_wallet/ui/home/chart/expense/presentation/presenter/chart_expense_presenter.dart';
+import 'package:my_wallet/data_observer.dart' as observer;
 
 class ExpenseChart extends StatefulWidget {
 
-  ExpenseChart(GlobalKey key) : super(key : key);
-
   @override
   State<StatefulWidget> createState() {
-    return ExpenseChartState();
+    return _ExpenseChartState();
   }
 }
 
-class ExpenseChartState extends State<ExpenseChart> {
+class _ExpenseChartState extends State<ExpenseChart> implements observer.DatabaseObservable {
+
+  final databaseWatch = [
+    observer.tableTransactions,
+    observer.tableCategory
+  ];
 
   final ChartExpensePresenter _presenter = ChartExpensePresenter();
 
@@ -23,7 +27,15 @@ class ExpenseChartState extends State<ExpenseChart> {
   void initState() {
     super.initState();
 
+    observer.registerDatabaseObservable(databaseWatch, this);
     _loadExpense();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    observer.unregisterDatabaseObservable(databaseWatch, this);
   }
 
   @override
@@ -46,7 +58,7 @@ class ExpenseChartState extends State<ExpenseChart> {
     );
   }
 
-  void refresh() {
+  void onDatabaseUpdate(String table) {
     _loadExpense();
   }
 

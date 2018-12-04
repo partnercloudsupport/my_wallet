@@ -179,18 +179,22 @@ int _toId(DataSnapshot snapshot) {
 }
 
 void _onAccountAdded(Event event) {
+  print("_onAccountAdded ${event.snapshot.key}");
   db.insertAccount(_snapshotToAccount(event.snapshot))
       .catchError((e) => _onAccountChanged(event));
 }
 
 void _onAccountChanged(Event event) {
+  print("_onAccountChanged ${event.snapshot.key}");
   db.updateAccount(_snapshotToAccount(event.snapshot));
 }
 
 void _onAccountMoved(Event event) {
+  print("_onAccountMoved ${event.snapshot.key}");
 }
 
 void _onAccountRemoved(Event event) {
+  print("_onAccountRemoved ${event.snapshot.key}");
   db.deleteAccount(int.parse(event.snapshot.key));
 }
 

@@ -2,20 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart';
 import 'package:my_wallet/ui/home/chart/income/data/income_entity.dart';
 import 'package:my_wallet/ui/home/chart/income/presentation/presenter/chart_income_presenter.dart';
+import 'package:my_wallet/data_observer.dart' as observer;
 
 class IncomeChart extends StatefulWidget {
 
-  IncomeChart(GlobalKey key) : super(key : key);
-
   @override
   State<StatefulWidget> createState() {
-    return IncomeChartState();
+    return _IncomeChartState();
   }
 }
 
-class IncomeChartState extends State<IncomeChart> {
+class _IncomeChartState extends State<IncomeChart> implements observer.DatabaseObservable {
 
   final ChartIncomePresenter _presenter = ChartIncomePresenter();
+  final databaseWatch = [
+    observer.tableTransactions,
+    observer.tableCategory
+  ];
 
   List<IncomeEntity> incomes = [];
 
@@ -23,7 +26,15 @@ class IncomeChartState extends State<IncomeChart> {
   void initState() {
     super.initState();
 
+    observer.registerDatabaseObservable(databaseWatch, this);
     _loadIncome();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    observer.unregisterDatabaseObservable(databaseWatch, this);
   }
 
   @override
@@ -47,7 +58,7 @@ class IncomeChartState extends State<IncomeChart> {
     );
   }
 
-  void refresh() {
+  void onDatabaseUpdate(String table) {
     _loadIncome();
   }
 

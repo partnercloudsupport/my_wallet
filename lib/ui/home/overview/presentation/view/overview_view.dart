@@ -3,27 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:my_wallet/ui/home/overview/presentation/presenter/overview_presenter.dart';
 import 'package:intl/intl.dart';
 import 'package:my_wallet/app_theme.dart' as theme;
+import 'package:my_wallet/data_observer.dart' as observer;
 
 class HomeOverview extends StatefulWidget {
   final TextStyle titleSTyle;
 
-  HomeOverview(key, this.titleSTyle) : super(key : key);
+  HomeOverview(this.titleSTyle) : super();
 
   @override
   State<StatefulWidget> createState() {
-    return HomeOverviewState();
+    return _HomeOverviewState();
   }
 }
 
-class HomeOverviewState extends State<HomeOverview> {
+class _HomeOverviewState extends State<HomeOverview> implements observer.DatabaseObservable {
+  final databaseWatch = [observer.tableAccount];
 
   final HomeOverviewPresenter _presenter = HomeOverviewPresenter();
   final NumberFormat nf = NumberFormat("\$#,##0.00");
 
   var _total = 0.0;
 
-  void refresh() {
-    _loadTotal();
+  void onDatabaseUpdate(String table) {
+    if (table == observer.tableAccount) _loadTotal();
   }
 
   void _loadTotal() {
@@ -37,7 +39,15 @@ class HomeOverviewState extends State<HomeOverview> {
   void initState() {
     super.initState();
 
+    observer.registerDatabaseObservable(databaseWatch, this);
     _loadTotal();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    observer.unregisterDatabaseObservable(databaseWatch, this);
   }
 
   @override

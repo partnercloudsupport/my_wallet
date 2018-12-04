@@ -5,25 +5,29 @@ import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ui/home/monthydetail/presentation/presenter/monthly_detail_presenter.dart';
 import 'package:my_wallet/ui/home/monthydetail/data/monthly_detail_entity.dart';
 import 'package:intl/intl.dart';
+import 'package:my_wallet/data_observer.dart' as observer;
 
 class HomeMonthlyDetail extends StatefulWidget {
   final TextStyle titleSTyle;
 
-  HomeMonthlyDetail(key, this.titleSTyle) : super(key: key);
+  HomeMonthlyDetail(this.titleSTyle) : super();
   @override
   State<StatefulWidget> createState() {
-    return HomeMonthlyDetailState();
+    return _HomeMonthlyDetailState();
   }
 }
 
-class HomeMonthlyDetailState extends State<HomeMonthlyDetail> {
+class _HomeMonthlyDetailState extends State<HomeMonthlyDetail> implements observer.DatabaseObservable {
+
+  final databaseWatch = [observer.tableTransactions];
+
   final HomeMonthlyDetailPresenter _presenter = HomeMonthlyDetailPresenter();
 
   var _dataEntity = HomeMonthlyDetailEntity(0.0, 0.0, 0.0);
 
   DateFormat _df = DateFormat("MMMM yyyy");
 
-  void refresh() {
+  void onDatabaseUpdate(String table) {
     _loadAllData();
   }
 
@@ -39,8 +43,17 @@ class HomeMonthlyDetailState extends State<HomeMonthlyDetail> {
   void initState() {
     super.initState();
 
+    observer.registerDatabaseObservable(databaseWatch, this);
     _loadAllData();
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    observer.unregisterDatabaseObservable(databaseWatch, this);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(

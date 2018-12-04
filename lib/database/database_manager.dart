@@ -46,15 +46,19 @@ final _budgetEnd = "_budgetEnd";
 _Database db = _Database();
 Lock _lock = Lock();
 
-void registerDatabaseObservable(String table, DatabaseObservable observable) {
-  _watchers.update(table,
-          (curObservers) {
-        curObservers.add(observable);
-      }, ifAbsent: () => [observable]);
+void registerDatabaseObservable(List<String> tables, DatabaseObservable observable) {
+  if (tables != null) {
+    print("register table $tables}");
+    tables.forEach((table) => _watchers.update(table,
+            (curObservers) {
+      if(curObservers == null) curObservers = [];
+          curObservers.add(observable);
+        }, ifAbsent: () => [observable]));
+  }
 }
 
-void unregisterDatabaseObservable(String table, DatabaseObservable observable) {
-  _watchers[table] ?? _watchers[table].remove(observable);
+void unregisterDatabaseObservable(List<String> tables, DatabaseObservable observable) {
+  tables ?? tables.forEach((table) => _watchers[table] ?? _watchers[table].remove(observable));
 }
 
 // ------------------------------------------------------------------------------------------------------------------------
@@ -504,8 +508,9 @@ class _Database {
   void _notifyObservers(String table) {
     var observables = _watchers[table];
 
+    print("$table : notifyObserver $observables");
     if(observables != null) {
-      observables.forEach((observable) => observable.onDatabaseUpdate());
+      observables.forEach((observable) => observable.onDatabaseUpdate(table));
     }
   }
 }

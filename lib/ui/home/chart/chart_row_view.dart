@@ -3,26 +3,17 @@ import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ui/home/chart/income/presentation/view/chart_income.dart';
 import 'package:my_wallet/ui/home/chart/expense/presentation/view/chart_expense.dart';
 
-/// show a bar chart of 7 days expenses and income
 class ChartRow extends StatefulWidget {
-  ChartRow(GlobalKey key) : super(key: key);
+  ChartRow() : super();
 
   @override
   State<StatefulWidget> createState() {
-    return ChartRowState();
+    return _ChartRowState();
   }
 }
 
-class ChartRowState extends State<ChartRow> with TickerProviderStateMixin {
+class _ChartRowState extends State<ChartRow> with TickerProviderStateMixin {
   TabController _tabController;
-
-  GlobalKey<IncomeChartState> _incomeState = GlobalKey();
-  GlobalKey<ExpenseChartState> _expenseState = GlobalKey();
-
-  void refresh() {
-    if(_incomeState.currentState != null) _incomeState.currentState.refresh();
-    if(_expenseState.currentState != null) _expenseState.currentState.refresh();
-  }
 
 
   @override
@@ -68,7 +59,7 @@ class ChartRowState extends State<ChartRow> with TickerProviderStateMixin {
             ),
             Container(
               height: MediaQuery.of(context).size.height * 0.3,
-              child: TabBarView(controller: _tabController, children: [IncomeChart(_incomeState), ExpenseChart(_expenseState)]),
+              child: TabBarView(controller: _tabController, children: [IncomeChart(), ExpenseChart()]),
             )
           ],
         ),

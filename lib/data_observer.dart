@@ -6,15 +6,15 @@ const tableCategory = "table_categories";
 const tableBudget = "table_budget";
 
 abstract class DatabaseObservable {
-  void onDatabaseUpdate();
+  void onDatabaseUpdate(String table);
 }
 
-void registerDatabaseObservable(String table, DatabaseObservable observable) {
-  db.registerDatabaseObservable(table, observable);
+void registerDatabaseObservable(List<String> tables, DatabaseObservable observable) {
+  db.registerDatabaseObservable(tables, observable);
 }
 
-void unregisterDatabaseObservable(String table, DatabaseObservable observable) {
-  db.unregisterDatabaseObservable(table, observable);
+void unregisterDatabaseObservable(List<String> tables, DatabaseObservable observable) {
+  db.unregisterDatabaseObservable(tables, observable);
 }
 
 

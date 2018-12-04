@@ -8,8 +8,6 @@ import 'package:my_wallet/ui/home/chart/chart_row_view.dart';
 import 'package:my_wallet/ui/home/expenses/presentation/view/expenses_view.dart';
 import 'package:my_wallet/routes.dart' as routes;
 
-import 'package:my_wallet/data_observer.dart' as observer;
-
 class MyWalletHome extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -17,35 +15,8 @@ class MyWalletHome extends StatefulWidget {
   }
 }
 
-class _MyWalletState extends State<MyWalletHome> with observer.DatabaseObservable {
+class _MyWalletState extends State<MyWalletHome> {
   TextStyle titleSTyle = TextStyle(color: theme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
-
-  GlobalKey<ExpensesState> expensesKey = GlobalKey();
-  GlobalKey<HomeMonthlyDetailState> monthlyDetailKey = GlobalKey();
-  GlobalKey<HomeOverviewState> overviewKey = GlobalKey();
-  GlobalKey<ChartRowState> chartKey = GlobalKey();
-
-  void onDatabaseUpdate() {
-    refreshAllView();
-  }
-  
-  @override
-  void initState() {
-    super.initState();
-
-    observer.registerDatabaseObservable(observer.tableAccount, this);
-    observer.registerDatabaseObservable(observer.tableTransactions, this);
-    observer.registerDatabaseObservable(observer.tableCategory, this);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    observer.unregisterDatabaseObservable(observer.tableAccount, this);
-    observer.unregisterDatabaseObservable(observer.tableTransactions, this);
-    observer.unregisterDatabaseObservable(observer.tableCategory, this);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +35,10 @@ class _MyWalletState extends State<MyWalletHome> with observer.DatabaseObservabl
       body: Container(
         child: ListView(
           children: <Widget>[
-            HomeOverview(overviewKey, titleSTyle),
-            HomeMonthlyDetail(monthlyDetailKey, titleSTyle),
-            ChartRow(chartKey),
-            Expenses(expensesKey)
+            HomeOverview(titleSTyle),
+            HomeMonthlyDetail(titleSTyle),
+            ChartRow(),
+            Expenses()
           ],
         ),
         decoration: BoxDecoration(color: theme.darkBlue),
@@ -76,11 +47,7 @@ class _MyWalletState extends State<MyWalletHome> with observer.DatabaseObservabl
       floatingActionButton: Padding(
         padding: EdgeInsets.all(platform == TargetPlatform.iOS ? 10.0 : 0.0),
         child: RaisedButton(
-          onPressed: () => Navigator.pushNamed(context, routes.AddTransaction).then((updated) {
-                if (updated == true) {
-                  refreshAllView();
-                }
-              }),
+          onPressed: () => Navigator.pushNamed(context, routes.AddTransaction),
           child: Container(
             margin: EdgeInsets.all(10.0),
             child: Text(
@@ -93,14 +60,6 @@ class _MyWalletState extends State<MyWalletHome> with observer.DatabaseObservabl
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
-  }
-
-  void refreshAllView() {
-    // refresh all views
-    overviewKey.currentState.refresh();
-    monthlyDetailKey.currentState.refresh();
-    expensesKey.currentState.refresh();
-    chartKey.currentState.refresh();
   }
 }
 
