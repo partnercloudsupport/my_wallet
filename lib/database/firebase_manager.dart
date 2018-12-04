@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:my_wallet/database/data.dart';
 import 'package:my_wallet/database/database_manager.dart' as db;
 import 'package:my_wallet/database/firebase_config.dart' as fbConfig;
+import 'package:synchronized/synchronized.dart';
 
 FirebaseDatabase _database;
 bool _isInit = false;
@@ -234,90 +235,109 @@ void _onTransactionRemoved(Event event) {
 
 // ####################################################################################################
 // Account
+Lock _lock = Lock();
 Future<bool> addAccount(Account acc) async {
-  DatabaseReference _ref = _database.reference().child(_Account);
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_Account);
 
-  var result = await _ref.child("${acc.id}").runTransaction((data) async {
-    data.value = _AccountToMap(acc);
+    var result = await _ref.child("${acc.id}").runTransaction((data) async {
+      data.value = _AccountToMap(acc);
 
-    return data;
+      return data;
+    });
+
+    return result.committed;
   });
-
-  return result.committed;
 }
 
 Future<bool> updateAccount(Account acc) async {
-  DatabaseReference _ref = _database.reference().child(_Account);
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_Account);
 
-  await _ref.child("${acc.id}").update(_AccountToMap(acc));
+    await _ref.child("${acc.id}").update(_AccountToMap(acc));
 
-  return true;
+    return true;
+  });
 }
 
 Future<bool> deleteAccount(Account acc) async {
-  DatabaseReference _ref = _database.reference().child(_Account);
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_Account);
 
-  await _ref.child("${acc.id}").remove();
+    await _ref.child("${acc.id}").remove();
 
-  return true;
+    return true;
+  });
 }
 
 // ####################################################################################################
 // Transaction
 Future<bool> addTransaction(AppTransaction transaction) async {
-  DatabaseReference _ref = _database.reference().child(_Transaction);
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_Transaction);
 
-  var result = await _ref.child("${transaction.id}").runTransaction((data) async {
-    data.value = _TransactionToMap(transaction);
+    var result = await _ref.child("${transaction.id}").runTransaction((data) async {
+      data.value = _TransactionToMap(transaction);
 
-    return data;
+      return data;
+    });
+
+    return result.committed;
   });
-
-  return result.committed;
 }
 
 Future<bool> updateTransaction(AppTransaction trans) async {
-  DatabaseReference _ref = _database.reference().child(_Transaction);
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_Transaction);
 
-  await _ref.child("${trans.id}").update(_TransactionToMap(trans));
+    await _ref.child("${trans.id}").update(_TransactionToMap(trans));
 
-  return true;
+    return true;
+  });
 }
 
 Future<bool> deleteTransaction(AppTransaction trans) async {
-  DatabaseReference _ref = _database.reference().child(_Transaction);
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_Transaction);
 
-  await _ref.child("${trans.id}").remove();
+    await _ref.child("${trans.id}").remove();
 
-  return true;
+    return true;
+  });
 }
 
 // ####################################################################################################
 // Category
 Future<bool> addCategory(AppCategory cat) async {
-  DatabaseReference _ref = _database.reference().child(_Category);
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_Category);
 
-  var result = await _ref.child("${cat.id}").runTransaction((data) async {
-    data.value = _CategoryToMap(cat);
+    var result = await _ref.child("${cat.id}").runTransaction((data) async {
+      data.value = _CategoryToMap(cat);
 
-    return data;
+      return data;
+    });
+
+    return result.committed;
   });
-
-  return result.committed;
 }
 
 Future<bool> updateCategory(AppCategory cat) async {
-  DatabaseReference _ref = _database.reference().child(_Category);
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_Category);
 
-  await _ref.child("${cat.id}").update(_CategoryToMap(cat));
+    await _ref.child("${cat.id}").update(_CategoryToMap(cat));
 
-  return true;
+    return true;
+  });
 }
 
 Future<bool> deleteCategory(AppCategory cat) async {
-  DatabaseReference _ref = _database.reference().child(_Category);
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_Category);
 
-  await _ref.child("${cat.id}").remove();
+    await _ref.child("${cat.id}").remove();
 
-  return true;
+    return true;
+  });
 }

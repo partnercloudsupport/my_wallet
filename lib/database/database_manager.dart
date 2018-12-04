@@ -423,7 +423,7 @@ class _Database {
 
     await db.close();
 
-    return id + 1;
+    return id == null ? 0 : id + 1;
   }
 
   Future<List<Map<String, dynamic>>> _executeSql(String sql) async {
