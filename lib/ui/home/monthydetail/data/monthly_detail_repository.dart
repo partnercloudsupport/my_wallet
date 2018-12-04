@@ -18,8 +18,8 @@ class _HomeMonthlyDetailDatabaseRepository {
     var from = Utils.firstMomentOfMonth(DateTime.now());
     var to = Utils.lastDayOfMonth(DateTime.now());
 
-    var income = await _db.sumAllTransactionBetweenDateByType(from, to, TransactionType.Income);
-    var expenses = await _db.sumAllTransactionBetweenDateByType(from, to, TransactionType.Expenses);
+    var income = await _db.sumAllTransactionBetweenDateByType(from, to, TransactionType.Income) ?? 0;
+    var expenses = await _db.sumAllTransactionBetweenDateByType(from, to, TransactionType.Expenses) ?? 0;
 
     return HomeMonthlyDetailEntity(income, expenses, income - expenses);
   }

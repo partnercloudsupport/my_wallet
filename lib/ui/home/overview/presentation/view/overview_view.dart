@@ -31,7 +31,7 @@ class _HomeOverviewState extends State<HomeOverview> implements observer.Databas
   void _loadTotal() {
     _presenter.loadTotal().then((value) {
       setState(() {
-        _total = value;
+        _total = value ?? 0.0;
       });
     });
   }

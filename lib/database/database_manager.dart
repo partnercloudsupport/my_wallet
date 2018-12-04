@@ -48,17 +48,18 @@ Lock _lock = Lock();
 
 void registerDatabaseObservable(List<String> tables, DatabaseObservable observable) {
   if (tables != null) {
-    print("register table $tables}");
     tables.forEach((table) => _watchers.update(table,
             (curObservers) {
       if(curObservers == null) curObservers = [];
-          curObservers.add(observable);
-        }, ifAbsent: () => [observable]));
+      curObservers.add(observable);
+      }, ifAbsent: () => [observable]));
   }
 }
 
 void unregisterDatabaseObservable(List<String> tables, DatabaseObservable observable) {
-  tables ?? tables.forEach((table) => _watchers[table] ?? _watchers[table].remove(observable));
+  if(tables != null) tables.forEach((table) {
+    if(_watchers[table] != null) _watchers[table].remove(observable);
+  });
 }
 
 // ------------------------------------------------------------------------------------------------------------------------
@@ -508,7 +509,6 @@ class _Database {
   void _notifyObservers(String table) {
     var observables = _watchers[table];
 
-    print("$table : notifyObserver $observables");
     if(observables != null) {
       observables.forEach((observable) => observable.onDatabaseUpdate(table));
     }
