@@ -66,7 +66,6 @@ Future<double> sumTransactionsByDay(DateTime day, TransactionType type) async {
 
     var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startOfDay AND $endOfDay) AND $_transType = ${type.index}"));
 
-    print("Sum transactions by day $day is $sum");
     return sum[0].values.first;
 }
 
