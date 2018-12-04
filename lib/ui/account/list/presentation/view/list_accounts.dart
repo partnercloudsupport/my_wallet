@@ -91,10 +91,34 @@ class _ListAccountsState extends State<ListAccounts> {
   }
 
   void _deleteAccount(Account account) {
-    _presenter.deleteAccount(account).then((result) {
-      if(result) {
-        _loadAllAccounts();
-      }
-    });
+    showDialog(context: context, builder: (context) => AlertDialog(
+      title: Text("Delete account ${account.name}"),
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            child: Icon(Icons.warning, color: Colors.yellow, size: 36.0,),
+            padding: EdgeInsets.all(10.0),
+          ),
+          Flexible(
+            child: Text("Warning: All transactions related to this account will be remove. Are you sure to delete this account?"),
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text("Delete"),
+          onPressed: () {
+            Navigator.pop(context);
+
+            _presenter.deleteAccount(account);
+          },
+        ),
+        FlatButton(
+          child: Text("Cancel"),
+          onPressed: () => Navigator.pop(context),
+        )
+      ],
+    ));
   }
 }
