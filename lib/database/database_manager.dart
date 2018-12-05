@@ -59,13 +59,21 @@ void unregisterDatabaseObservable(List<String> tables, DatabaseObservable observ
 Future<double> sumAllTransactionBetweenDateByType(DateTime from, DateTime to, TransactionType type) async {
   var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN ${from.millisecondsSinceEpoch} AND ${to.millisecondsSinceEpoch}) AND $_transType = ${type.index}"));
 
-  return sum[0].values.first;
+  return sum[0].values.first ?? 0.0;
 }
 
-Future<double> sumAllAccountBalance() async {
-  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_accBalance) FROM $_tableAccounts"));
+Future<double> sumAllAccountBalance({List<AccountType> types}) async {
+  var where = "";
 
-  return sum[0].values.first;
+  if (types != null && types.isNotEmpty) {
+    var typeWhere = types.map((f) => "${f.index}").toString();
+
+    where = " WHERE $_accType in $typeWhere";
+  }
+
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_accBalance) FROM $_tableAccounts$where"));
+
+  return sum[0].values.first ?? 0.0;
 }
 
 Future<double> sumTransactionsByDay(DateTime day, TransactionType type) async {
@@ -74,7 +82,7 @@ Future<double> sumTransactionsByDay(DateTime day, TransactionType type) async {
 
     var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startOfDay AND $endOfDay) AND $_transType = ${type.index}"));
 
-    return sum[0].values.first;
+    return sum[0].values.first ?? 0.0;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------
