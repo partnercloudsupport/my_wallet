@@ -32,7 +32,6 @@ final _transType = "transactionType";
 final _tableCategory = tableCategory;
 final _catId = _id;
 final _catName = "_name";
-final _catTransactionType = "_transactionType";
 final _catColorHex = "_colorHex";
 
 // table budget
@@ -66,7 +65,7 @@ Future<double> sumAllAccountBalance({List<AccountType> types}) async {
   var where = "";
 
   if (types != null && types.isNotEmpty) {
-    var typeWhere = types.map((f) => "${f.index}").toString();
+    var typeWhere = types.map((f) => "${f.id}").toString();
 
     where = " WHERE $_accType in $typeWhere";
   }
@@ -97,7 +96,7 @@ Future<List<Account>> queryAccounts({int id, AccountType type}) async {
 
   if (type != null) {
     where = "$_accType = ?";
-    whereArgs = [type.index];
+    whereArgs = [type.id];
   } else if (id != null) {
     where = "$_accID = ?";
     whereArgs = [id];
@@ -145,16 +144,13 @@ Future<List<AppTransaction>> queryTransactionForAccount(int accountId) async {
   return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
 }
 
-Future<List<AppCategory>> queryCategory({int id, int transactionType}) async {
+Future<List<AppCategory>> queryCategory({int id}) async {
   String where;
   List<int> whereArg;
 
-  if (id == null && transactionType == null) {
+  if (id == null) {
     where = null;
     whereArg = null;
-  } else if (transactionType != null) {
-    where = "$_catTransactionType = ?";
-    whereArg = [transactionType];
   } else {
     where = "$_id = ?";
     whereArg = [id];
@@ -202,7 +198,6 @@ Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime 
           return AppCategory(
             f[_catId],
             f[_catName],
-            TransactionType.values[f[_catTransactionType]],
             f[_catColorHex],
             total,
           );
@@ -318,14 +313,13 @@ AppTransaction _toTransaction(Map<String, dynamic> map) {
 }
 
 Account _toAccount(Map<String, dynamic> map) {
-  return new Account(map[_accID], map[_accName], map[_accBalance], AccountType.values[map[_accType]], map[_accCurrency]);
+  return new Account(map[_accID], map[_accName], map[_accBalance], AccountType.all[map[_accType]], map[_accCurrency]);
 }
 
 AppCategory _toCategory(Map<String, dynamic> map) {
   return AppCategory(
     map[_catId],
     map[_catName],
-    TransactionType.values[map[_catTransactionType]],
     map[_catColorHex],
     0,
   );
@@ -340,14 +334,13 @@ Map<String, dynamic> _transactionToMap(AppTransaction transaction) {
 }
 
 Map<String, dynamic> _accountToMap(Account acc) {
-  return {_accID: acc.id, _accName: acc.name, _accBalance: acc.balance, _accType: acc.type.index, _accCurrency: acc.type.index};
+  return {_accID: acc.id, _accName: acc.name, _accBalance: acc.balance, _accType: acc.type.id, _accCurrency: acc.type.id};
 }
 
 Map<String, dynamic> _categoryToMap(AppCategory cat) {
   return {
     _catId: cat.id,
     _catName: cat.name,
-    _catTransactionType: cat.transactionType.index,
     _catColorHex: cat.colorHex,
   };
 }
@@ -395,7 +388,6 @@ class _Database {
         CREATE TABLE $_tableCategory (
         $_catId INTEGER PRIMARY KEY,
         $_catName TEXT NOT NULL,
-        $_catTransactionType INTEGER NOT NULL,
         $_catColorHex TEXT NOT NULL
         )
         """);

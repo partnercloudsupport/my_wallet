@@ -12,7 +12,6 @@ class CreateCategory extends StatefulWidget {
 }
 
 class _CreateCategoryState extends State<CreateCategory> {
-  TransactionType _type = TransactionType.Expenses;
   String _name = "";
 
   final CreateCategoryPresenter _presenter = CreateCategoryPresenter();
@@ -31,7 +30,6 @@ class _CreateCategoryState extends State<CreateCategory> {
       ),
       body: Column(
         children: <Widget>[
-          SelectTransactionType(_type, _onTransactionChanged),
           ListTile(
             title: TextField(
               onChanged: _onNameChanged,
@@ -49,7 +47,7 @@ class _CreateCategoryState extends State<CreateCategory> {
   }
 
   void _saveCategory() {
-    _presenter.saveCategory(_name, _type)
+    _presenter.saveCategory(_name)
     .then((value) {
       Navigator.pop(context, value);
     })
@@ -65,10 +63,6 @@ class _CreateCategoryState extends State<CreateCategory> {
         ],
       ));
     });
-  }
-
-  void _onTransactionChanged(TransactionType type) {
-    _type = type;
   }
 
   void _onNameChanged(String name) {

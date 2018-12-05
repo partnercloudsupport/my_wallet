@@ -4,7 +4,7 @@ import 'package:my_wallet/database/data.dart';
 class CreateCategoryPresenter {
   final CreateCategoryUseCase _useCase = CreateCategoryUseCase();
 
-  Future<bool> saveCategory(String name, TransactionType type) {
-    return _useCase.saveCategory(name, type);
+  Future<bool> saveCategory(String name) {
+    return _useCase.saveCategory(name);
   }
 }

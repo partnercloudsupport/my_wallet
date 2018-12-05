@@ -4,7 +4,7 @@ import 'package:my_wallet/database/data.dart';
 class ListCategoryUseCase {
   final CategoryListRepository _repo = CategoryListRepository();
 
-  Future<List<AppCategory>> loadCategories(TransactionType type) {
-    return _repo.loadCategories(type);
+  Future<List<AppCategory>> loadCategories() {
+    return _repo.loadCategories();
   }
 }

@@ -117,7 +117,7 @@ void init() async {
 Map<String, dynamic> _AccountToMap(Account acc) {
   return {
     _name: acc.name,
-    _type: acc.type.index,
+    _type: acc.type.id,
     _balance: acc.balance,
     _currency: acc.currency
   };
@@ -128,7 +128,7 @@ Account _snapshotToAccount(DataSnapshot snapshot) {
       _toId(snapshot),
       snapshot.value[_name],
       double.parse("${snapshot.value[_balance]}"),
-      AccountType.values[snapshot.value[_type]],
+      AccountType.all[snapshot.value[_type]],
       snapshot.value[_currency]
   );
 }
@@ -136,7 +136,6 @@ Account _snapshotToAccount(DataSnapshot snapshot) {
 Map<String, dynamic> _CategoryToMap(AppCategory cat) {
   return {
     _name: cat.name,
-    _transactionType: cat.transactionType.index,
     _colorHex: cat.colorHex,
     _balance: cat.balance
   };
@@ -146,7 +145,6 @@ AppCategory _snapshotToCategory(DataSnapshot snapshot) {
   return AppCategory(
       _toId(snapshot),
       snapshot.value[_name],
-      TransactionType.values[snapshot.value[_transactionType]],
       snapshot.value[_colorHex],
       double.parse("${snapshot.value[_balance]}")
   );

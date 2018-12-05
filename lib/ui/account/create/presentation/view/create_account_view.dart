@@ -13,21 +13,39 @@ class CreateAccount extends StatefulWidget {
   }
 }
 
+enum _CreateAccountSteps {
+  SelectAccountType,
+  EnterDetail
+}
+
 class _CreateAccountState extends State<CreateAccount> {
   final CreateAccountPresenter _presenter = CreateAccountPresenter();
 
-  AccountType _type = AccountType.Cash;
+  String title = "Select Account Type";
+
+  PageController _pageController = PageController(initialPage: _CreateAccountSteps.SelectAccountType.index);
+
+  AccountType _type = AccountType.paymentAccount;
   String _name = "";
 
-  GlobalKey<_AccountInitialAmountState> _accountAmountKey = GlobalKey();
+  GlobalKey<_EnterDetailState> _detailState = GlobalKey();
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
-  bool showNumberIputPad = false;
+  bool showNumberInputPad = false;
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _pageController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: MyWalletAppBar(
-        title: "Create Account",
+        title: title,
         actions: <Widget>[
           FlatButton(
             child: Text("Save"),
@@ -35,43 +53,51 @@ class _CreateAccountState extends State<CreateAccount> {
           )
         ],
       ),
-      body: Stack(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              AccountTypeSelection(_type, _onTransactionTypeChanged),
-              ListTile(
-                title: TextField(
-                  onChanged: _onAccountNameChanged,
-                  onTap: () {
-                    if(showNumberIputPad) {
-                      setState(() {
-                        showNumberIputPad = false;
-                      });
-                    }
-                  },
-                  decoration: InputDecoration(
-                    hintText: "Account Name",
-                    hintStyle: Theme.of(context).textTheme.subhead.apply(color: theme.blueGrey),
-                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: theme.darkBlue, width: 1.0)),
-                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: theme.darkBlue, width: 1.0)),
-                  ),
-                ),
-              ),
-              _AccountInitialAmount(_accountAmountKey, _toggleNumberInputPad),
-            ],
+      body: Container(
+          decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+                theme.darkBlue,
+                theme.darkBlue.withOpacity(0.9),
+              ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight)
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: showNumberIputPad ? NumberInputPad(_onAmountChanged, _accountAmountKey.currentState == null ? "" : _accountAmountKey.currentState._number, _accountAmountKey.currentState == null ? "" : _accountAmountKey.currentState._decimal) : null,
-          )
-        ],
-      )
+    child: PageView.builder(
+        physics:new NeverScrollableScrollPhysics(),
+        controller: _pageController,
+        itemCount: _CreateAccountSteps.values.length,
+        itemBuilder: _createAccountPage)
+      ),
     );
   }
 
+  Widget _createAccountPage(BuildContext context, int index) {
+    _CreateAccountSteps step = _CreateAccountSteps.values[index];
+
+    switch(step) {
+      case _CreateAccountSteps.SelectAccountType: return _SelectAccountType(_onAccountSelected);
+      default: return _EnterDetail(_detailState, _type, _onAccountChangeRequest);
+    }
+  }
+
+  void _onAccountChangeRequest() {
+    _pageController.previousPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+  }
+
+  void _onAccountSelected(AccountType type) {
+    _type = type;
+    if(_detailState != null && _detailState.currentState != null) _detailState.currentState.setType(_type);
+
+    _pageController.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease)
+    .then((_) {
+      setState(() {
+        title = "Enter Account Detail";
+      });
+    });
+  }
+
   void _saveAccount() {
-    _presenter.saveAccount(_type, _name, _accountAmountKey.currentState._getAmount())
+    _presenter.saveAccount(_type, _name, _detailState.currentState._getAmount())
     .then((result) {
       Navigator.pop(context, result);
 //    })
@@ -88,74 +114,193 @@ class _CreateAccountState extends State<CreateAccount> {
 //      ));
     });
   }
-
-  void _onTransactionTypeChanged(AccountType type) {
-    _type = type;
-  }
-
-  void _onAccountNameChanged(String name) {
-    _name = name;
-  }
-
-  void _onAmountChanged(String number, String decimal) {
-    _accountAmountKey.currentState.update(number, decimal);
-  }
-
-  void _toggleNumberInputPad() {
-    setState(() {
-      showNumberIputPad = !showNumberIputPad;
-    });
-  }
 }
 
-class _AccountInitialAmount extends StatefulWidget {
-  final Function _onTap;
+class _SelectAccountType extends StatelessWidget {
+  final ValueChanged<AccountType> _onAccountSelected;
 
-  _AccountInitialAmount(key, this._onTap) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() {
-    return _AccountInitialAmountState();
-  }
-}
-
-class _AccountInitialAmountState extends State<_AccountInitialAmount> {
-  NumberFormat _nf = NumberFormat("#,##0.00");
-  String _number;
-  String _decimal;
+  _SelectAccountType(this._onAccountSelected);
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Center(
+        child: ListView(
+            shrinkWrap: true,
+            children: AccountType.all.map((f) => InkWell(
+              child: Container(
+                padding: EdgeInsets.all(10.0),
+                alignment: Alignment.center,
+                child: Text(f.name, style: Theme.of(context).textTheme.headline.apply(color: Colors.white),),
+              ),
+              onTap: () => _onAccountSelected(f),
+            ),).toList()
+        ),
+    );
+  }
+}
+
+class _EnterDetail extends StatefulWidget {
+  final AccountType _type;
+  final VoidCallback _onAccountChangeRequest;
+
+  _EnterDetail(key, this._type, this._onAccountChangeRequest) : super(key : key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _EnterDetailState();
+  }
+}
+
+class _EnterDetailState extends State<_EnterDetail> {
+  AccountType _type;
+  String _name;
+
+  TextEditingController _nameTextController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _type = widget._type;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: <Widget>[
+        _accountType(),
+        _accountName(),
+        _initialAmount(),
+      ],
+    );
+  }
+
+  Widget _accountType() {
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child: Row(
         children: <Widget>[
-          Text("Initial Amount"),
-          InkWell(
-            child: Text(formatAmount(_number, _decimal), style: Theme.of(context).textTheme.title.apply(color: theme.darkBlue, fontSizeFactor: 1.5 ),),
-            onTap: widget._onTap,
+          Text("Your new account is type", style: Theme.of(context).textTheme.subhead.apply(color: Colors.white.withOpacity(0.9)),),
+          FlatButton(
+            child: Text(_type.name, style: Theme.of(context).textTheme.headline.apply(color: Colors.white),),
+            onPressed: widget._onAccountChangeRequest,
           )
         ],
       ),
     );
   }
 
-  String formatAmount(String number, String decimal) {
-    return "\$${_nf.format(_toNumber(number, decimal))}";
+  Widget _initialAmount() {
+    return Container(
+      alignment: Alignment.center,
+      padding: EdgeInsets.all(10.0),
+      child: Text("\$0.0", style: Theme.of(context).textTheme.display2),
+    );
   }
 
-  double _toNumber(String number, String decimal) {
-    return double.parse("${number == null || number.isEmpty ? "0" : number}.${decimal == null || decimal.isEmpty ? "0" : decimal}");
+  Widget _accountName() {
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child: Row(
+        children: <Widget>[
+          Text("with name", style: Theme.of(context).textTheme.subhead.apply(color: Colors.white.withOpacity(0.9)),),
+          FlatButton(
+            child: Text(_name == null || _name.isEmpty ? "Account name" : _name, style: Theme.of(context).textTheme.headline.apply(color: Colors.white),),
+            onPressed: () => showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text("Enter your account name", style: Theme.of(context).textTheme.title.apply(color: Colors.white),),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                  content: TextField(
+                    controller: _nameTextController,
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: theme.tealAccent)),
+                      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: theme.tealAccent)),
+                      border: UnderlineInputBorder(borderSide: BorderSide(color: theme.tealAccent))
+                    ),
+                  ),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("Cancel", style: TextStyle(color: Colors.white.withOpacity(0.5)),),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    FlatButton(
+                      child: Text("Choose this name"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          _name = _nameTextController.text;
+                        });
+                      },
+                    )
+                  ],
+                )
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  void setType(AccountType type) {
+    setState(() {
+      _type = type;
+    });
   }
 
   double _getAmount() {
-    return _toNumber(_number, _decimal);
-  }
-
-  void update(String number, String decimal) {
-    setState(() {
-      _number = number == null ? "" : number;
-      _decimal = decimal == null ? "" : decimal;
-    });
+    return 0.0;
   }
 }
+
+//class _AccountInitialAmount extends StatefulWidget {
+//  final Function _onTap;
+//
+//  _AccountInitialAmount(key, this._onTap) : super(key: key);
+//
+//  @override
+//  State<StatefulWidget> createState() {
+//    return _AccountInitialAmountState();
+//  }
+//}
+//
+//class _AccountInitialAmountState extends State<_AccountInitialAmount> {
+//  NumberFormat _nf = NumberFormat("#,##0.00");
+//  String _number;
+//  String _decimal;
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return ListTile(
+//      title: Row(
+//        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//        children: <Widget>[
+//          Text("Initial Amount"),
+//          InkWell(
+//            child: Text(formatAmount(_number, _decimal), style: Theme.of(context).textTheme.title.apply(color: theme.darkBlue, fontSizeFactor: 1.5 ),),
+//            onTap: widget._onTap,
+//          )
+//        ],
+//      ),
+//    );
+//  }
+//
+//  String formatAmount(String number, String decimal) {
+//    return "\$${_nf.format(_toNumber(number, decimal))}";
+//  }
+//
+//  double _toNumber(String number, String decimal) {
+//    return double.parse("${number == null || number.isEmpty ? "0" : number}.${decimal == null || decimal.isEmpty ? "0" : decimal}");
+//  }
+//
+//  double _getAmount() {
+//    return _toNumber(_number, _decimal);
+//  }
+//
+//  void update(String number, String decimal) {
+//    setState(() {
+//      _number = number == null ? "" : number;
+//      _decimal = decimal == null ? "" : decimal;
+//    });
+//  }
+//}

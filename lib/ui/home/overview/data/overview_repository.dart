@@ -13,9 +13,9 @@ class HomeOverviewRepository {
 class _HomeOverviewDatabaseRepository {
   Future<double> loadTotal() async {
     return await _db.sumAllAccountBalance(types: [
-      AccountType.Cash,
-      AccountType.Credit,
-      AccountType.Saving
-    ]) - await _db.sumAllAccountBalance(types: [AccountType.Loan]);
+      AccountType.paymentAccount,
+      AccountType.credit,
+      AccountType.assets
+    ]) - await _db.sumAllAccountBalance(types: [AccountType.liability]);
   }
 }

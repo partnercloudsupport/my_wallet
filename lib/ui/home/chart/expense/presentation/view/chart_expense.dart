@@ -44,6 +44,7 @@ class _ExpenseChartState extends State<ExpenseChart> implements observer.Databas
         ? Center(child: Text("No Expense found", style: Theme.of(context).textTheme.title,),)
         : PieChart([
           Series<ExpenseEntity, double>(
+              id: "_expenses",
               data: expenses,
               measureFn: (data, index) => data.amount,
               domainFn: (data, index) => data.amount,

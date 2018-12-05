@@ -1,7 +1,7 @@
 // This is a generated file; do not edit or check into version control.
 FLUTTER_ROOT=/Users/744486/flutter
-FLUTTER_APPLICATION_PATH=/Users/744486/Documents/my_wallet
-FLUTTER_TARGET=/Users/744486/Documents/my_wallet/lib/main.dart
+FLUTTER_APPLICATION_PATH=/Users/744486/AndroidStudioProjects/my_wallet
+FLUTTER_TARGET=/Users/744486/AndroidStudioProjects/my_wallet/lib/main.dart
 FLUTTER_BUILD_DIR=build
 SYMROOT=${SOURCE_ROOT}/../build/ios
 FLUTTER_FRAMEWORK_DIR=/Users/744486/flutter/bin/cache/artifacts/engine/ios

@@ -71,7 +71,7 @@ class _ExpensesState extends State<Expenses> implements observer.DatabaseObserva
             child: ListTile(
               title: Text(_expensesList[index].name, style: TextStyle(color: theme.darkBlue),),
               leading: Icon(Icons.map, color: theme.darkBlue,),
-              trailing: Text("\$${_expensesList[index].amount}", style: TextStyle(color: _expensesList[index].type == TransactionType.Expenses ? theme.pinkAccent : theme.tealAccent),),
+              trailing: Text("\$${_expensesList[index].amount}", style: TextStyle(color: theme.tealAccent),),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionList("${_expensesList[index].name}", categoryId: _expensesList[index].categoryId,))),
             ),
             color: index % 2 == 0 ? Color(0xFFDADADA) : Colors.white,

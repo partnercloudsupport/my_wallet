@@ -15,6 +15,6 @@ class _ExpensesDatabaseRepository {
   Future<List<ExpeneseEntity>> loadExpenses() async {
     List<AppCategory> cats = await _db.queryCategoryWithTransaction(from: Utils.firstMomentOfMonth(DateTime.now()), to: Utils.lastDayOfMonth(DateTime.now()), filterZero: true);
 
-    return cats == null ? [] : cats.map((f) => ExpeneseEntity(f.id, f.name, f.balance, f.transactionType, f.colorHex)).toList();
+    return cats == null ? [] : cats.map((f) => ExpeneseEntity(f.id, f.name, f.balance, f.colorHex)).toList();
   }
 }

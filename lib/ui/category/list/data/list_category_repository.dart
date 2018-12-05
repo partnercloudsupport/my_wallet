@@ -4,16 +4,13 @@ import 'package:my_wallet/database/data.dart';
 class CategoryListRepository {
   final _CategoryListDatabaseRepository _dbRepo = _CategoryListDatabaseRepository();
 
-  Future<List<AppCategory>> loadCategories(TransactionType type) {
-    return _dbRepo.loadCategories(type);
+  Future<List<AppCategory>> loadCategories() {
+    return _dbRepo.loadCategories();
   }
 }
 
 class _CategoryListDatabaseRepository {
-  Future<List<AppCategory>> loadCategories(TransactionType type) async {
-    if (type == null) {
+  Future<List<AppCategory>> loadCategories() async {
       return await db.queryCategory();
-    }
-    return await db.queryCategory(transactionType: type.index);
   }
 }

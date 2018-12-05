@@ -16,16 +16,12 @@ class CreateCategoryRepository {
     return _dbRepo._generateRandomColor();
   }
 
-  Future<bool> saveCategory(int id, String name, TransactionType type, String color) {
-    return _fbRepo.saveCategory(id, name, type, color);
+  Future<bool> saveCategory(int id, String name, String color) {
+    return _fbRepo.saveCategory(id, name, color);
   }
 
   Future<bool> validateName(String name) async {
     return _dbRepo.validateName(name);
-  }
-
-  Future<bool> validateType(TransactionType type) async {
-    return _dbRepo.validateType(type);
   }
 }
 
@@ -33,10 +29,6 @@ class _CreateCategoryDatabaseRepository {
 
   Future<bool> validateName(String name) async {
     return name == null || name.isEmpty ? throw CreateCategoryException("Please enter Category name") : true;
-  }
-
-  Future<bool> validateType(TransactionType type) async {
-    return type == null ? throw CreateCategoryException("Please select Category type") : true;
   }
 
   Future<int> generateId() {
@@ -58,7 +50,7 @@ class _CreateCategoryDatabaseRepository {
 }
 
 class _CreateCategoryFirebaseRepository {
-  Future<bool> saveCategory(int id, String name, TransactionType type, String color) {
-    return fm.addCategory(AppCategory(id, name, type, color, 0.0));
+  Future<bool> saveCategory(int id, String name, String color) {
+    return fm.addCategory(AppCategory(id, name, color, 0.0));
   }
 }

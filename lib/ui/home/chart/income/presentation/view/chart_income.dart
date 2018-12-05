@@ -44,6 +44,7 @@ class _IncomeChartState extends State<IncomeChart> implements observer.DatabaseO
         : PieChart(
           [
             Series<IncomeEntity, double>(
+                id: "_income",
                 data: incomes,
                 measureFn: (data, index) => data.amount,
                 domainFn: (data, index) => data.amount,

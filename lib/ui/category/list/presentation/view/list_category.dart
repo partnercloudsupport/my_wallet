@@ -87,7 +87,7 @@ class _CategoryListState extends State<CategoryList> {
   }
 
   void _loadCategories() {
-    _presenter.loadCategories(widget._type).then((value) {
+    _presenter.loadCategories().then((value) {
       if (value != null) {
         setState(() {
           _categories = value;

@@ -1,17 +1,32 @@
 // #############################################################################################################################
 // classes to be used in database
 // #############################################################################################################################
-enum AccountType {
-  Saving,
-  Cash,
-  Credit,
-  Loan,
-  Assets
+class AccountType {
+  final String name;
+  final int id;
+  AccountType(this.id, this.name);
+
+  static final List<AccountType> all =[
+    paymentAccount,
+    credit,
+    assets,
+    liability
+  ];
+
+  static final AccountType paymentAccount = AccountType(0, "Payment Account");
+  static final AccountType credit = AccountType(1, "Credit");
+  static final AccountType assets = AccountType(2, "Assets");
+  static final AccountType liability = AccountType(3, "Liability");
 }
 
 enum TransactionType {
+  Expenses,
   Income,
-  Expenses
+  MoneyTransfer,
+  AssetPurchase,
+  AssetSale,
+  LiabilityAcquisition,
+  DischargeOfLiability
 }
 
 class Account {
@@ -53,14 +68,12 @@ class AppTransaction {
 class AppCategory {
   final int id;
   final String name;
-  final TransactionType transactionType;
   final String colorHex;
   final double balance;
 
   const AppCategory(
       this.id,
       this.name,
-      this.transactionType,
       this.colorHex,
       this.balance
       );
