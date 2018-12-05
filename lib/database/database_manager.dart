@@ -47,19 +47,11 @@ _Database db = _Database();
 Lock _lock = Lock();
 
 void registerDatabaseObservable(List<String> tables, DatabaseObservable observable) {
-  if (tables != null) {
-    tables.forEach((table) => _watchers.update(table,
-            (curObservers) {
-      if(curObservers == null) curObservers = [];
-      curObservers.add(observable);
-      }, ifAbsent: () => [observable]));
-  }
+  _lock.synchronized(() => db.registerDatabaseObservable(tables, observable));
 }
 
 void unregisterDatabaseObservable(List<String> tables, DatabaseObservable observable) {
-  if(tables != null) tables.forEach((table) {
-    if(_watchers[table] != null) _watchers[table].remove(observable);
-  });
+  _lock.synchronized(() => db.unregisterDatabaseObservable(tables, observable));
 }
 
 // ------------------------------------------------------------------------------------------------------------------------
@@ -360,9 +352,13 @@ Map<String, dynamic> _bugetToMap(Budget budget) {
 // #############################################################################################################################
 // private database handler
 // #############################################################################################################################
-Map<String, List<DatabaseObservable>> _watchers = {};
 class _Database {
   Database db;
+//  Map<String, List<DatabaseObservable>> _watchers = {};
+  List<DatabaseObservable> _accountWatchers = [];
+  List<DatabaseObservable> _categoryWatchers = [];
+  List<DatabaseObservable> _transactionWatchers = [];
+  List<DatabaseObservable> _budgetWatchers  = [];
 
   Future<Database> _openDatabase() async {
     String dbPath = join((await getApplicationDocumentsDirectory()).path, "MyWalletDb");
@@ -507,10 +503,39 @@ class _Database {
   }
 
   void _notifyObservers(String table) {
-    var observables = _watchers[table];
+    switch(table) {
+      case tableAccount: _accountWatchers.forEach((w) => w.onDatabaseUpdate(table)); break;
+      case tableCategory: _categoryWatchers.forEach((w) => w.onDatabaseUpdate(table)); break;
+      case tableTransactions: _transactionWatchers.forEach((w) => w.onDatabaseUpdate(table)); break;
+      case tableBudget: _budgetWatchers.forEach((w) => w.onDatabaseUpdate(table)); break;
+      }
+  }
 
-    if(observables != null) {
-      observables.forEach((observable) => observable.onDatabaseUpdate(table));
+  void registerDatabaseObservable(List<String> tables, DatabaseObservable observable) {
+    if (tables != null) {
+    tables.forEach((f) {
+      switch(f) {
+        case tableAccount: _accountWatchers.add(observable); break;
+        case tableCategory: _categoryWatchers.add(observable); break;
+        case tableTransactions: _transactionWatchers.add(observable); break;
+        case tableBudget: _budgetWatchers.add(observable); break;
+      }
+    });
+    }
+
+  }
+
+  void unregisterDatabaseObservable(List<String> tables, DatabaseObservable observable) {
+
+    if(tables != null) {
+      tables.forEach((f) {
+        switch(f) {
+          case tableAccount: _accountWatchers.remove(observable); break;
+          case tableCategory: _categoryWatchers.remove(observable); break;
+          case tableTransactions: _transactionWatchers.remove(observable); break;
+          case tableBudget: _budgetWatchers.remove(observable); break;
+        }
+      });
     }
   }
 }

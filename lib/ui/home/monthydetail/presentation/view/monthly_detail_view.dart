@@ -92,7 +92,7 @@ class _HomeMonthlyDetailState extends State<HomeMonthlyDetail> implements observ
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text("Balance", style: widget.titleSTyle,),
+                    Text("Saving", style: widget.titleSTyle,),
                     Text("\$${_dataEntity.balance}", style: Theme.of(context).textTheme.headline.apply(color: (_dataEntity.balance > 0) ? Colors.greenAccent : theme.pinkAccent),)
                   ],
                 ),
