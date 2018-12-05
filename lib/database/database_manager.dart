@@ -379,7 +379,7 @@ class _Database {
           $_transAcc INTEGER NOT NULL,
           $_transCategory INTEGER NOT NULL,
           $_transAmount DOUBLE NOT NULL,
-          $_transDesc TEXT NOT NULL,
+          $_transDesc TEXT,
           $_transType INTEGER NOT NULL
           )""");
 

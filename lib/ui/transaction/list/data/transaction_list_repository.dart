@@ -20,17 +20,41 @@ class _TransactionListDatabaseRepository {
       int categoryId,
       DateTime day
       ) async {
+    List<AppTransaction> transactions = [];
     if(accountId != null) {
-      return await db.queryTransactionForAccount(accountId);
+      transactions = await db.queryTransactionForAccount(accountId);
     }
 
     if(categoryId != null) {
-      return await db.queryTransactionForCategory(categoryId);
+      transactions = await db.queryTransactionForCategory(categoryId);
     }
 
     if(day != null) {
-      return await db.queryTransactionsBetweenDates(Utils.startOfDay(day), Utils.endOfDay(day));
+      transactions = await db.queryTransactionsBetweenDates(Utils.startOfDay(day), Utils.endOfDay(day));
     }
-    return [];
+
+    // update category names to transactions which does not have description
+    List<AppTransaction> noDesc = transactions.where((f) => f.desc == null || f.desc.isEmpty).toList();
+
+    if(noDesc != null && noDesc.isNotEmpty) {
+      transactions.removeWhere((f) => f.desc == null || f.desc.isEmpty);
+
+      if(categoryId != null) {
+        var cat = await db.queryCategory(id: categoryId);
+
+        noDesc.forEach((f) => transactions.add(AppTransaction(f.id, f.dateTime, f.accountId, f.categoryId, f.amount, cat[0].name, f.type)));
+      } else {
+        for (int i = 0; i < noDesc.length; i++) {
+          var cat = await db.queryCategory(id: noDesc[i].categoryId);
+
+          transactions.add(AppTransaction(noDesc[i].id, noDesc[i].dateTime, noDesc[i].accountId, noDesc[i].categoryId, noDesc[i].amount, cat[0].name, noDesc[i].type));
+        }
+      }
+    }
+
+    // sort transactions by date
+    transactions.sort((a, b) => a.dateTime.millisecondsSinceEpoch - b.dateTime.millisecondsSinceEpoch);
+
+    return transactions;
   }
 }
