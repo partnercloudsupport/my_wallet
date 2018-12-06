@@ -27,19 +27,16 @@ class _ChartRowState extends State<ChartRow> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        alignment: Alignment.center,
-        child: Column(
-          children: <Widget>[
-            ChartTitleView(_tabController,),
-            Container(
-              height: MediaQuery.of(context).size.height * 0.3,
-              child: TabBarView(controller: _tabController, children: [IncomeChart(), ExpenseChart(), SavingChartView()]),
-            )
-          ],
-        ),
+    return Container(
+      alignment: Alignment.center,
+      child: Column(
+        children: <Widget>[
+          ChartTitleView(_tabController,),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.3,
+            child: TabBarView(controller: _tabController, children: [IncomeChart(), ExpenseChart(), SavingChartView()]),
+          )
+        ],
       ),
     );
   }
