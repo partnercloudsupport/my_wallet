@@ -5,10 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:my_wallet/ui/home/overview/presentation/view/overview_view.dart';
 import 'package:my_wallet/ui/home/chart/chart_row_view.dart';
 import 'package:my_wallet/routes.dart' as routes;
-import 'package:my_wallet/ui/home/main/data/main_home_entity.dart';
-import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
-
-import 'package:my_wallet/ui/home/main/presentation/presenter/main_home_presenter.dart';
+import 'package:my_wallet/ui/home/expenseslist/data/expense_list_entity.dart';
+import 'package:my_wallet/ui/home/expenseslist/presentation/view/expense_list_view.dart';
 
 class MyWalletHome extends StatefulWidget {
   @override
@@ -19,25 +17,11 @@ class MyWalletHome extends StatefulWidget {
 
 class _MyWalletState extends State<MyWalletHome> {
 
-  final HomePresenter _presenter = HomePresenter();
-
-  TextStyle titleSTyle = TextStyle(color: theme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
-  List<HomeEntity> homeEntities = [];
+  TextStyle titleStyle = TextStyle(color: theme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
+  List<ExpenseEntity> homeEntities = [];
 
   DateFormat _df = DateFormat("MMM, yyyy");
-  NumberFormat _nf = NumberFormat("\$#,##0.00");
 
-  @override
-  void initState() {
-    super.initState();
-
-    _presenter.loadHome().then((value) {
-      setState(() {
-        print("Home loaded ${value.length}");
-        homeEntities = value;
-      });
-    });
-  }
   @override
   Widget build(BuildContext context) {
     var platform = Theme.of(context).platform;
@@ -74,7 +58,7 @@ class _MyWalletState extends State<MyWalletHome> {
         background: ListView(
           physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
-            HomeOverview(titleSTyle),
+            HomeOverview(titleStyle),
             ChartRow(),
           ],
         ),
@@ -82,21 +66,13 @@ class _MyWalletState extends State<MyWalletHome> {
     ));
 
     list.add(
-        SliverFillRemaining(
-          child: ListView(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                children: homeEntities.map((f) => ListTile(
-                  title: Text(f.name, style: TextStyle(color: theme.darkBlue),),
-                  leading: Icon(Icons.map, color: theme.darkBlue,),
-                  trailing: Text(_nf.format(f.amount), style: TextStyle(color: theme.tealAccent),),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionList(f.name, categoryId: f.categoryId,))),
-                )).toList(),
-              ),
-          ),
+      SliverFillRemaining(
+        child: ExpensesListView(),
+      ),
     );
+
     return CustomScrollView(
-      slivers: list
+        slivers: list
     );
   }
 }

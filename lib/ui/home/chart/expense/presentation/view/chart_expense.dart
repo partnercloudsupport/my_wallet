@@ -35,7 +35,6 @@ class _ExpenseChartState extends State<ExpenseChart> implements observer.Databas
   void dispose() {
     super.dispose();
 
-    print("dispose chart expenses");
     observer.unregisterDatabaseObservable(databaseWatch, this);
   }
 

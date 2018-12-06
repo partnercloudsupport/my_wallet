@@ -46,10 +46,6 @@ class _TransactionDateState extends State<TransactionDate> {
                 fontWeight: FontWeight.bold
             ),),
           ),
-
-          IconButton(icon: Icon(Icons.category, color: theme.blueGrey,), onPressed: () {
-            print("open category list");
-          },)
         ],
       ),
     );

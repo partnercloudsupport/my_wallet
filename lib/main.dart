@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:my_wallet/app_theme.dart' as theme;
 
-import 'package:my_wallet/ui/home/main/presentation/view/main_home_view.dart';
+import 'package:my_wallet/ui/home/home_view.dart';
 import 'package:my_wallet/my_wallet_view.dart';
 import 'package:my_wallet/routes.dart' as routes;
 import 'package:my_wallet/database/data.dart';

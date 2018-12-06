@@ -82,7 +82,7 @@ class _CategoryListState extends State<CategoryList> {
         ),
         alignment: Alignment.center,
       ),
-      onTap: () => widget.returnValue == false ? Navigator.pop(context, category) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(category.name, categoryId: category.id,))) ,
+      onTap: () => widget.returnValue == true ? Navigator.pop(context, category) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(category.name, categoryId: category.id,))) ,
     );
   }
 
