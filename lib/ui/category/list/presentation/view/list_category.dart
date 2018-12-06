@@ -9,6 +9,8 @@ import 'package:my_wallet/ui/category/list/presentation/presenter/list_category_
 
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
+import 'package:my_wallet/ca/presentation/view/ca_state.dart';
+import 'package:my_wallet/ui/category/list/presentation/view/list_category_data_view.dart';
 
 class CategoryList extends StatefulWidget {
   final String _title;
@@ -22,11 +24,17 @@ class CategoryList extends StatefulWidget {
   }
 }
 
-class _CategoryListState extends State<CategoryList> {
-  final ListCategoryPresenter _presenter = ListCategoryPresenter();
+class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategoryPresenter> implements CategoryListDataView {
+  _CategoryListState() : super(ListCategoryPresenter());
+
   List<AppCategory> _categories = [];
 
   var isEditMode = false;
+
+  @override
+  void init() {
+    presenter.dataView = this;
+  }
 
   @override
   void initState() {
@@ -87,12 +95,12 @@ class _CategoryListState extends State<CategoryList> {
   }
 
   void _loadCategories() {
-    _presenter.loadCategories().then((value) {
-      if (value != null) {
-        setState(() {
-          _categories = value;
-        });
-      }
+    presenter.loadCategories();
+  }
+
+  void onCategoriesLoaded(List<AppCategory> value) {
+    if(value != null) setState(() {
+      _categories = value;
     });
   }
 }
