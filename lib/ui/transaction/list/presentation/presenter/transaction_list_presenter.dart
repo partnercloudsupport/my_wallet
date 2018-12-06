@@ -1,14 +1,16 @@
 import 'package:my_wallet/database/data.dart';
 import 'package:my_wallet/ui/transaction/list/domain/transaction_list_use_case.dart';
+import 'package:my_wallet/ca/presentation/presenter/ca_presenter.dart';
+import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_data_view.dart';
 
-class TransactionListPresenter {
-  final TransactionListUseCase _useCase = TransactionListUseCase();
+class TransactionListPresenter extends CleanArchitecturePresenter<TransactionListUseCase, TransactionListDataView>{
+  TransactionListPresenter() : super(TransactionListUseCase());
 
-  Future<List<AppTransaction>> loadDataFor(
+  void loadDataFor(
       int accountId,
       int categoryId,
       DateTime day
       ) {
-    return _useCase.loadDataFor(accountId, categoryId, day);
+    return useCase.loadDataFor(accountId, categoryId, day, dataView.onTransactionListLoaded);
   }
 }

@@ -1,8 +1,9 @@
 import 'package:my_wallet/database/database_manager.dart' as db;
 import 'package:my_wallet/database/data.dart';
 import 'package:my_wallet/utils.dart' as Utils;
+import 'package:my_wallet/ca/data/ca_repository.dart';
 
-class TransactionListRepository {
+class TransactionListRepository extends CleanArchitectureRepository {
   final _TransactionListDatabaseRepository _dbRepo = _TransactionListDatabaseRepository();
 
   Future<List<AppTransaction>> loadDataFor(

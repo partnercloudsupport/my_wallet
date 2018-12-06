@@ -4,6 +4,8 @@ import 'package:my_wallet/database/data.dart';
 import 'package:my_wallet/my_wallet_view.dart';
 import 'package:intl/intl.dart';
 import 'package:my_wallet/app_theme.dart' as theme;
+import 'package:my_wallet/ca/presentation/view/ca_state.dart';
+import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_data_view.dart';
 
 class TransactionList extends StatefulWidget {
   final String title;
@@ -19,8 +21,8 @@ class TransactionList extends StatefulWidget {
   }
 }
 
-class _TransactionListState extends State<TransactionList> {
-  final TransactionListPresenter _presenter = TransactionListPresenter();
+class _TransactionListState extends CleanArchitectureView<TransactionList, TransactionListPresenter> implements TransactionListDataView {
+  _TransactionListState() : super(TransactionListPresenter());
 
   List<AppTransaction> entities = [];
 
@@ -28,14 +30,15 @@ class _TransactionListState extends State<TransactionList> {
   DateFormat df = DateFormat("dd MMM, yyyy");
 
   @override
+  void init() {
+    presenter.dataView = this;
+  }
+
+  @override
   void initState() {
     super.initState();
 
-    _presenter.loadDataFor(widget.accountId, widget.categoryId, widget.day).then((data) {
-      setState(() {
-        entities = data ?? [];
-      });
-    });
+    presenter.loadDataFor(widget.accountId, widget.categoryId, widget.day);
   }
 
   @override
@@ -56,5 +59,12 @@ class _TransactionListState extends State<TransactionList> {
           )
       ),
     );
+  }
+
+  @override
+  void onTransactionListLoaded(List<AppTransaction> value) {
+    setState(() {
+      this.entities = value;
+    });
   }
 }

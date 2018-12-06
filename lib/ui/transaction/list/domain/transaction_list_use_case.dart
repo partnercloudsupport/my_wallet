@@ -1,14 +1,16 @@
 import 'package:my_wallet/database/data.dart';
 import 'package:my_wallet/ui/transaction/list/data/transaction_list_repository.dart';
+import 'package:my_wallet/ca/domain/ca_use_case.dart';
 
-class TransactionListUseCase {
-  final TransactionListRepository _repo = TransactionListRepository();
+class TransactionListUseCase extends CleanArchitectureUseCase<TransactionListRepository>{
+  TransactionListUseCase() : super(TransactionListRepository());
 
-  Future<List<AppTransaction>> loadDataFor(
+  void loadDataFor(
       int accountId,
       int categoryId,
-      DateTime day
+      DateTime day,
+      onNext<List<AppTransaction>> next
       ) {
-    return _repo.loadDataFor(accountId, categoryId, day);
+    repo.loadDataFor(accountId, categoryId, day).then((value) => next(value));
   }
 }
