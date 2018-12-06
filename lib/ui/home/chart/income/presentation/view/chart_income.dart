@@ -54,7 +54,21 @@ class _IncomeChartState extends State<IncomeChart> implements observer.DatabaseO
           ],
           animate: false,
           defaultRenderer: ArcRendererConfig(
-              arcRendererDecorators: [ ArcLabelDecorator() ]
+              arcRendererDecorators: [ ArcLabelDecorator(
+                  labelPosition: ArcLabelPosition.auto,
+                  outsideLabelStyleSpec: TextStyleSpec(
+                      color: Color.fromHex(code: "#FFFFFF"),
+                      fontSize: 14
+                  ),
+                  insideLabelStyleSpec: TextStyleSpec(
+                      color: Color.fromHex(code: "#FFFFFF"),
+                      fontSize: 14
+                  ),
+                  leaderLineStyleSpec: ArcLabelLeaderLineStyleSpec(
+                      color: Color.fromHex(code: "#FFFFFF"),
+                      thickness: 2.0,
+                      length: 24.0
+                  )              ) ]
           ),
     );
   }
