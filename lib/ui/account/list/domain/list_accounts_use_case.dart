@@ -1,14 +1,15 @@
 import 'package:my_wallet/ui/account/list/data/list_accounts_repository.dart';
 import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/ca/domain/ca_use_case.dart';
 
-class ListAccountsUseCase {
-  final ListAccountsRepository _repo = ListAccountsRepository();
+class ListAccountsUseCase extends CleanArchitectureUseCase<ListAccountsRepository>{
+  ListAccountsUseCase() : super(ListAccountsRepository());
 
-  Future<List<Account>> loadAllAccounts() {
-    return _repo.loadAllAccounts();
+  void loadAllAccounts(onNext<List<Account>> next) async {
+    return repo.loadAllAccounts().then((value) => next(value));
   }
 
-  Future<bool> deleteAccount(Account acc) {
-    return _repo.deleteAccount(acc);
+  void deleteAccount(Account acc, onNext<bool> next) async {
+    return repo.deleteAccount(acc).then((result) => next(result));
   }
 }

@@ -1,14 +1,16 @@
 import 'package:my_wallet/ui/account/list/domain/list_accounts_use_case.dart';
 import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/ca/presentation/presenter/ca_presenter.dart';
+import 'package:my_wallet/ui/account/list/presentation/view/list_account_dataview.dart';
 
-class ListAccountsPresenter {
-  final ListAccountsUseCase _useCase = ListAccountsUseCase();
+class ListAccountsPresenter extends CleanArchitecturePresenter<ListAccountsUseCase, ListAccountDataView>{
+  ListAccountsPresenter() : super(ListAccountsUseCase());
 
-  Future<List<Account>> loadAllAccounts() {
-    return _useCase.loadAllAccounts();
+  void loadAllAccounts() {
+    return useCase.loadAllAccounts(dataView.onAccountListLoaded);
   }
 
-  Future<bool> deleteAccount(Account acc) {
-    return _useCase.deleteAccount(acc);
+  void deleteAccount(Account acc) async {
+    return useCase.deleteAccount(acc, (_) {});
   }
 }

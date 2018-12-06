@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:my_wallet/ui/account/list/presentation/presenter/list_accounts_presenter.dart';
 import 'package:my_wallet/routes.dart' as routes;
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
+import 'package:my_wallet/ca/presentation/view/ca_state.dart';
+import 'package:my_wallet/ui/account/list/presentation/view/list_account_dataview.dart';
 
 class ListAccounts extends StatefulWidget {
   final String _title;
@@ -20,12 +22,18 @@ class ListAccounts extends StatefulWidget {
   }
 }
 
-class _ListAccountsState extends State<ListAccounts> {
-  final ListAccountsPresenter _presenter = ListAccountsPresenter();
+class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccountsPresenter> implements ListAccountDataView {
+  _ListAccountsState() : super(ListAccountsPresenter());
+
   var isEditMode = false;
 
   List<Account> _accounts = [];
   final NumberFormat _nf = NumberFormat("#,##0.00");
+
+  @override
+  void init() {
+    presenter.dataView = this;
+  }
 
   @override
   void initState() {
@@ -82,11 +90,12 @@ class _ListAccountsState extends State<ListAccounts> {
   }
 
   void _loadAllAccounts() {
-    _presenter.loadAllAccounts()
-        .then((value) {
-      setState(() {
-        _accounts = value;
-      });
+    presenter.loadAllAccounts();
+  }
+
+  void onAccountListLoaded(List<Account> acc) {
+    setState(() {
+      _accounts = acc;
     });
   }
 
@@ -111,7 +120,7 @@ class _ListAccountsState extends State<ListAccounts> {
           onPressed: () {
             Navigator.pop(context);
 
-            _presenter.deleteAccount(account);
+            presenter.deleteAccount(account);
           },
         ),
         FlatButton(
