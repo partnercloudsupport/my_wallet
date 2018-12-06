@@ -54,6 +54,7 @@ class _MyWalletState extends State<MyWalletHome> {
       expandedHeight: MediaQuery.of(context).size.height * 0.55,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
+        centerTitle: true,
         title: Text(_df.format(DateTime.now()), style: Theme.of(context).textTheme.title,),
         background: ListView(
           physics: NeverScrollableScrollPhysics(),
