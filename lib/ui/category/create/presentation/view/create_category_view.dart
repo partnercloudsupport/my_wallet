@@ -3,6 +3,8 @@ import 'package:my_wallet/my_wallet_view.dart';
 import 'package:my_wallet/database/data.dart';
 import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ui/category/create/presentation/presenter/create_category_presenter.dart';
+import 'package:my_wallet/ca/presentation/view/ca_state.dart';
+import 'package:my_wallet/ui/category/create/presentation/view/create_category_data_view.dart';
 
 class CreateCategory extends StatefulWidget {
   @override
@@ -11,10 +13,15 @@ class CreateCategory extends StatefulWidget {
   }
 }
 
-class _CreateCategoryState extends State<CreateCategory> {
+class _CreateCategoryState extends CleanArchitectureView<CreateCategory, CreateCategoryPresenter> implements CreateCategoryDataView {
+  _CreateCategoryState() : super(CreateCategoryPresenter());
+
   String _name = "";
 
-  final CreateCategoryPresenter _presenter = CreateCategoryPresenter();
+  @override
+  void init() {
+    presenter.dataView = this;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,23 +54,28 @@ class _CreateCategoryState extends State<CreateCategory> {
   }
 
   void _saveCategory() {
-    _presenter.saveCategory(_name)
-    .then((value) {
-      Navigator.pop(context, value);
-    })
-    .catchError((e) {
-      showDialog(context: context, builder: (context) => AlertDialog(
-        title: Text("Error"),
-        content: Text(e.toString()),
-        actions: <Widget>[
-          FlatButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("OK"),
-          )
-        ],
-      ));
-    });
+    presenter.saveCategory(_name);
   }
+
+  @override
+  void onCreateCategorySuccess(bool result) {
+    Navigator.pop(context, result);
+  }
+
+  @override
+  void onCreateCategoryError(Exception e) {
+    showDialog(context: context, builder: (context) => AlertDialog(
+      title: Text("Error"),
+      content: Text(e.toString()),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text("OK"),
+        )
+      ],
+    ));
+  }
+
 
   void _onNameChanged(String name) {
     _name = name;

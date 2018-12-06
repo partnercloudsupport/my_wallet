@@ -3,8 +3,9 @@ import 'package:my_wallet/database/database_manager.dart' as db;
 import 'package:my_wallet/ui/category/create/domain/create_category_exception.dart';
 import 'dart:math';
 import 'package:my_wallet/database/firebase_manager.dart' as fm;
+import 'package:my_wallet/ca/data/ca_repository.dart';
 
-class CreateCategoryRepository {
+class CreateCategoryRepository extends CleanArchitectureRepository {
   final _CreateCategoryDatabaseRepository _dbRepo = _CreateCategoryDatabaseRepository();
   final _CreateCategoryFirebaseRepository _fbRepo = _CreateCategoryFirebaseRepository();
 

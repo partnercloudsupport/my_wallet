@@ -1,19 +1,21 @@
 import 'package:my_wallet/ui/category/create/data/create_category_repository.dart';
-import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/ca/domain/ca_use_case.dart';
+import 'package:my_wallet/ui/category/create/domain/create_category_exception.dart';
 
-class CreateCategoryUseCase {
-  final CreateCategoryRepository _repo = CreateCategoryRepository();
+class CreateCategoryUseCase extends CleanArchitectureUseCase<CreateCategoryRepository>{
+  CreateCategoryUseCase() : super(CreateCategoryRepository());
 
-  Future<bool> saveCategory(String name) async {
-    do {
-      if(!(await _repo.validateName(name))) break;
+  void saveCategory(String name, onNext<bool> next, onError error) async {
+    try {
+      bool validateName = await repo.validateName(name);
 
-      var color = await _repo.generateRandomColor();
-      var id = await _repo.generateId();
+      if (!validateName) throw CreateCategoryException("Failed to validate name");
+      var color = await repo.generateRandomColor();
+      var id = await repo.generateId();
 
-      return _repo.saveCategory(id, name, color);
-    } while(false);
-
-    return false;
+      repo.saveCategory(id, name, color).then((result) => next(result)).catchError(error);
+    } catch(e) {
+      error(e);
+    }
   }
 }
