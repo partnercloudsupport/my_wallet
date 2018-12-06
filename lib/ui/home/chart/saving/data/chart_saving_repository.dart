@@ -22,6 +22,6 @@ class SavingChartRepository {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var targetSaving = sharedPreferences.get(keyTargetSaving) ?? 0.0;
 
-    return SavingEntity(monthlySaving, targetSaving > 0 ? monthlySaving/targetSaving : 1.0);
+    return SavingEntity(monthlySaving, monthlySaving > 0 ? targetSaving > 0 ? monthlySaving/targetSaving : 1.0 : 0.0);
   }
 }
