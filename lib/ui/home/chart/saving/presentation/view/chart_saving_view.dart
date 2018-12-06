@@ -4,6 +4,10 @@ import 'package:my_wallet/ui/home/chart/saving/data/chart_saving_entity.dart';
 import 'package:my_wallet/ui/home/chart/saving/presentation/presenter/chart_saving_presenter.dart';
 import 'package:intl/intl.dart';
 
+import 'package:my_wallet/ca/presentation/view/ca_state.dart';
+import 'package:my_wallet/ui/home/chart/saving/presentation/view/chart_saving_data_view.dart';
+import 'package:my_wallet/data_observer.dart' as observer;
+
 class SavingChartView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -11,24 +15,43 @@ class SavingChartView extends StatefulWidget {
   }
 }
 
-class _SavingChartViewState extends State<SavingChartView> {
+class _SavingChartViewState extends CleanArchitectureView<SavingChartView, SavingChartPresenter> implements ChartSavingDataView, observer.DatabaseObservable {
 
-  final SavingChartPresenter _presenter = SavingChartPresenter();
+  _SavingChartViewState() : super(SavingChartPresenter());
+
+  final tables = [
+    observer.tableTransactions
+  ];
+
   final NumberFormat _nf = NumberFormat("\$#,##0.00");
 
   SavingEntity entity;
 
   @override
+  void init() {
+    presenter.dataView = this;
+  }
+
+  @override
   void initState() {
     super.initState();
 
-    _presenter.loadSaving()
-    .then((value) {
-      setState(() {
-        entity = value;
-      });
-    });
+    observer.registerDatabaseObservable(tables, this);
+
+    loadChartData();
   }
+
+  @override
+  void dispose() {
+
+    observer.unregisterDatabaseObservable(tables, this);
+    super.dispose();
+  }
+
+  void onDatabaseUpdate(String table) {
+    loadChartData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -56,5 +79,15 @@ class _SavingChartViewState extends State<SavingChartView> {
         ],
       ),
     );
+  }
+
+  void loadChartData() {
+    presenter.loadSaving();
+  }
+
+  void onDataAvailable(SavingEntity value) {
+    setState(() {
+      entity = value;
+    });
   }
 }
