@@ -17,7 +17,7 @@ class _ChartIncomeDatabaseRepository {
     var from = Utils.firstMomentOfMonth(DateTime.now());
     var to = Utils.lastDayOfMonth(DateTime.now());
 
-    var transactions = await db.queryCategoryWithTransaction(from: from, to: to, type: TransactionType.Income, filterZero: true);
+    var transactions = await db.queryCategoryWithTransaction(from: from, to: to, type: TransactionType.typeIncome, filterZero: true);
 
     return transactions == null ? [] : transactions.map((f) => IncomeEntity(f.name, f.balance, f.colorHex)).toList();
   }

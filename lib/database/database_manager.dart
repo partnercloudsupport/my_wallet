@@ -55,8 +55,8 @@ void unregisterDatabaseObservable(List<String> tables, DatabaseObservable observ
 
 // ------------------------------------------------------------------------------------------------------------------------
 // other SQL helper methods
-Future<double> sumAllTransactionBetweenDateByType(DateTime from, DateTime to, TransactionType type) async {
-  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN ${from.millisecondsSinceEpoch} AND ${to.millisecondsSinceEpoch}) AND $_transType = ${type.index}"));
+Future<double> sumAllTransactionBetweenDateByType(DateTime from, DateTime to, List<TransactionType> type) async {
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN ${from.millisecondsSinceEpoch} AND ${to.millisecondsSinceEpoch}) AND $_transType IN ${type.map((f) => "${f.id}").toString()}"));
 
   return sum[0].values.first ?? 0.0;
 }
@@ -79,7 +79,7 @@ Future<double> sumTransactionsByDay(DateTime day, TransactionType type) async {
     var startOfDay = DateTime(day.year, day.month, day.day).millisecondsSinceEpoch;
     var endOfDay = DateTime(day.year, day.month, day.day + 1).millisecondsSinceEpoch;
 
-    var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startOfDay AND $endOfDay) AND $_transType = ${type.index}"));
+    var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startOfDay AND $endOfDay) AND $_transType = ${type.id}"));
 
     return sum[0].values.first ?? 0.0;
 }
@@ -124,7 +124,7 @@ Future<List<AppTransaction>> queryTransactionsBetweenDates(DateTime from, DateTi
   String where = from != null && to != null ? "$_transDateTime BETWEEN ${from.millisecondsSinceEpoch} AND ${to.millisecondsSinceEpoch}" : null;
 
   if(type != null) {
-    where = "($where) AND $_transType = ${type.index}";
+    where = "($where) AND $_transType = ${type.id}";
   }
 
   List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: where));
@@ -162,7 +162,7 @@ Future<List<AppCategory>> queryCategory({int id}) async {
   return null;
 }
 
-Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime to, TransactionType type, bool filterZero}) async {
+Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime to, List<TransactionType> type, bool filterZero}) async {
   String where;
   int _from = 0;
   int _to = DateTime.now().millisecondsSinceEpoch;
@@ -177,7 +177,8 @@ Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime 
   where = "$_transDateTime BETWEEN $_from AND $_to";
 
   if(type != null) {
-    where = "($where) AND $_transType = ${type.index}";
+    var types = type.map((f) => "${f.id}").toString();
+    where = "($where) AND ($_transType IN $types)";
   }
 
   List<Map<String, dynamic>> catMaps = await _lock.synchronized(() => db._query(_tableCategory));
@@ -309,7 +310,7 @@ Future<int> updateCategory(AppCategory cat) {
 
 // private helper
 AppTransaction _toTransaction(Map<String, dynamic> map) {
-  return AppTransaction(map[_transID], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], map[_transAmount], map[_transDesc], TransactionType.values[map[_transType]]);
+  return AppTransaction(map[_transID], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], map[_transAmount], map[_transDesc], TransactionType.all[map[_transType]]);
 }
 
 Account _toAccount(Map<String, dynamic> map) {
@@ -330,7 +331,7 @@ Budget _toBudget(Map<String, dynamic> map) {
 }
 
 Map<String, dynamic> _transactionToMap(AppTransaction transaction) {
-  return {_transID: transaction.id, _transDateTime: transaction.dateTime.millisecondsSinceEpoch, _transAcc: transaction.accountId, _transCategory: transaction.categoryId, _transAmount: transaction.amount, _transDesc: transaction.desc, _transType: transaction.type.index};
+  return {_transID: transaction.id, _transDateTime: transaction.dateTime.millisecondsSinceEpoch, _transAcc: transaction.accountId, _transCategory: transaction.categoryId, _transAmount: transaction.amount, _transDesc: transaction.desc, _transType: transaction.type.id};
 }
 
 Map<String, dynamic> _accountToMap(Account acc) {

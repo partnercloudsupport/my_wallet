@@ -157,7 +157,7 @@ Map<String, dynamic> _TransactionToMap(AppTransaction trans) {
     _categoryId: trans.categoryId,
     _amount: trans.amount,
     _desc: trans.desc,
-    _type: trans.type.index
+    _type: trans.type.id
   };
 }
 
@@ -169,7 +169,7 @@ AppTransaction _snapshotToTransaction(DataSnapshot snapshot) {
       snapshot.value[_categoryId],
       double.parse("${snapshot.value[_amount]}"),
       snapshot.value[_desc],
-      TransactionType.values[snapshot.value[_type]]
+      TransactionType.all[snapshot.value[_type]]
   );
 }
 

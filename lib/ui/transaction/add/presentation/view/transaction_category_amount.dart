@@ -46,7 +46,7 @@ class TransactionCategoryAndAmountState extends State<TransactionCategoryAndAmou
                   fontSize: 20.0
               ),),
             onPressed: () {
-              Navigator.pushNamed(context, _type == TransactionType.Expenses ? routes.SelectCategoryExpenses : routes.SelectCategoryIncome).then((value) {
+              Navigator.pushNamed(context, routes.SelectCategory).then((value) {
                 if(value != null) {
                   setState(() {
                     _category = value;
@@ -65,7 +65,7 @@ class TransactionCategoryAndAmountState extends State<TransactionCategoryAndAmou
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.right,
               style: TextStyle(
-                color: _type == TransactionType.Income ? theme.darkGreen : theme.pinkAccent,
+                color: TransactionType.isIncome(_type) ? theme.darkGreen : theme.pinkAccent,
                 fontSize: 20.0,
               ),
             ),

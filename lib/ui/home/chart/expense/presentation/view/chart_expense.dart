@@ -50,7 +50,7 @@ class _ExpenseChartState extends State<ExpenseChart> implements observer.Databas
               measureFn: (data, index) => data.amount,
               domainFn: (data, index) => data.amount,
               colorFn: (data, index) => Color.fromHex(code: data.color),
-              labelAccessorFn: (data, index) => "${data.category}"
+              labelAccessorFn: (data, index) => "${data.category} : ${data.amount}"
           ),
     ],
       animate: false,
@@ -61,7 +61,6 @@ class _ExpenseChartState extends State<ExpenseChart> implements observer.Databas
   }
 
   void onDatabaseUpdate(String table) {
-    print("on database update");
     _loadExpense();
   }
 

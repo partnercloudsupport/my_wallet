@@ -17,8 +17,11 @@ class _ChartExpenseDatabaseRepository {
     var from = Utils.firstMomentOfMonth(DateTime.now());
     var to = Utils.lastDayOfMonth(DateTime.now());
 
-    var transactions = await db.queryCategoryWithTransaction(from: from, to: to, type: TransactionType.Expenses, filterZero: true);
+    var transactions = await db.queryCategoryWithTransaction(from: from, to: to, type: TransactionType.typeExpense, filterZero: true);
 
+    // debug purpose
+    print("expenses transaction: ${transactions.length}");
+    transactions.forEach((f) => print("transaction ${f.name} amount ${f.balance}"));
     return transactions == null ? [] : transactions.map((f) => ExpenseEntity(f.name, f.balance, f.colorHex)).toList();
   }
 }

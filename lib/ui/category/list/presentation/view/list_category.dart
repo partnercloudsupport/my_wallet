@@ -12,9 +12,9 @@ import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list
 
 class CategoryList extends StatefulWidget {
   final String _title;
-  final TransactionType _type;
+  final bool returnValue;
 
-  CategoryList(this._title, this._type);
+  CategoryList(this._title, {this.returnValue = false});
 
   @override
   State<StatefulWidget> createState() {
@@ -82,7 +82,7 @@ class _CategoryListState extends State<CategoryList> {
         ),
         alignment: Alignment.center,
       ),
-      onTap: () => widget._type != null ? Navigator.pop(context, category) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(category.name, categoryId: category.id,))) ,
+      onTap: () => widget.returnValue == false ? Navigator.pop(context, category) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(category.name, categoryId: category.id,))) ,
     );
   }
 

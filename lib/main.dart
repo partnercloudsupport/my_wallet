@@ -64,12 +64,10 @@ class _MyAppState extends State<MyApp> {
             case routes.ListAccounts:
               return ListAccounts("Accounts");
               break;
-            case routes.SelectCategoryExpenses:
-              return CategoryList("Select Category", TransactionType.Expenses);
-            case routes.SelectCategoryIncome:
-              return CategoryList("Select Category", TransactionType.Income);
+            case routes.SelectCategory:
+              return CategoryList("Select Category", returnValue: true,);
             case routes.ListCategories:
-              return CategoryList("Categories", null);
+              return CategoryList("Categories");
             case routes.CreateCategory:
               return CreateCategory();
             default:

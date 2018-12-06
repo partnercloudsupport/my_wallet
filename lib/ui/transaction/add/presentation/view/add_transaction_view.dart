@@ -18,7 +18,7 @@ class AddTransaction extends StatefulWidget {
 class _AddTransactionState extends State<AddTransaction> {
   final AddTransactionPresenter _presenter = AddTransactionPresenter();
 
-  TransactionType _type = TransactionType.Expenses;
+  TransactionType _type = TransactionType.expenses;
 
   GlobalKey<TransactionCategoryAndAmountState> _amountKey = GlobalKey<TransactionCategoryAndAmountState>();
 

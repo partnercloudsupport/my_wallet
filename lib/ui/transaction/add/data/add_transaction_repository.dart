@@ -93,7 +93,7 @@ class _AddTransactionFirebaseRepository {
       Account acc,
       TransactionType type,
       double amount) {
-    var newBalance = acc.balance + (type == TransactionType.Expenses ? -1 : 1) * amount;
+    var newBalance = acc.balance + (TransactionType.typeExpense.contains(type) ? -1 : 1) * amount;
 
     return fm.updateAccount(Account(acc.id, acc.name, newBalance, acc.type, acc.currency));
   }

@@ -55,10 +55,10 @@ class _TransactionTypeState extends State<SelectTransactionType> with TickerProv
     super.initState();
 
     _type = widget._type;
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: TransactionType.all.length, vsync: this);
 
     _tabController.addListener(_onTabValueChanged);
-    _tabController.index = _type.index;
+    _tabController.index = _type.id;
 
   }
   @override
@@ -67,9 +67,10 @@ class _TransactionTypeState extends State<SelectTransactionType> with TickerProv
       padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
       child: Container(
         child: TabBar(
-          tabs: TransactionType.values.map((f) => Padding(
+          isScrollable: true,
+          tabs: TransactionType.all.map((f) => Padding(
             padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-            child: Text(_getTypeName(f),
+            child: Text(f.name,
               style: TextStyle(color: _type == f ? Colors.white : theme.darkBlue, fontSize: 16.0),),
           )).toList(),
           indicator: BoxDecoration(
@@ -78,31 +79,13 @@ class _TransactionTypeState extends State<SelectTransactionType> with TickerProv
           ),
           controller: _tabController,
         ),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(40.0), border: Border.all(color: theme.blueGrey, width: 1.0)),
       ),
     );
   }
 
-  String _getTypeName(TransactionType type) {
-    String name = "Unknown";
-
-    switch (type) {
-      case TransactionType.Expenses: name = "Expenses"; break;
-      case TransactionType.Income: name = "Income"; break;
-      case TransactionType.MoneyTransfer: name = "Money Transfer"; break;
-      case TransactionType.AssetPurchase: name = "Asset Purchase"; break;
-      case TransactionType.AssetSale: name = "Asset Sale"; break;
-      case TransactionType.LiabilityAcquisition: name = "Liability Acquisition"; break;
-      case TransactionType.DischargeOfLiability: name = "Discharge of Liability"; break;
-    }
-
-    return name;
-  }
-
   void _onTabValueChanged() {
     setState(() {
-      _type = TransactionType.values[_tabController.index];
-//      _tabController.index == 0 ? TransactionType.Expenses : TransactionType.Income;
+      _type = TransactionType.all[_tabController.index];
     });
     widget._onChanged(_type);
   }
@@ -114,82 +97,6 @@ class _TransactionTypeState extends State<SelectTransactionType> with TickerProv
     _tabController.dispose();
   }
 }
-
-//class AccountTypeSelection extends StatefulWidget {
-//  final AccountType _type;
-//  final ValueChanged<AccountType> _onChanged;
-//
-//  AccountTypeSelection(this._type, this._onChanged);
-//
-//  @override
-//  State<StatefulWidget> createState() {
-//    return _AccountTypeState();
-//  }
-//}
-//class _AccountTypeState extends State<AccountTypeSelection> with TickerProviderStateMixin {
-//  AccountType _type;
-//  TabController _tabController;
-//
-//  @override
-//  void initState() {
-//    super.initState();
-//
-//    _type = widget._type;
-//    _tabController = TabController(length: AccountType.values.length, vsync: this);
-//
-//    _tabController.addListener(_onTabValueChanged);
-//    _tabController.index = _type.index;
-//  }
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return Padding(
-//      padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-//      child: Container(
-//        child: TabBar(
-//          tabs: AccountType.values.map((f) => Padding(
-//            padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-//            child: Text(_getTypeName(f),
-//            style: TextStyle(color: _type == f ? Colors.white : theme.darkBlue, fontSize: 14.0) ,),
-//          )).toList(),
-//          indicator: BoxDecoration(
-//            borderRadius: BorderRadius.circular(40.0),
-//            color: theme.pinkAccent,
-//          ),
-//          controller: _tabController,
-//        ),
-//        decoration: BoxDecoration(borderRadius: BorderRadius.circular(40.0), border: Border.all(color: theme.blueGrey, width: 1.0)),
-//      ),
-//    );
-//  }
-//
-//  void _onTabValueChanged() {
-//    setState(() {
-//      _type = AccountType.values[_tabController.index];
-//    });
-//    widget._onChanged(_type);
-//  }
-//
-//  String _getTypeName(AccountType type) {
-//    String _type = "Unknown";
-//
-//    switch(type) {
-//      case AccountType.PaymentAccount: _type = "Payment Account"; break;
-//      case AccountType.Credit: _type = "Credit"; break;
-//      case AccountType.Assets: _type = "Assets"; break;
-//      case AccountType.Liability: _type = "Liability"; break;
-//    }
-//
-//    return _type;
-//  }
-//
-//  @override
-//  void dispose() {
-//    super.dispose();
-//
-//    _tabController.dispose();
-//  }
-//}
 
 class NumberInputPad extends StatefulWidget {
   final Function(String, String) _onValueChanged;

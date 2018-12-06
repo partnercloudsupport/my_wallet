@@ -8,8 +8,8 @@ class ChartTitleRepository {
     var from = Utils.firstMomentOfMonth(DateTime.now());
     var to = Utils.lastDayOfMonth(DateTime.now());
 
-    var income = await _db.sumAllTransactionBetweenDateByType(from, to, TransactionType.Income) ?? 0;
-    var expenses = await _db.sumAllTransactionBetweenDateByType(from, to, TransactionType.Expenses) ?? 0;
+    var income = await _db.sumAllTransactionBetweenDateByType(from, to, TransactionType.typeIncome) ?? 0;
+    var expenses = await _db.sumAllTransactionBetweenDateByType(from, to, TransactionType.typeExpense) ?? 0;
 
     return ChartTitleEntity(expenses, income, income - expenses);
   }

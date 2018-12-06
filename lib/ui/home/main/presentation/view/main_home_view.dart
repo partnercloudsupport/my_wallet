@@ -25,6 +25,7 @@ class _MyWalletState extends State<MyWalletHome> {
   List<HomeEntity> homeEntities = [];
 
   DateFormat _df = DateFormat("MMM, yyyy");
+  NumberFormat _nf = NumberFormat("\$#,##0.00");
 
   @override
   void initState() {
@@ -88,7 +89,7 @@ class _MyWalletState extends State<MyWalletHome> {
                 children: homeEntities.map((f) => ListTile(
                   title: Text(f.name, style: TextStyle(color: theme.darkBlue),),
                   leading: Icon(Icons.map, color: theme.darkBlue,),
-                  trailing: Text("\$${f.amount}", style: TextStyle(color: theme.tealAccent),),
+                  trailing: Text(_nf.format(f.amount), style: TextStyle(color: theme.tealAccent),),
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionList(f.name, categoryId: f.categoryId,))),
                 )).toList(),
               ),

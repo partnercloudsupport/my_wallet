@@ -1,7 +1,6 @@
 const AddTransaction = "AddTransaction";
 
-const SelectCategoryExpenses = "SelectCategoryExpenses";
-const SelectCategoryIncome = "SelectCategoryIncome";
+const SelectCategory = "SelectCategory";
 const ListCategories = "ListCategories";
 const CreateCategory = "CreateCategory";
 

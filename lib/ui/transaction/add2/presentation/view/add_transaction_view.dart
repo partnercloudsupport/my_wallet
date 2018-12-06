@@ -23,7 +23,7 @@ class _AddTransactionState extends State<AddTransaction> {
   var _number = "";
   var _decimal = "";
 
-  var _type = TransactionType.Expenses;
+  var _type = TransactionType.expenses;
   var _showNumPad = false;
 
   var _nf = NumberFormat("\$#,##0.00");

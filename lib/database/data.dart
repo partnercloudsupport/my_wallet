@@ -19,14 +19,49 @@ class AccountType {
   static final AccountType liability = AccountType(3, "Liability");
 }
 
-enum TransactionType {
-  Expenses,
-  Income,
-  MoneyTransfer,
-  AssetPurchase,
-  AssetSale,
-  LiabilityAcquisition,
-  DischargeOfLiability
+class TransactionType {
+  final String name;
+  final int id;
+
+  TransactionType(this.id, this.name);
+
+  static final expenses = TransactionType(0, "Expense");
+  static final income = TransactionType(1, "Income");
+//  static final moneyTransfer = TransactionType(2, "Money Transfer");
+//  static final assetPurchase = TransactionType(3, "Asset Purchase");
+//  static final assetSale = TransactionType(4, "Asset Sale");
+//  static final liabilityAcquisition = TransactionType(5, "Liability Acquisition");
+//  static final dischargeOfLiability = TransactionType(6, "Discharge Of Liability");
+
+  static final List<TransactionType> typeIncome = [
+    income,
+//    assetSale,
+//    liabilityAcquisition
+  ];
+
+  static final List<TransactionType> typeExpense = [
+    expenses,
+//    assetPurchase,
+//    dischargeOfLiability
+  ];
+
+  static final List<TransactionType> all = [
+    expenses,
+    income,
+//    moneyTransfer,
+//    assetSale,
+//    assetSale,
+//    liabilityAcquisition,
+//    dischargeOfLiability
+  ];
+
+  static bool isExpense(TransactionType type) {
+    return typeExpense.contains(type);
+  }
+
+  static bool isIncome(TransactionType type) {
+    return typeIncome.contains(type);
+  }
 }
 
 class Account {

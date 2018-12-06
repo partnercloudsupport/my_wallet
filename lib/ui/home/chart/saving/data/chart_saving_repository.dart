@@ -14,8 +14,8 @@ class SavingChartRepository {
     var today = DateTime.now();
 
 
-    var incomeThisMonth = await _db.sumAllTransactionBetweenDateByType(start, today, TransactionType.Income);
-    var expenseThisMonth = await _db.sumAllTransactionBetweenDateByType(start, today, TransactionType.Expenses);
+    var incomeThisMonth = await _db.sumAllTransactionBetweenDateByType(start, today, TransactionType.typeIncome);
+    var expenseThisMonth = await _db.sumAllTransactionBetweenDateByType(start, today, TransactionType.typeExpense);
 
     var monthlySaving = incomeThisMonth - expenseThisMonth;
 
