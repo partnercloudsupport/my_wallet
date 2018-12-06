@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/data_observer.dart' as observer;
 
+import 'package:my_wallet/ca/presentation/view/ca_state.dart';
+import 'package:my_wallet/ui/home/overview/presentation/view/overview_callback.dart';
+
 class HomeOverview extends StatefulWidget {
   final TextStyle titleSTyle;
 
@@ -16,31 +19,36 @@ class HomeOverview extends StatefulWidget {
   }
 }
 
-class _HomeOverviewState extends State<HomeOverview> implements observer.DatabaseObservable {
+class _HomeOverviewState extends CleanArchitectureView<HomeOverview, HomeOverviewPresenter> implements observer.DatabaseObservable, OverviewDataView {
+  _HomeOverviewState() : super(HomeOverviewPresenter());
+
   final databaseWatch = [observer.tableAccount];
 
-  final HomeOverviewPresenter _presenter = HomeOverviewPresenter();
   final NumberFormat nf = NumberFormat("\$#,##0.00");
 
   var _total = 0.0;
 
   void onDatabaseUpdate(String table) {
-    if (table == observer.tableAccount) _loadTotal();
+    if (table == observer.tableAccount) presenter.loadTotal();
   }
 
-  void _loadTotal() {
-    _presenter.loadTotal().then((value) {
-      setState(() {
-        _total = value ?? 0.0;
-      });
+  void init() {
+    presenter.dataView = this;
+
+    presenter.loadTotal();
+  }
+
+  void onLoadTotalSuccess(double value) {
+    setState(() {
+      _total = value;
     });
   }
+
   @override
   void initState() {
     super.initState();
 
     observer.registerDatabaseObservable(databaseWatch, this);
-    _loadTotal();
   }
 
   @override

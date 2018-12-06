@@ -1,9 +1,10 @@
 import 'package:my_wallet/ui/home/overview/data/overview_repository.dart';
+import 'package:my_wallet/ca/domain/ca_use_case.dart';
 
-class HomeOverviewUseCase {
-  final HomeOverviewRepository _repo = HomeOverviewRepository();
+class HomeOverviewUseCase extends CleanArchitectureUseCase<HomeOverviewRepository>{
+  HomeOverviewUseCase() : super(HomeOverviewRepository());
 
-  Future<double> loadTotal() {
-    return _repo.loadTotal();
+  void loadTotal(onNext<double> next) {
+    repo.loadTotal().then(next);
   }
 }
