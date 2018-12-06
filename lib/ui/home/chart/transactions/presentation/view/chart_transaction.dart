@@ -1,34 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart';
-import 'package:my_wallet/ui/home/chart/expense/data/expense_entity.dart';
-import 'package:my_wallet/ui/home/chart/expense/presentation/presenter/chart_expense_presenter.dart';
+import 'package:my_wallet/ui/home/chart/transactions/data/transaction_entity.dart';
+import 'package:my_wallet/ui/home/chart/transactions/presentation/presenter/transaction_presenter.dart';
 import 'package:my_wallet/data_observer.dart' as observer;
+import 'package:my_wallet/ca/presentation/view/ca_state.dart';
+import 'package:my_wallet/ui/home/chart/transactions/presentation/view/chart_transaction_dataview.dart';
 
-class ExpenseChart extends StatefulWidget {
+class TransactionChart extends StatefulWidget {
+  final List<TransactionType> _type;
+
+  TransactionChart(this._type);
 
   @override
   State<StatefulWidget> createState() {
-    return _ExpenseChartState();
+    return _TransactionChartState();
   }
 }
 
-class _ExpenseChartState extends State<ExpenseChart> implements observer.DatabaseObservable {
+class _TransactionChartState extends CleanArchitectureView<TransactionChart, TransactionPresenter> implements observer.DatabaseObservable, TransactionDataView {
+
+  _TransactionChartState() : super(TransactionPresenter());
 
   final databaseWatch = [
     observer.tableTransactions,
     observer.tableCategory
   ];
 
-  final ChartExpensePresenter _presenter = ChartExpensePresenter();
+  List<TransactionEntity> transactions = [];
 
-  List<ExpenseEntity> expenses = [];
-
+  @override
+  void init() {
+    presenter.dataView = this;
+  }
   @override
   void initState() {
     super.initState();
 
     observer.registerDatabaseObservable(databaseWatch, this);
-    _loadExpense();
+    _loadTransaction();
   }
 
   @override
@@ -40,12 +49,12 @@ class _ExpenseChartState extends State<ExpenseChart> implements observer.Databas
 
   @override
   Widget build(BuildContext context) {
-    return expenses == null || expenses.isEmpty
-        ? Center(child: Text("No Expense found", style: Theme.of(context).textTheme.title,),)
+    return transactions == null || transactions.isEmpty
+        ? Center(child: Text("No Transaction found", style: Theme.of(context).textTheme.title,),)
         : PieChart([
-          Series<ExpenseEntity, double>(
-              id: "_expenses",
-              data: expenses,
+          Series<TransactionEntity, double>(
+              id: "_transactions",
+              data: transactions,
               measureFn: (data, index) => data.amount,
               domainFn: (data, index) => data.amount,
               colorFn: (data, index) => Color.fromHex(code: data.color),
@@ -75,14 +84,25 @@ class _ExpenseChartState extends State<ExpenseChart> implements observer.Databas
   }
 
   void onDatabaseUpdate(String table) {
-    _loadExpense();
+    _loadTransaction();
   }
 
-  void _loadExpense() {
-    _presenter.loadExpense().then((data) {
-      setState(() {
-        expenses = data;
-      });
-    });
+  void _loadTransaction() {
+    presenter.loadTransaction(widget._type);
   }
+
+  void onTransactionListLoaded(List<TransactionEntity> list) {
+    if(this.mounted)
+      setState(() {
+        this.transactions = list;
+      });
+  }
+}
+
+class ExpenseChart extends TransactionChart {
+  ExpenseChart() : super(TransactionType.typeExpense);
+}
+
+class IncomeChart extends TransactionChart {
+  IncomeChart() : super(TransactionType.typeIncome);
 }

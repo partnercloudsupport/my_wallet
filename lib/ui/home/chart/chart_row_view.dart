@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
-import 'package:my_wallet/ui/home/chart/income/presentation/view/chart_income.dart';
-import 'package:my_wallet/ui/home/chart/expense/presentation/view/chart_expense.dart';
 
+import 'package:my_wallet/ui/home/chart/transactions/presentation/view/chart_transaction.dart';
 import 'package:my_wallet/ui/home/chart/title/presentation/view/chart_title_view.dart';
 import 'package:my_wallet/ui/home/chart/saving/presentation/view/chart_saving_view.dart';
 
