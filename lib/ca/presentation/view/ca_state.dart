@@ -15,4 +15,9 @@ abstract class CleanArchitectureView<ST extends StatefulWidget, T extends CleanA
 
     init();
   }
+
+  @override
+  void setState(fn) {
+    if(this.mounted) super.setState(fn);
+  }
 }
