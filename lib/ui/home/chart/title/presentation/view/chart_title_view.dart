@@ -4,6 +4,8 @@ import 'package:my_wallet/ui/home/chart/title/data/chart_title_entity.dart';
 import 'package:my_wallet/ui/home/chart/title/presentation/presenter/chart_title_presenter.dart';
 import 'package:intl/intl.dart';
 import 'package:my_wallet/data_observer.dart' as observer;
+import 'package:my_wallet/ca/presentation/view/ca_state.dart';
+import 'package:my_wallet/ui/home/chart/title/presentation/view/chart_title_data_view.dart';
 
 class ChartTitleView extends StatefulWidget {
   final TabController _controller;
@@ -16,15 +18,20 @@ class ChartTitleView extends StatefulWidget {
   }
 }
 
-class _ChartTitleViewState extends State<ChartTitleView> implements observer.DatabaseObservable {
+class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTitlePresenter> implements observer.DatabaseObservable, ChartTitleDataView {
+  _ChartTitleViewState() : super(ChartTitlePresenter());
 
   final tableWatch = [
     observer.tableTransactions
   ];
 
   ChartTitleEntity entity;
-  final ChartTitlePresenter _presenter = ChartTitlePresenter();
   NumberFormat _nf = NumberFormat("#,##0.00");
+
+  @override
+  void init() {
+    presenter.dataView = this;
+  }
 
   @override
   void initState() {
@@ -94,10 +101,12 @@ class _ChartTitleViewState extends State<ChartTitleView> implements observer.Dat
   }
 
   void _loadDetails() {
-    _presenter.loadTitleDetail().then((value) {
-      setState(() {
-        entity = value;
-      });
+    presenter.loadTitleDetail();
+  }
+
+  void onDetailLoaded(ChartTitleEntity value) {
+    setState(() {
+      entity = value;
     });
   }
 
