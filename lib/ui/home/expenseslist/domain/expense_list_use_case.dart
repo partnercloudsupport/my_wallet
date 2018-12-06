@@ -1,11 +1,12 @@
 import 'package:my_wallet/ui/home/expenseslist/data/expense_list_repository.dart';
 import 'package:my_wallet/ui/home/expenseslist/data/expense_list_entity.dart';
+import 'package:my_wallet/ca/domain/ca_use_case.dart';
 
-class ExpenseRepositoryUseCase {
+class ExpenseUseCase extends CleanArchitectureUseCase<ExpenseRepository>{
 
-  final ExpenseRepository _repo = ExpenseRepository();
+  ExpenseUseCase() : super(ExpenseRepository());
 
-  Future<List<ExpenseEntity>> loadExpense() {
-  return _repo.loadExpense();
+  void loadExpense(onNext<List<ExpenseEntity>> next) {
+    repo.loadExpense().then((value) => next(value));
   }
-  }
+}

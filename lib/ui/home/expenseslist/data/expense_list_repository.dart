@@ -2,8 +2,9 @@ import 'package:my_wallet/ui/home/expenseslist/data/expense_list_entity.dart';
 import 'package:my_wallet/database/database_manager.dart' as _db;
 import 'package:my_wallet/utils.dart' as Utils;
 import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/ca/data/ca_repository.dart';
 
-class ExpenseRepository {
+class ExpenseRepository extends CleanArchitectureRepository {
   final _ExpenseDatabaseRepository _dbRepo = _ExpenseDatabaseRepository();
   Future<List<ExpenseEntity>> loadExpense() {
     return _dbRepo.loadExpense();

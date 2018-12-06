@@ -8,6 +8,8 @@ import 'package:my_wallet/ui/home/expenseslist/data/expense_list_entity.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
 
 import 'package:my_wallet/ui/home/expenseslist/presentation/presenter/expense_list_presenter.dart';
+import 'package:my_wallet/ca/presentation/view/ca_state.dart';
+import 'package:my_wallet/ui/home/expenseslist/presentation/view/expese_list_dataview.dart';
 
 class ExpensesListView extends StatefulWidget {
   @override
@@ -16,9 +18,10 @@ class ExpensesListView extends StatefulWidget {
   }
 }
 
-class _ExpensesListViewState extends State<ExpensesListView> implements observer.DatabaseObservable {
+class _ExpensesListViewState extends CleanArchitectureView<ExpensesListView, ExpensePresenter> implements observer.DatabaseObservable, ExpenseDataView {
 
-  final ExpensePresenter _presenter = ExpensePresenter();
+  _ExpensesListViewState() : super(ExpensePresenter());
+
   final tables = [
     observer.tableTransactions,
     observer.tableCategory
@@ -28,6 +31,11 @@ class _ExpensesListViewState extends State<ExpensesListView> implements observer
   List<ExpenseEntity> homeEntities = [];
 
   NumberFormat _nf = NumberFormat("\$#,##0.00");
+
+  @override
+  void init() {
+    presenter.dataView = this;
+  }
 
   @override
   void initState() {
@@ -60,10 +68,12 @@ class _ExpensesListViewState extends State<ExpensesListView> implements observer
   }
 
   void _loadDetails() {
-    _presenter.loadExpense().then((value) {
-      setState(() {
-        homeEntities = value;
-      });
+    presenter.loadExpense();
+  }
+
+  void onExpensesDetailLoaded(List<ExpenseEntity> value) {
+    setState(() {
+      homeEntities = value;
     });
   }
 
