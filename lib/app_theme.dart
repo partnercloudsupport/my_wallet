@@ -6,6 +6,7 @@ const tealAccent = Color(0xFF10EDC5);
 const darkGreen = Color(0xFF1B5E20);
 const pinkAccent = Color(0xFFED1946);
 const blueGrey = Color(0xFF9A9AAC);
+const brightGreen = Color(0xFF00FF00);
 
 ThemeData appTheme = ThemeData(
     brightness: Brightness.dark,

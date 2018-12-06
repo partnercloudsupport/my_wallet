@@ -3,7 +3,6 @@ import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:intl/intl.dart';
 
 import 'package:my_wallet/ui/home/overview/presentation/view/overview_view.dart';
-import 'package:my_wallet/ui/home/monthydetail/presentation/view/monthly_detail_view.dart';
 import 'package:my_wallet/ui/home/chart/chart_row_view.dart';
 import 'package:my_wallet/routes.dart' as routes;
 import 'package:my_wallet/ui/home/main/data/main_home_entity.dart';
@@ -67,7 +66,7 @@ class _MyWalletState extends State<MyWalletHome> {
     List<Widget> list = [];
 
     list.add(SliverAppBar(
-      expandedHeight: MediaQuery.of(context).size.height * 0.63,
+      expandedHeight: MediaQuery.of(context).size.height * 0.55,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
         title: Text(_df.format(DateTime.now()), style: Theme.of(context).textTheme.title,),
@@ -75,30 +74,12 @@ class _MyWalletState extends State<MyWalletHome> {
           physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
             HomeOverview(titleSTyle),
-            HomeMonthlyDetail(titleSTyle),
             ChartRow(),
           ],
         ),
       ),
     ));
 
-//    list.add(
-//        SliverFillViewport(
-//          delegate: new SliverChildBuilderDelegate(
-//                  (context, index) => ListView(
-//                    physics: NeverScrollableScrollPhysics(),
-//                    shrinkWrap: true,
-//                    children: homeEntities.map((f) => ListTile(
-//                      title: Text(f.name, style: TextStyle(color: theme.darkBlue),),
-//                      leading: Icon(Icons.map, color: theme.darkBlue,),
-//                      trailing: Text("\$${f.amount}", style: TextStyle(color: theme.tealAccent),),
-//                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionList(f.name, categoryId: f.categoryId,))),
-//                    )).toList(),
-//                  ),
-//              childCount: 1
-//          ),
-//        )
-//    );
     list.add(
         SliverFillRemaining(
           child: ListView(
