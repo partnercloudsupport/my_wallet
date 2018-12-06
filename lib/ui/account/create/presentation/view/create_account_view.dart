@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:my_wallet/my_wallet_view.dart';
 import 'package:my_wallet/database/data.dart';
 import 'package:my_wallet/app_theme.dart' as theme;
-import 'package:intl/intl.dart';
+import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 
 import 'package:my_wallet/ui/account/create/presentation/presenter/create_account_presenter.dart';
+import 'package:my_wallet/ui/account/create/presentation/view/create_account_dataview.dart';
 
 class CreateAccount extends StatefulWidget {
   @override
@@ -18,8 +19,8 @@ enum _CreateAccountSteps {
   EnterDetail
 }
 
-class _CreateAccountState extends State<CreateAccount> {
-  final CreateAccountPresenter _presenter = CreateAccountPresenter();
+class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAccountPresenter> implements CreateAccountDataView {
+  _CreateAccountState() : super(CreateAccountPresenter());
 
   String title = "Select Account Type";
 
@@ -32,6 +33,10 @@ class _CreateAccountState extends State<CreateAccount> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   bool showNumberInputPad = false;
+
+  init() {
+    presenter.dataView = this;
+  }
 
   @override
   void dispose() {
@@ -97,23 +102,24 @@ class _CreateAccountState extends State<CreateAccount> {
   }
 
   void _saveAccount() {
-    _presenter.saveAccount(_type, _name, _detailState.currentState._getAmount())
-    .then((result) {
-      Navigator.pop(context, result);
-//    })
-//    .catchError((e) {
-//      showDialog(context: context, builder: (context) => AlertDialog(
-//        title: Text("Error"),
-//        content: Text(e.toString()),
-//        actions: <Widget>[
-//          FlatButton(
-//            onPressed: () => Navigator.pop(context),
-//            child: Text("OK"),
-//          )
-//        ],
-//      ));
-    });
+    presenter.saveAccount(_type, _detailState.currentState._getAccountName(), _detailState.currentState._getAmount());
   }
+
+  void onAccountSaved(bool result) {
+    if(result) Navigator.pop(context, result);
+  }
+
+  void onError(Exception e) {
+      showDialog(context: context, builder: (context) => AlertDialog(
+        title: Text("Error"),
+        content: Text(e.toString()),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("OK"),
+          )
+        ],
+      ));  }
 }
 
 class _SelectAccountType extends StatelessWidget {
@@ -250,6 +256,10 @@ class _EnterDetailState extends State<_EnterDetail> {
 
   double _getAmount() {
     return 0.0;
+  }
+
+  String _getAccountName() {
+    return _name;
   }
 }
 

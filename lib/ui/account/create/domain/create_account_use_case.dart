@@ -1,29 +1,32 @@
 import 'package:my_wallet/ui/account/create/data/create_account_repository.dart';
 import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/ca/domain/ca_use_case.dart';
 
-class CreateAccountUseCase {
-  final CreateAccountRepository _repo = CreateAccountRepository();
+class CreateAccountUseCase extends CleanArchitectureUseCase<CreateAccountRepository>{
+  CreateAccountUseCase() : super(CreateAccountRepository());
 
-  Future<bool> saveAccount(
+  void saveAccount(
       AccountType type,
       String name,
-      double amount
+      double amount,
+      onNext<bool> next,
+      onError error,
       ) async {
     var result = false;
 
     do {
-      if(!(await _repo.verifyType(type))) break;
+      if(!(await repo.verifyType(type))) break;
 
-      if (!(await _repo.verifyName(name))) break;
+      if (!(await repo.verifyName(name))) break;
 
-      int id = await _repo.generateAccountId();
+      int id = await repo.generateAccountId();
 
       if (id < 0) break;
 
-      result = await _repo.saveAccountToFirebase(id, name, amount, type);
+      result = await repo.saveAccountToFirebase(id, name, amount, type);
 
     } while (false);
 
-    return result;
+    return next(result);
   }
 }

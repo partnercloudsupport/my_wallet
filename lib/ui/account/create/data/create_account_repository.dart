@@ -2,8 +2,9 @@ import 'package:my_wallet/database/data.dart';
 import 'package:my_wallet/database/database_manager.dart' as db;
 import 'package:my_wallet/ui/account/create/domain/create_account_exception.dart';
 import 'package:my_wallet/database/firebase_manager.dart' as fm;
+import 'package:my_wallet/ca/data/ca_repository.dart';
 
-class CreateAccountRepository {
+class CreateAccountRepository extends CleanArchitectureRepository {
   final _CreateAccountDatabaseRepository _dbRepo = _CreateAccountDatabaseRepository();
   final _CreateAccountFirebaseRepository _fbRepo = _CreateAccountFirebaseRepository();
 

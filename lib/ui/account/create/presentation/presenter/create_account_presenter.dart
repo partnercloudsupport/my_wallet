@@ -1,14 +1,15 @@
 import 'package:my_wallet/ui/account/create/domain/create_account_use_case.dart';
 import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/ca/presentation/presenter/ca_presenter.dart';
+import 'package:my_wallet/ui/account/create/presentation/view/create_account_dataview.dart';
 
-class CreateAccountPresenter {
-  final CreateAccountUseCase _useCase = CreateAccountUseCase();
+class CreateAccountPresenter extends CleanArchitecturePresenter<CreateAccountUseCase, CreateAccountDataView>{
+  CreateAccountPresenter() : super(CreateAccountUseCase());
 
-  Future<bool> saveAccount(
+  void saveAccount(
       AccountType type,
       String name,
-      double amount
-      ) {
-    return _useCase.saveAccount(type, name, amount);
+      double amount) {
+    useCase.saveAccount(type, name, amount, dataView.onAccountSaved, dataView.onError);
   }
 }
