@@ -1,27 +1,39 @@
+import 'package:my_wallet/ca/domain/ca_use_case.dart';
 import 'package:my_wallet/ui/transaction/add/data/add_transaction_repository.dart';
 import 'package:my_wallet/database/data.dart';
 
-class AddTransactionUseCase {
-  final AddTransactionRepository _repo = AddTransactionRepository();
+class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepository> {
+  AddTransactionUseCase() : super(AddTransactionRepository());
 
-  Future<bool> saveTransaction(TransactionType _type, Account _account, AppCategory _category, double _amount, DateTime _date, String _desc) async {
+  void loadAccounts(onNext<List<Account>> next) {
+    repo.loadAccounts().then((value) => next(value));
+  }
+
+  void loadCategory(onNext<List<AppCategory>> next) {
+    repo.loadCategory().then((value) => next(value));
+  }
+
+  void saveTransaction(TransactionType _type, Account _account, AppCategory _category, double _amount, DateTime _date, onNext<bool> next, onError error) async {
     var result = false;
-    do {
-      if (!(await _repo.checkTransactionType(_type))) break;
-      if (!(await _repo.checkAccount(_account))) break;
-      if (!(await _repo.checkCategory(_category))) break;
-      if (!(await _repo.checkDateTime(_date))) break;
-      if (!(await _repo.checkDescription(_desc))) break;
+    try {
+      do {
+        if (!(await repo.checkTransactionType(_type))) break;
+        if (!(await repo.checkAccount(_account))) break;
+        if (!(await repo.checkCategory(_category))) break;
+        if (!(await repo.checkDateTime(_date))) break;
 
-      int id = await _repo.generateId();
+        int id = await repo.generateId();
 
-      result = await _repo.saveTransaction(id, _type, _account, _category, _amount, _date, _desc);
-      
-      if (!result) break;
+        result = await repo.saveTransaction(id, _type, _account, _category, _amount, _date, _category.name);
 
-      result = await _repo.updateAccount(_account, _type, _amount);
-    } while (false);
+        if (!result) break;
 
-    return result;
+        result = await repo.updateAccount(_account, _type, _amount);
+
+        next(result);
+      } while(false);
+    } catch (e) {
+      error(e);
+    }
   }
 }

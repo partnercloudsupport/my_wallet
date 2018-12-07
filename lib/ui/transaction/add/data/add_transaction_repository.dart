@@ -1,11 +1,23 @@
-import 'package:my_wallet/database/database_manager.dart' as db;
+import 'package:my_wallet/ca/data/ca_repository.dart';
 import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/database/database_manager.dart' as _db;
+import 'package:my_wallet/database/firebase_manager.dart' as _fm;
 import 'package:my_wallet/ui/transaction/add/domain/add_transaction_exception.dart';
-import 'package:my_wallet/database/firebase_manager.dart' as fm;
 
-class AddTransactionRepository {
+export 'package:my_wallet/database/data.dart';
+
+class AddTransactionRepository extends CleanArchitectureRepository {
+
   final _AddTransactionDatabaseRepository _dbRepo = _AddTransactionDatabaseRepository();
   final _AddTransactionFirebaseRepository _fbRepo = _AddTransactionFirebaseRepository();
+
+  Future<List<Account>> loadAccounts() {
+    return _dbRepo.loadAccounts();
+  }
+
+  Future<List<AppCategory>> loadCategory() {
+    return _dbRepo.loadCategory();
+  }
 
   Future<int> generateId() {
     return _dbRepo.generateId();
@@ -52,6 +64,14 @@ class AddTransactionRepository {
 
 class _AddTransactionDatabaseRepository {
 
+  Future<List<Account>> loadAccounts() async{
+    return _db.queryAccounts();
+  }
+
+  Future<List<AppCategory>> loadCategory() {
+    return _db.queryCategory();
+  }
+
   Future<bool> checkTransactionType(TransactionType type) async {
     return type == null ? throw AddTransactionException("Please Select Transaction Type") : true;
   }
@@ -73,7 +93,7 @@ class _AddTransactionDatabaseRepository {
   }
 
   Future<int> generateId() {
-    return db.generateTransactionId();
+    return _db.generateTransactionId();
   }
 }
 
@@ -86,7 +106,7 @@ class _AddTransactionFirebaseRepository {
       double _amount,
       DateTime _date,
       String _desc) {
-    return fm.addTransaction(AppTransaction(id, _date, _account.id, _category.id, _amount, _desc, _type));
+    return _fm.addTransaction(AppTransaction(id, _date, _account.id, _category.id, _amount, _desc, _type));
   }
 
   Future<bool> updateAccount(
@@ -95,6 +115,6 @@ class _AddTransactionFirebaseRepository {
       double amount) {
     var newBalance = acc.balance + (TransactionType.typeExpense.contains(type) ? -1 : 1) * amount;
 
-    return fm.updateAccount(Account(acc.id, acc.name, newBalance, acc.type, acc.currency));
+    return _fm.updateAccount(Account(acc.id, acc.name, newBalance, acc.type, acc.currency));
   }
 }

@@ -1,23 +1,32 @@
+import 'package:my_wallet/ca/presentation/presenter/ca_presenter.dart';
+import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_data_view.dart';
 import 'package:my_wallet/ui/transaction/add/domain/add_transaction_use_case.dart';
-import 'package:my_wallet/database/data.dart';
 
-class AddTransactionPresenter {
-  final AddTransactionUseCase _useCase = AddTransactionUseCase();
+class AddTransactionPresenter extends CleanArchitecturePresenter<AddTransactionUseCase, AddTransactionDataView> {
+  AddTransactionPresenter() : super(AddTransactionUseCase());
 
-  Future<bool> saveTransaction(
+  void loadAccounts() {
+    useCase.loadAccounts(dataView.onAccountListLoaded);
+  }
+
+  void loadCategory() {
+    useCase.loadCategory(dataView.onCategoryListLoaded);
+  }
+
+  void saveTransaction(
       TransactionType _type,
       Account _account,
       AppCategory _category,
       double _amount,
-      DateTime _date,
-      String _desc) {
-    return _useCase.saveTransaction(
+      DateTime _date) {
+    useCase.saveTransaction(
         _type,
         _account,
         _category,
         _amount,
         _date,
-        _desc
+      dataView.onSaveTransactionSuccess,
+      dataView.onSaveTransactionFailed
     );
   }
 }
