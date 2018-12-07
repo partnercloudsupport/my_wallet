@@ -52,7 +52,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
           itemBuilder: (context, index) => Container(
             child: ListTile(
               title: Text(entities[index].desc, style: Theme.of(context).textTheme.body2.apply(color: theme.darkBlue),),
-              subtitle: Text(df.format(entities[index].dateTime)),
+              subtitle: Text(df.format(entities[index].dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
               trailing: Text("\$${nf.format(entities[index].amount)}", style: Theme.of(context).textTheme.title.apply(color: theme.darkBlue),),
             ),
             color: index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.2),
