@@ -25,6 +25,7 @@ dependencies:
   firebase_core: any
   firebase_database: any
   shared_preferences: any
+  gradient_app_bar: any
 
 dev_dependencies:
   flutter_test:

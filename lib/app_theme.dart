@@ -8,6 +8,7 @@ const pinkAccent = Color(0xFFED1946);
 const brightPink = Color(0xFFFF4081);
 const blueGrey = Color(0xFF9A9AAC);
 const brightGreen = Color(0xFF00FF00);
+const white = Color(0xFFFFFFFF);
 
 ThemeData appTheme = ThemeData(
     brightness: Brightness.dark,

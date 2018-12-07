@@ -41,6 +41,14 @@ class _NumberInputPadState extends State<NumberInputPad> {
     final size = 100.0;
 
     return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [
+          theme.darkBlue,
+          theme.darkBlue.withOpacity(0.89)
+        ],
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight)
+      ),
       child: StaggeredGridView.countBuilder(
         shrinkWrap: true,
         primary: false,
@@ -59,7 +67,7 @@ class _NumberInputPadState extends State<NumberInputPad> {
       height: height,
       decoration: BoxDecoration(
           border: Border.all(color: Colors.white, width: 0.3),
-          color: theme.darkBlue
+//          color: theme.darkBlue
       ),
       child: FlatButton(onPressed: () => f(title), child: Text(title, style: TextStyle(fontSize: 24.0), textAlign: TextAlign.center,)),
     );

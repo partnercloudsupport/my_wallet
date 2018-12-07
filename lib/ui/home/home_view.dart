@@ -56,12 +56,22 @@ class _MyWalletState extends State<MyWalletHome> {
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
         title: Text(_df.format(DateTime.now()), style: Theme.of(context).textTheme.title,),
-        background: ListView(
-          physics: NeverScrollableScrollPhysics(),
-          children: <Widget>[
-            HomeOverview(titleStyle),
-            ChartRow(),
-          ],
+        background: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              theme.white.withOpacity(0.0),
+              theme.white.withOpacity(0.2)
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight)
+          ),
+          child: ListView(
+            physics: NeverScrollableScrollPhysics(),
+            children: <Widget>[
+              HomeOverview(titleStyle),
+              ChartRow(),
+            ],
+          ),
         ),
       ),
     ));
