@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
 import 'package:intl/intl.dart';
 import 'package:my_wallet/widget/number_input_pad.dart';
+import 'package:my_wallet/widget/conversation_row.dart';
 
 typedef BuildWidget<T> = Widget Function(T);
 
@@ -28,8 +29,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   _AddTransactionState() : super(AddTransactionPresenter());
 
   var _numberFormat = NumberFormat("\$#,##0.00");
-  var _dateFormat = DateFormat("dd MMM, yyyy");
-  var _timeFormat = DateFormat("hh:mm a");
 
   final tables = [observer.tableAccount, observer.tableCategory];
 
@@ -98,53 +97,28 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
               child: ListView(
                 shrinkWrap: true,
                 children: <Widget>[
-                  Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Description(widget.transactionId == null ? "Create new" : "An"),
-                        Data(_type.name, theme.darkBlue, onPressed: _showTransactionTypeSelection,)
-                      ],
-                    ),
+                  ConversationRow(
+                      widget.transactionId == null ? "Create new" : "An",
+                      _type.name,
+                      theme.darkBlue,
+                      onPressed: _showTransactionTypeSelection),
+                  ConversationRow(
+                      widget.transactionId == null ? "of" : "valued of",
+                      _numberFormat.format(_toNumber(_number, _decimal)),
+                      TransactionType.isIncome(_type) ? theme.tealAccent : TransactionType.isExpense(_type) ? theme.pinkAccent : theme.blueGrey,
+                      style: Theme.of(context).textTheme.display2),
+                  ConversationRow(
+                      "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
+                      _account == null ? "Select Account" : _account.name,
+                      theme.darkGreen,
+                    onPressed: _showSelectAccount,),
+                  ConversationRow(
+                    "for",
+                      _category == null ? "Select Category" : _category.name,
+                      theme.brightPink,
+                      onPressed: _showSelectCategory
                   ),
-                  Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Description(widget.transactionId == null ? "of" : "valued of"),
-                        Data(_numberFormat.format(_toNumber(_number, _decimal)),TransactionType.isIncome(_type) ? theme.tealAccent : TransactionType.isExpense(_type) ? theme.pinkAccent : theme.blueGrey, style: Theme.of(context).textTheme.display2,),
-                      ],
-                    ),
-                  ),
-                  Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Description("${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}"),
-                        Data(_account == null ? "Select Account" : _account.name, theme.darkGreen, onPressed: _showSelectAccount,),
-                      ],
-                    ),
-                  ),
-                  Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Description("for"),
-                        Data(_category == null ? "Select Category" : _category.name, theme.brightPink, onPressed: _showSelectCategory),
-                      ],
-                    ),
-                  ),
-                  Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Description("on"),
-                        Data(_dateFormat.format(_date), theme.darkBlue, onPressed: _showDatePicker,),
-                        Description("at"),
-                        Data(_timeFormat.format(_date), theme.darkBlue, onPressed: _showTimePicker,),
-                      ],
-                    ),
-                  )
+                  DateTimeRow(_date, _showDatePicker, _showTimePicker)
                 ],
               ),
             ),
@@ -293,47 +267,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   @override
   void onLoadTransactionFailed(Exception e) {
-  }
-}
-
-class Description extends StatelessWidget {
-  final String _title;
-
-  Description(this._title);
-
-  @override
-  Widget build(BuildContext context) {
-    return
-      Padding(
-        child: Text(_title, style: Theme.of(context).textTheme.subhead.apply(color: theme.blueGrey)),
-        padding: EdgeInsets.all(8.0),
-      );
-  }
-}
-
-class Data extends StatelessWidget {
-  final String _data;
-  final Color _color;
-  final TextStyle style;
-  final Function onPressed;
-
-  Data(this._data, this._color, {this.style, this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return Flexible(
-      child: onPressed == null ? Text(
-        _data,
-        style: style == null ? Theme.of(context).textTheme.title.apply(color: _color) : style.apply(color: _color),
-        overflow: TextOverflow.ellipsis,)
-          : FlatButton(
-        onPressed: onPressed,
-        child: Text(
-          _data,
-          style: style == null ? Theme.of(context).textTheme.title.apply(color: _color) : style.apply(color: _color),
-          overflow: TextOverflow.ellipsis,) ,
-      ),
-    );
   }
 }
 
