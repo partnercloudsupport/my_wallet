@@ -13,13 +13,19 @@ class AddTransactionPresenter extends CleanArchitecturePresenter<AddTransactionU
     useCase.loadCategory(dataView.onCategoryListLoaded);
   }
 
+  void loadTransactionDetail(int id) {
+    useCase.loadTransactionDetail(id, dataView.onLoadTransactionDetail, dataView.onLoadTransactionFailed);
+  }
+
   void saveTransaction(
+      int id,
       TransactionType _type,
       Account _account,
       AppCategory _category,
       double _amount,
       DateTime _date) {
     useCase.saveTransaction(
+      id,
         _type,
         _account,
         _category,

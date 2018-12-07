@@ -3,6 +3,7 @@ import 'package:my_wallet/database/data.dart';
 import 'package:my_wallet/database/database_manager.dart' as _db;
 import 'package:my_wallet/database/firebase_manager.dart' as _fm;
 import 'package:my_wallet/ui/transaction/add/domain/add_transaction_exception.dart';
+import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
 
 export 'package:my_wallet/database/data.dart';
 
@@ -17,6 +18,10 @@ class AddTransactionRepository extends CleanArchitectureRepository {
 
   Future<List<AppCategory>> loadCategory() {
     return _dbRepo.loadCategory();
+  }
+
+  Future<TransactionDetail> loadTransactionDetail(int id) {
+    return _dbRepo.loadTransactionDetail(id);
   }
 
   Future<int> generateId() {
@@ -35,10 +40,11 @@ class AddTransactionRepository extends CleanArchitectureRepository {
   }
 
   Future<bool> updateAccount(
+      TransactionDetail currentTransaction,
       Account acc,
       TransactionType type,
       double amount) {
-    return _fbRepo.updateAccount(acc, type, amount);
+    return _fbRepo.updateAccount(currentTransaction, acc, type, amount);
   }
 
   Future<bool> checkTransactionType(TransactionType type) {
@@ -70,6 +76,33 @@ class _AddTransactionDatabaseRepository {
 
   Future<List<AppCategory>> loadCategory() {
     return _db.queryCategory();
+  }
+
+  Future<TransactionDetail> loadTransactionDetail(int id) async {
+    List<AppTransaction> transactions = await _db.queryTransactions(id: id);
+
+    if(transactions == null || transactions.isEmpty) throw AddTransactionException("Transaction with id $id not found");
+
+    AppTransaction transaction = transactions[0];
+
+    List<Account> accounts = await _db.queryAccounts(id: transaction.accountId);
+
+    Account account;
+    if(accounts != null && accounts.isNotEmpty) account = accounts[0];
+
+    List<AppCategory> categories = await _db.queryCategory(id: transaction.categoryId);
+
+    AppCategory category;
+    if(categories != null && categories.isNotEmpty) category = categories[0];
+
+    return TransactionDetail(
+      transaction.id,
+      transaction.dateTime,
+      account,
+      category,
+      transaction.amount,
+      transaction.type
+    );
   }
 
   Future<bool> checkTransactionType(TransactionType type) async {
@@ -110,10 +143,18 @@ class _AddTransactionFirebaseRepository {
   }
 
   Future<bool> updateAccount(
+      TransactionDetail currentTransaction,
       Account acc,
       TransactionType type,
       double amount) {
-    var newBalance = acc.balance + (TransactionType.typeExpense.contains(type) ? -1 : 1) * amount;
+    var revertBalance = 0.0;
+
+    if(currentTransaction != null) {
+      // revert to amount before this transaction happened
+      revertBalance = (TransactionType.isExpense(currentTransaction.type) ? 1 : -1) * currentTransaction.amount;
+    }
+
+    var newBalance = acc.balance + (TransactionType.isExpense(type) ? -1 : 1) * amount + revertBalance;
 
     return _fm.updateAccount(Account(acc.id, acc.name, newBalance, acc.type, acc.currency));
   }

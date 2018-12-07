@@ -114,8 +114,12 @@ Future<List<Account>> queryAccounts({int id, AccountType type}) async {
   return null;
 }
 
-Future<List<AppTransaction>> queryTransactions() async {
-  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions));
+Future<List<AppTransaction>> queryTransactions({int id}) async {
+  String where;
+
+  if(id != null) where = "$_transID = $id";
+
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: where));
 
   return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
 }

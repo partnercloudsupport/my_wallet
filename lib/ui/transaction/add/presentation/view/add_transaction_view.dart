@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:my_wallet/my_wallet_view.dart';
 import 'package:my_wallet/database/data.dart';
-import 'package:intl/intl.dart';
 import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_data_view.dart';
 import 'package:my_wallet/ui/transaction/add/presentation/presenter/add_transaction_presenter.dart';
 import 'package:my_wallet/data_observer.dart' as observer;
 import 'package:flutter/cupertino.dart';
+import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
+import 'package:intl/intl.dart';
+
+import 'package:my_wallet/app_theme.dart' as theme;
 
 typedef BuildWidget<T> = Widget Function(T);
 
 class AddTransaction extends StatefulWidget {
+  final int transactionId;
+
+  AddTransaction({this.transactionId});
+
   @override
   State<StatefulWidget> createState() {
     return _AddTransactionState();
@@ -21,7 +28,11 @@ class AddTransaction extends StatefulWidget {
 class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTransactionPresenter> implements AddTransactionDataView, observer.DatabaseObservable {
   _AddTransactionState() : super(AddTransactionPresenter());
 
-  final tables = [observer.tableAccount, observer.tableCategory];
+  var _numberFormat = NumberFormat("\$#,##0.00");
+  var _dateFormat = DateFormat("dd MMM, yyyy");
+  var _timeFormat = DateFormat("hh:mm a");
+
+  final _tables = [observer.tableAccount, observer.tableCategory];
 
   var _number = "";
   var _decimal = "";
@@ -29,15 +40,11 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   var _type = TransactionType.expenses;
   var _date = DateTime.now();
 
-  var _nf = NumberFormat("\$#,##0.00");
-  var _df = DateFormat("dd MMM, yyyy");
-  var _tf = DateFormat("hh:mm a");
-
   Account _account;
   AppCategory _category;
 
-  List<Account> accountList = [];
-  List<AppCategory> categoryList = [];
+  List<Account> _accountList = [];
+  List<AppCategory> _categoryList = [];
 
   @override
   void init() {
@@ -57,6 +64,10 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
     presenter.loadAccounts();
     presenter.loadCategory();
+
+    if(widget.transactionId != null) {
+      presenter.loadTransactionDetail(widget.transactionId);
+    }
   }
 
   @override
@@ -83,11 +94,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        Description("Create new"),
-                        FlatButton(
-                          onPressed: _showTransactionTypeSelection,
-                          child: Data(_type.name, theme.darkBlue),
-                        ),
+                        Description(widget.transactionId == null ? "Create new" : "An"),
+                        Data(_type.name, theme.darkBlue, onPressed: _showTransactionTypeSelection,)
                       ],
                     ),
                   ),
@@ -95,8 +103,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        Description("of"),
-                        Data(_nf.format(_toNumber(_number, _decimal)),TransactionType.isIncome(_type) ? theme.tealAccent : TransactionType.isExpense(_type) ? theme.pinkAccent : theme.blueGrey, style: Theme.of(context).textTheme.display2,),
+                        Description(widget.transactionId == null ? "of" : "valued of"),
+                        Data(_numberFormat.format(_toNumber(_number, _decimal)),TransactionType.isIncome(_type) ? theme.tealAccent : TransactionType.isExpense(_type) ? theme.pinkAccent : theme.blueGrey, style: Theme.of(context).textTheme.display2,),
                       ],
                     ),
                   ),
@@ -104,11 +112,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        Description(TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"),
-                        FlatButton(
-                          onPressed: _showSelectAccount,
-                          child: Data(_account == null ? "Select Account" : _account.name, theme.darkGreen),
-                        )
+                        Description("${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}"),
+                        Data(_account == null ? "Select Account" : _account.name, theme.darkGreen, onPressed: _showSelectAccount,),
                       ],
                     ),
                   ),
@@ -117,10 +122,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         Description("for"),
-                        FlatButton(
-                          onPressed: _showSelectCategory,
-                          child: Data(_category == null ? "Select Category" : _category.name, theme.brightPink),
-                        )
+                        Data(_category == null ? "Select Category" : _category.name, theme.brightPink, onPressed: _showSelectCategory),
                       ],
                     ),
                   ),
@@ -129,15 +131,9 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         Description("on"),
-                        FlatButton(
-                          onPressed: _showDatePicker,
-                          child: Data(_df.format(_date), theme.darkBlue),
-                        ),
+                        Data(_dateFormat.format(_date), theme.darkBlue, onPressed: _showDatePicker,),
                         Description("at"),
-                        FlatButton(
-                          onPressed: _showTimePicker,
-                          child: Data(_tf.format(_date), theme.darkBlue),
-                        )
+                        Data(_timeFormat.format(_date), theme.darkBlue, onPressed: _showTimePicker,),
                       ],
                     ),
                   )
@@ -155,12 +151,12 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   void _showTransactionTypeSelection() {
     showModalBottomSheet(context: context, builder: (context) =>
-        _BottomViewContent(TransactionType.all, (f) =>
+        BottomViewContent(TransactionType.all, (f) =>
             Align(
               child: InkWell(
                 child: Padding(
                   padding: EdgeInsets.all(10.0),
-                  child: Data(f.name, theme.darkBlue)
+                  child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: theme.darkBlue))
                 ),
                 onTap: () {
                   setState(() => _type = f);
@@ -176,10 +172,10 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   void _showSelectAccount() {
     showModalBottomSheet(context: context, builder: (context) =>
-        _BottomViewContent(accountList, (f) => Align(
+        BottomViewContent(_accountList, (f) => Align(
           child: InkWell(
             child: Padding(padding: EdgeInsets.all(10.0),
-              child: Data(f.name, theme.darkGreen)
+              child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: theme.darkGreen), overflow: TextOverflow.ellipsis, maxLines: 1,) //Data(f.name, theme.darkGreen)
             ),
             onTap: () {
               setState(() => _account = f);
@@ -193,10 +189,10 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   void _showSelectCategory() {
     showModalBottomSheet(context: context, builder: (context) =>
-        _BottomViewContent(categoryList, (f) => Align(
+        BottomViewContent(_categoryList, (f) => Align(
           child: InkWell(
             child: Padding(padding: EdgeInsets.all(10.0),
-                child: Data(f.name, theme.brightPink)
+                child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: theme.brightPink), overflow: TextOverflow.ellipsis, maxLines: 1,)
             ),
             onTap: () {
               setState(() => _category = f);
@@ -210,13 +206,13 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   void _showDatePicker() {
     showDatePicker(context: context, initialDate: _date, firstDate: _date, lastDate: _date.add(Duration(days: 365))).then((selected) {
-      setState(() => _date = DateTime(selected.year, selected.month, selected.day, _date.hour, _date.minute, _date.second, _date.millisecond));
+      if(selected != null) setState(() => _date = DateTime(selected.year, selected.month, selected.day, _date.hour, _date.minute, _date.second, _date.millisecond));
     });
   }
 
   void _showTimePicker() {
     showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_date)).then((selected) {
-      setState(() => _date = DateTime(_date.year, _date.month, _date.day, selected.hour, selected.minute, _date.second));
+      if(selected != null) setState(() => _date = DateTime(_date.year, _date.month, _date.day, selected.hour, selected.minute, _date.second));
     });
   }
 
@@ -233,6 +229,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   void _saveTransaction() {
     presenter.saveTransaction(
+      widget.transactionId,
         _type,
         _account,
         _category,
@@ -243,12 +240,12 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   @override
   void onAccountListLoaded(List<Account> value) {
-    setState(() => this.accountList = value);
+    setState(() => this._accountList = value);
   }
 
   @override
   void onCategoryListLoaded(List<AppCategory> value) {
-    setState(() => this.categoryList = value);
+    setState(() => this._categoryList = value);
   }
 
   @override
@@ -269,6 +266,25 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
         )
       ],
     ));
+  }
+
+  @override
+  void onLoadTransactionDetail(TransactionDetail detail) {
+    setState(() {
+      var _nf = NumberFormat("#");
+
+      _type = detail.type;
+      _date = detail.dateTime;
+      _account = detail.account;
+      _category = detail.category;
+
+      _number = "${_nf.format(detail.amount)}";
+      _decimal = "${_nf.format((detail.amount - detail.amount.floor()) * 100)}";
+    });
+  }
+
+  @override
+  void onLoadTransactionFailed(Exception e) {
   }
 }
 
@@ -291,20 +307,33 @@ class Data extends StatelessWidget {
   final String _data;
   final Color _color;
   final TextStyle style;
+  final Function onPressed;
 
-  Data(this._data, this._color, {this.style});
+  Data(this._data, this._color, {this.style, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return Text(_data, style: style == null ? Theme.of(context).textTheme.title.apply(color: _color) : style.apply(color: _color),);
+    return Flexible(
+      child: onPressed == null ? Text(
+        _data,
+        style: style == null ? Theme.of(context).textTheme.title.apply(color: _color) : style.apply(color: _color),
+        overflow: TextOverflow.ellipsis,)
+          : FlatButton(
+        onPressed: onPressed,
+        child: Text(
+          _data,
+          style: style == null ? Theme.of(context).textTheme.title.apply(color: _color) : style.apply(color: _color),
+          overflow: TextOverflow.ellipsis,) ,
+      ),
+    );
   }
 }
 
-class _BottomViewContent<T> extends StatefulWidget {
+class BottomViewContent<T> extends StatefulWidget {
   final List<T> _data;
   final BuildWidget _buildWidget;
 
-  _BottomViewContent(this._data, this._buildWidget);
+  BottomViewContent(this._data, this._buildWidget);
 
   @override
   State<StatefulWidget> createState() {
@@ -312,7 +341,7 @@ class _BottomViewContent<T> extends StatefulWidget {
   }
 }
 
-class _BottomViewContentState<T> extends State<_BottomViewContent> {
+class _BottomViewContentState<T> extends State<BottomViewContent> {
   List<T> data = [];
 
   @override
@@ -324,8 +353,10 @@ class _BottomViewContentState<T> extends State<_BottomViewContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+      height: MediaQuery.of(context).size.height * 0.5,
+      alignment: Alignment.center,
       child: ListView.builder(
           shrinkWrap: true,
           itemCount: data == null ? 0 : data.length,

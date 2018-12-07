@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_data_view.dart';
+import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_view.dart';
 
 class TransactionList extends StatefulWidget {
   final String title;
@@ -54,6 +55,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
               title: Text(entities[index].desc, style: Theme.of(context).textTheme.body2.apply(color: theme.darkBlue),),
               subtitle: Text(df.format(entities[index].dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
               trailing: Text("\$${nf.format(entities[index].amount)}", style: Theme.of(context).textTheme.title.apply(color: theme.darkBlue),),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AddTransaction(transactionId: entities[index].id,))),
             ),
             color: index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.2),
           )
