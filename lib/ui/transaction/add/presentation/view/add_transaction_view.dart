@@ -31,7 +31,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   var _dateFormat = DateFormat("dd MMM, yyyy");
   var _timeFormat = DateFormat("hh:mm a");
 
-  final _tables = [observer.tableAccount, observer.tableCategory];
+  final tables = [observer.tableAccount, observer.tableCategory];
 
   var _number = "";
   var _decimal = "";
@@ -61,12 +61,21 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   void initState() {
     super.initState();
 
+    observer.registerDatabaseObservable(tables, this);
+
     presenter.loadAccounts();
     presenter.loadCategory();
 
     if(widget.transactionId != null) {
       presenter.loadTransactionDetail(widget.transactionId);
     }
+  }
+
+  @override
+  void dispose() {
+    observer.unregisterDatabaseObservable(tables, this);
+
+    super.dispose();
   }
 
   @override
