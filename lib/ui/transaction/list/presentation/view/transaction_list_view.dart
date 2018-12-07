@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/presenter/transaction_list_presenter.dart';
 import 'package:my_wallet/database/data.dart';
-import 'package:my_wallet/my_wallet_view.dart';
+import 'package:my_wallet/widget/my_wallet_app_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
