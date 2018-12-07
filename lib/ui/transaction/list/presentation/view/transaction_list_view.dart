@@ -7,6 +7,7 @@ import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_data_view.dart';
 import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_view.dart';
+import 'package:my_wallet/data_observer.dart' as observer;
 
 class TransactionList extends StatefulWidget {
   final String title;
@@ -22,8 +23,10 @@ class TransactionList extends StatefulWidget {
   }
 }
 
-class _TransactionListState extends CleanArchitectureView<TransactionList, TransactionListPresenter> implements TransactionListDataView {
+class _TransactionListState extends CleanArchitectureView<TransactionList, TransactionListPresenter> implements TransactionListDataView, observer.DatabaseObservable {
   _TransactionListState() : super(TransactionListPresenter());
+
+  final tables = [observer.tableTransactions];
 
   List<AppTransaction> entities = [];
 
@@ -39,7 +42,16 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
   void initState() {
     super.initState();
 
-    presenter.loadDataFor(widget.accountId, widget.categoryId, widget.day);
+    observer.registerDatabaseObservable(tables, this);
+
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    observer.unregisterDatabaseObservable(tables, this);
   }
 
   @override
@@ -68,5 +80,14 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
     setState(() {
       this.entities = value;
     });
+  }
+
+  @override
+  void onDatabaseUpdate(String table) {
+    _loadData();
+  }
+
+  void _loadData() {
+    presenter.loadDataFor(widget.accountId, widget.categoryId, widget.day);
   }
 }
