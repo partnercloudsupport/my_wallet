@@ -10,8 +10,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
 import 'package:intl/intl.dart';
 
-import 'package:my_wallet/app_theme.dart' as theme;
-
 typedef BuildWidget<T> = Widget Function(T);
 
 class AddTransaction extends StatefulWidget {
