@@ -11,8 +11,7 @@ import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
 import 'package:intl/intl.dart';
 import 'package:my_wallet/widget/number_input_pad.dart';
 import 'package:my_wallet/widget/conversation_row.dart';
-
-typedef BuildWidget<T> = Widget Function(T);
+import 'package:my_wallet/widget/bottom_sheet_list.dart';
 
 class AddTransaction extends StatefulWidget {
   final int transactionId;
@@ -267,42 +266,5 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   @override
   void onLoadTransactionFailed(Exception e) {
-  }
-}
-
-class BottomViewContent<T> extends StatefulWidget {
-  final List<T> _data;
-  final BuildWidget _buildWidget;
-
-  BottomViewContent(this._data, this._buildWidget);
-
-  @override
-  State<StatefulWidget> createState() {
-    return _BottomViewContentState<T>();
-  }
-}
-
-class _BottomViewContentState<T> extends State<BottomViewContent> {
-  List<T> data = [];
-
-  @override
-  void initState() {
-    super.initState();
-
-    data = widget._data;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-      height: MediaQuery.of(context).size.height * 0.5,
-      alignment: Alignment.center,
-      child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: data == null ? 0 : data.length,
-          itemBuilder: (context, index) => widget._buildWidget(data[index])
-      ),
-    );
   }
 }
