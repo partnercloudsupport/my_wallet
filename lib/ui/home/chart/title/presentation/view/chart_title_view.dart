@@ -6,11 +6,13 @@ import 'package:intl/intl.dart';
 import 'package:my_wallet/data_observer.dart' as observer;
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/home/chart/title/presentation/view/chart_title_data_view.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class ChartTitleView extends StatefulWidget {
   final TabController _controller;
+  final double height;
 
-  ChartTitleView(this._controller);
+  ChartTitleView(this._controller, {this.height});
 
   @override
   State<StatefulWidget> createState() {
@@ -56,38 +58,41 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
     return TabBar(
               tabs: <Widget>[
                 Padding(
-                  padding: EdgeInsets.all(10.0),
+                  padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text(
+                      AutoSizeText(
                         "Income",
                         style: textStyle.apply(color: theme.tealAccent),
+                        maxLines: 1,
                       ),
                       Text("${entity == null ? "\$0.00" : _nf.format(entity.incomeAmount)}",)
                     ],
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(10.0),
+                  padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text(
+                      AutoSizeText(
                         "Expense",
                         style: textStyle.apply(color: theme.pinkAccent),
+                        maxLines: 1,
                       ),
                       Text("${entity == null ? "\$0.00" : _nf.format(entity.expensesAmount)}",)
                     ],
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(10.0),
+                  padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text("Saving",
+                      AutoSizeText("Saving",
                       style: textStyle.apply(color: theme.brightGreen),
+                        maxLines: 1,
                       ),
                       Text("${entity == null ? "\$0.00" : _nf.format(entity.savingAmount)}")
                     ],

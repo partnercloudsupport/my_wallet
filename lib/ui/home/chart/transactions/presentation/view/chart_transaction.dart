@@ -58,13 +58,13 @@ class _TransactionChartState extends CleanArchitectureView<TransactionChart, Tra
               measureFn: (data, index) => data.amount,
               domainFn: (data, index) => data.amount,
               colorFn: (data, index) => Color.fromHex(code: data.color),
-              labelAccessorFn: (data, index) => "${data.category}"
+              labelAccessorFn: (data, index) => "${data.category}",
           ),
     ],
       animate: false,
       defaultRenderer: ArcRendererConfig(
           arcRendererDecorators: [ ArcLabelDecorator(
-            labelPosition: ArcLabelPosition.auto,
+            labelPosition: ArcLabelPosition.outside,
             outsideLabelStyleSpec: TextStyleSpec(
                 color: Color.fromHex(code: "#FFFFFF"),
                 fontSize: 14
@@ -77,7 +77,7 @@ class _TransactionChartState extends CleanArchitectureView<TransactionChart, Tra
               color: Color.fromHex(code: "#FFFFFF"),
               thickness: 2.0,
               length: 24.0
-            )
+            ),
           ) ]
       ),
     );

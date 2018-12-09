@@ -22,6 +22,11 @@ class _MyWalletState extends State<MyWalletHome> {
 
   DateFormat _df = DateFormat("MMM, yyyy");
 
+  final overviewRatio = 0.15;
+  final chartRatio = 0.5;
+  final titleHeight = 22.0;
+
+
   @override
   Widget build(BuildContext context) {
     var platform = Theme.of(context).platform;
@@ -51,11 +56,15 @@ class _MyWalletState extends State<MyWalletHome> {
     List<Widget> list = [];
 
     list.add(SliverAppBar(
-      expandedHeight: MediaQuery.of(context).size.height * 0.55,
+      expandedHeight: MediaQuery.of(context).size.height * (overviewRatio + chartRatio) + titleHeight,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
-        title: Text(_df.format(DateTime.now()), style: Theme.of(context).textTheme.title,),
+        title: SizedBox(
+          height: titleHeight,
+          child: Text(_df.format(DateTime.now()), style: Theme.of(context).textTheme.title,),
+        ),
+        collapseMode: CollapseMode.parallax,
         background: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
@@ -68,8 +77,8 @@ class _MyWalletState extends State<MyWalletHome> {
           child: ListView(
             physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
-              HomeOverview(titleStyle),
-              ChartRow(),
+              HomeOverview(titleStyle, MediaQuery.of(context).size.height * overviewRatio),
+              ChartRow(MediaQuery.of(context).size.height * chartRatio),
             ],
           ),
         ),
