@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_wallet/app_theme.dart' as theme;
+import 'package:auto_size_text/auto_size_text.dart';
 
 class ConversationRow extends StatelessWidget {
   final String description;
@@ -85,10 +86,10 @@ class _Data extends StatelessWidget {
         overflow: TextOverflow.ellipsis,)
           : FlatButton(
         onPressed: onPressed,
-        child: Text(
+        child: AutoSizeText(
           _data,
           style: style == null ? Theme.of(context).textTheme.title.apply(color: _color) : style.apply(color: _color),
-          overflow: TextOverflow.ellipsis,) ,
+          maxLines: 1,) ,
       ),
     );
   }
