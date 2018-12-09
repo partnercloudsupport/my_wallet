@@ -76,7 +76,7 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: NumberInputPad(_onNumberInput, null, null),
+            child: NumberInputPad(_onNumberInput, () {}, null, null),
           )
         ],
       )

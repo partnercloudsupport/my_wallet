@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:my_wallet/widget/number_input_pad.dart';
 import 'package:my_wallet/widget/conversation_row.dart';
 import 'package:my_wallet/widget/bottom_sheet_list.dart';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
 
 class AddTransaction extends StatefulWidget {
   final int transactionId;
@@ -43,9 +44,14 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   List<Account> _accountList = [];
   List<AppCategory> _categoryList = [];
 
+  var _showNumPad = true;
+  var keyboardSubscriptionId;
+
   @override
   void init() {
     presenter.dataView = this;
+
+    keyboardSubscriptionId = KeyboardVisibilityNotification().addNewListener(onShow: () => setState(() => _showNumPad = false));
   }
 
   @override
@@ -88,12 +94,10 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
           )
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
+      body: Stack(
           children: <Widget>[
-            Center(
-              child: ListView(
+            /*Center(
+              child:*/ ListView(
                 shrinkWrap: true,
                 children: <Widget>[
                   ConversationRow(
@@ -105,7 +109,10 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                       widget.transactionId == null ? "of" : "valued of",
                       _numberFormat.format(_toNumber(_number, _decimal)),
                       TransactionType.isIncome(_type) ? theme.tealAccent : TransactionType.isExpense(_type) ? theme.pinkAccent : theme.blueGrey,
-                      style: Theme.of(context).textTheme.display2),
+                      style: Theme.of(context).textTheme.display2,
+                  onPressed: () {
+                        setState(() => _showNumPad = !_showNumPad);
+                  },),
                   ConversationRow(
                       "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
                       _account == null ? "Select Account" : _account.name,
@@ -120,10 +127,10 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                   DateTimeRow(_date, _showDatePicker, _showTimePicker)
                 ],
               ),
-            ),
+//            ),
             Align(
-              alignment: Alignment.bottomCenter,
-              child: NumberInputPad(_onNumberInput, _number, _decimal),
+                alignment: Alignment.bottomCenter,
+                child: _showNumPad ? NumberInputPad(_onNumberInput, () => setState(() => _showNumPad = false), _number, _decimal) : null
             )
           ],
         ),

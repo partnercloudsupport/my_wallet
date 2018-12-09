@@ -4,10 +4,11 @@ import 'package:my_wallet/app_theme.dart' as theme;
 
 class NumberInputPad extends StatefulWidget {
   final Function(String, String) _onValueChanged;
+  final Function _onOkClicked;
   final String _number;
   final String _decimal;
 
-  NumberInputPad(this._onValueChanged, this._number, this._decimal);
+  NumberInputPad(this._onValueChanged, this._onOkClicked, this._number, this._decimal);
 
   @override
   State<StatefulWidget> createState() {
@@ -37,8 +38,7 @@ class _NumberInputPadState extends State<NumberInputPad> {
   Widget build(BuildContext context) {
     FocusScope.of(context).requestFocus(new FocusNode());
 
-    final numbers = ["1", "2", "3", "C", "4", "5", "6", "7", "8", "9", "0", "."];
-    final size = 100.0;
+    final numbers = ["1", "2", "3", "C", "4", "5", "6", "7", "8", "9", ".", "0", "OK"];
 
     return Container(
       decoration: BoxDecoration(
@@ -54,7 +54,7 @@ class _NumberInputPadState extends State<NumberInputPad> {
         primary: false,
         crossAxisCount: 4,
         itemCount: numbers.length,
-        itemBuilder: (BuildContext context, int index) => _createButton(numbers[index], _onButtonClick, width: size, height: size),
+        itemBuilder: (BuildContext context, int index) => _createButton(numbers[index], _onButtonClick),
         staggeredTileBuilder: (int index) => new StaggeredTile.count(_isDoubleWidth(index) ? 2 : 1, _isDoubleHeight(index) ? 3 : 1),
         crossAxisSpacing: 0.3,
       ),
@@ -63,8 +63,6 @@ class _NumberInputPadState extends State<NumberInputPad> {
 
   Widget _createButton(String title, ValueChanged<String> f, {double width, double height}) {
     return Container(
-      width: width,
-      height: height,
       decoration: BoxDecoration(
           border: Border.all(color: Colors.white, width: 0.3),
 //          color: theme.darkBlue
@@ -78,7 +76,7 @@ class _NumberInputPadState extends State<NumberInputPad> {
   }
 
   bool _isDoubleWidth(int index) {
-    return index == 10 || index == 11;
+    return index == 11;
   }
 
   void _onButtonClick(String value) {
@@ -111,6 +109,9 @@ class _NumberInputPadState extends State<NumberInputPad> {
         break;
       case ".":
         isDecimal = true;
+        break;
+      case "OK":
+        widget._onOkClicked();
         break;
     }
 
