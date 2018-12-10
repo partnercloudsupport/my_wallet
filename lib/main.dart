@@ -15,33 +15,27 @@ import 'package:my_wallet/ui/category/list/presentation/view/list_category.dart'
 import 'package:my_wallet/ui/category/create/presentation/view/create_category_view.dart';
 
 import 'package:my_wallet/database/firebase_manager.dart' as fm;
+import 'package:my_wallet/ui/user/login/presentation/view/login_view.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  await fm.init();
 
-
-class MyApp extends StatefulWidget {
-
-  MyApp() : super();
-
-  @override
-  State<StatefulWidget> createState() {
-    return _MyAppState();
-  }
+  var user = await fm.checkCurrentUser();
+  runApp(MyApp(user));
 }
 
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    fm.init();
-  }
-  
+
+class MyApp extends StatelessWidget {
+
+  final bool hasUser;
+  MyApp(this.hasUser) : super();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: theme.appTheme,
-      home: MyWalletHome(),
+      home: hasUser ? MyWalletHome() : Login(),
       debugShowCheckedModeBanner: false,
       showPerformanceOverlay: false,
       showSemanticsDebugger: false,

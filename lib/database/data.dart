@@ -129,3 +129,11 @@ class Budget {
       this.budgetEnd
       );
 }
+
+class User {
+  final String uuid;
+  final String email;
+  final String displayName;
+
+  User(this.uuid, this.email, this.displayName);
+}

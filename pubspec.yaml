@@ -24,6 +24,7 @@ dependencies:
   flutter_staggered_grid_view: any
   firebase_core: any
   firebase_database: any
+  firebase_auth: any
   shared_preferences: any
   gradient_app_bar: any
   auto_size_text: any

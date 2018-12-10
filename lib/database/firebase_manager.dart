@@ -5,8 +5,11 @@ import 'package:my_wallet/database/data.dart';
 import 'package:my_wallet/database/database_manager.dart' as db;
 import 'package:my_wallet/database/firebase_config.dart' as fbConfig;
 import 'package:synchronized/synchronized.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:my_wallet/database/data.dart';
 
 FirebaseDatabase _database;
+FirebaseAuth _auth;
 bool _isInit = false;
 
 const _Account = "Account";
@@ -24,7 +27,7 @@ const _accountId = "accountId";
 const _categoryId = "categoryId";
 const _amount = "amount";
 const _desc = "desc";
-void init() async {
+Future<void> init() async {
   if (_isInit) return;
 
   _isInit = true;
@@ -44,6 +47,7 @@ void init() async {
         databaseURL: fbConfig.firebase_database_url,
       ));
   _database = FirebaseDatabase(app: _app);
+  _auth = FirebaseAuth.fromApp(_app);
 
   // register listener to Account
   _database
@@ -334,4 +338,40 @@ Future<bool> deleteCategory(AppCategory cat) async {
 
     return true;
   });
+}
+
+Future<bool> getCurrentUser() async {
+//  FirebaseUser user = await _auth.createUserWithEmailAndPassword(email: "susu@mama.com", password: "mamama");
+//  if(user != null) {
+//    UserUpdateInfo update = UserUpdateInfo();
+//    update.displayName = "Susu";
+//    await user.updateProfile(update);
+//  }
+
+try {
+  FirebaseUser user = await _auth.signInWithEmailAndPassword(email: "susu@mama.com", password: "mamama");
+
+  if (user != null) {
+    print("User has display name as ${user.displayName}");
+  }
+} catch(e) {
+  print("Error: ${e.toString()}");
+
+}
+
+  return true;
+}
+
+Future<User> login(String email, String password, {bool createIfNeeded}) async {
+  FirebaseUser user = await _auth.signInWithEmailAndPassword(email: email, password: password);
+
+  if(user != null) {
+    return User(user.uid, user.email, user.displayName);
+  }
+
+  throw Exception("Failed to signin to firebase");
+}
+
+Future<bool> checkCurrentUser() async {
+  return await _auth.currentUser() != null;
 }
