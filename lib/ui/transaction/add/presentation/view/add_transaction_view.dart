@@ -32,6 +32,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   final tables = [observer.tableAccount, observer.tableCategory];
 
+  GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
+
   var _number = "";
   var _decimal = "";
 
@@ -44,14 +46,13 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   List<Account> _accountList = [];
   List<AppCategory> _categoryList = [];
 
-  var _showNumPad = true;
   var keyboardSubscriptionId;
 
   @override
   void init() {
     presenter.dataView = this;
 
-    keyboardSubscriptionId = KeyboardVisibilityNotification().addNewListener(onShow: () => setState(() => _showNumPad = false));
+    keyboardSubscriptionId = KeyboardVisibilityNotification().addNewListener(onShow: () => setState(() => numPadKey.currentState.hide()));
   }
 
   @override
@@ -106,17 +107,15 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                       theme.darkBlue,
                       onPressed: _showTransactionTypeSelection),
                   ConversationRow(
-                      widget.transactionId == null ? "of" : "valued of",
-                      _numberFormat.format(_toNumber(_number, _decimal)),
-                      TransactionType.isIncome(_type) ? theme.tealAccent : TransactionType.isExpense(_type) ? theme.pinkAccent : theme.blueGrey,
-                      style: Theme.of(context).textTheme.display2,
-                  onPressed: () {
-                        setState(() => _showNumPad = !_showNumPad);
-                  },),
+                    widget.transactionId == null ? "of" : "valued of",
+                    _numberFormat.format(_toNumber(_number, _decimal)),
+                    TransactionType.isIncome(_type) ? theme.tealAccent : TransactionType.isExpense(_type) ? theme.pinkAccent : theme.blueGrey,
+                    style: Theme.of(context).textTheme.display2,
+                    onPressed: () => numPadKey.currentState.show(),),
                   ConversationRow(
-                      "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
-                      _account == null ? "Select Account" : _account.name,
-                      theme.darkGreen,
+                    "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
+                    _account == null ? "Select Account" : _account.name,
+                    theme.darkGreen,
                     onPressed: _showSelectAccount,),
                   ConversationRow(
                     "for",
@@ -128,16 +127,15 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                 ],
               ),
 //            ),
-            Align(
-                alignment: Alignment.bottomCenter,
-                child: _showNumPad ? NumberInputPad(_onNumberInput, () => setState(() => _showNumPad = false), _number, _decimal) : null
-            )
+            NumberInputPad(numPadKey, _onNumberInput, _number, _decimal, showNumPad: true,)
           ],
         ),
     );
   }
 
   void _showTransactionTypeSelection() {
+    numPadKey.currentState.hide();
+
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(TransactionType.all, (f) =>
             Align(
@@ -150,6 +148,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                   setState(() => _type = f);
 
                   Navigator.pop(context);
+
+                  numPadKey.currentState.show();
                 },
               ),
               alignment: Alignment.center,
@@ -159,6 +159,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   }
 
   void _showSelectAccount() {
+    numPadKey.currentState.hide();
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(_accountList, (f) => Align(
           child: InkWell(
@@ -168,14 +169,17 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
             onTap: () {
               setState(() => _account = f);
 
+              numPadKey.currentState.show();
+
               Navigator.pop(context);
             },
           ),
-        ))
+        )),
     );
   }
 
   void _showSelectCategory() {
+    numPadKey.currentState.hide();
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(_categoryList, (f) => Align(
           child: InkWell(
@@ -184,6 +188,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
             ),
             onTap: () {
               setState(() => _category = f);
+
+              numPadKey.currentState.show();
 
               Navigator.pop(context);
             },

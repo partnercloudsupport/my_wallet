@@ -62,7 +62,9 @@ class _MyWalletState extends State<MyWalletHome> {
         centerTitle: true,
         title: SizedBox(
           height: titleHeight,
-          child: Text(_df.format(DateTime.now()), style: Theme.of(context).textTheme.title,),
+          child: Center(
+            child: Text(_df.format(DateTime.now()), style: Theme.of(context).textTheme.title,),
+          ),
         ),
         collapseMode: CollapseMode.parallax,
         background: Container(

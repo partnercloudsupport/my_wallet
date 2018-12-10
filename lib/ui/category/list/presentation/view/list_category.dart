@@ -7,7 +7,6 @@ import 'package:my_wallet/routes.dart' as routes;
 
 import 'package:my_wallet/ui/category/list/presentation/presenter/list_category_presenter.dart';
 
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/category/list/presentation/view/list_category_data_view.dart';
@@ -59,12 +58,30 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
           )
         ],
       ),
-      body: StaggeredGridView.countBuilder(
-        crossAxisCount: 4,
-        itemCount: _categories.length,
-        itemBuilder: (context, index) => _buildCategoryView(_categories[index]),
-        staggeredTileBuilder: (index) => StaggeredTile.count(index > 0 && index % 2 == 0 ? 2 : 1, index > 0 && index % 4 == 0 ? 2 : 1),
+    body: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [
+          theme.darkBlue,
+          theme.darkBlue.withOpacity(0.8)
+        ],
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight)
       ),
+      padding: EdgeInsets.all(10.0),
+      child: ListView.builder(
+        itemCount: _categories.length,
+        itemBuilder: (_, index) => Card(
+          color: Colors.white.withOpacity(0.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.0), side: BorderSide(width: 1.0, color: Colors.white)),
+          child: ListTile(
+            title: Text(_categories[index].name, style: TextStyle(color: theme.darkBlue),),
+            onTap: () => widget.returnValue
+                ? Navigator.pop(context, _categories[index])
+                : Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionList(_categories[index].name, categoryId: _categories[index].id,))),
+          ),
+        )
+      ),
+    ),
         floatingActionButton: isEditMode ? RaisedButton(onPressed: () => Navigator.pushNamed(context, routes.CreateCategory)
             .then((value) {
           if(value != null) _loadCategories();
@@ -76,24 +93,6 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
     );
   }
 
-  Widget _buildCategoryView(AppCategory category) {
-    Color color = Color(theme.hexToInt(category.colorHex));
-    return InkWell(
-      child: Container(
-        margin: EdgeInsets.all(2.0),
-        color: color,
-        child: Text(
-          "${category.name}",
-          style: TextStyle(color: color.withGreen(255).withBlue(200).withRed(100)),
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-        ),
-        alignment: Alignment.center,
-      ),
-      onTap: () => widget.returnValue == true ? Navigator.pop(context, category) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(category.name, categoryId: category.id,))) ,
-    );
-  }
-
   void _loadCategories() {
     presenter.loadCategories();
   }
@@ -102,5 +101,15 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
     if(value != null) setState(() {
       _categories = value;
     });
+  }
+
+  int stageCrossAxisCellCount(String name) {
+    if(name.length > 12) return 3;
+    else if(name.length > 7) return 2;
+    else return 1;
+  }
+
+  int stageMainAxisCellCount(String name) {
+    return 1;
   }
 }

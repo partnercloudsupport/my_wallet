@@ -12,6 +12,7 @@ import 'package:my_wallet/widget/number_input_pad.dart';
 import 'package:intl/intl.dart';
 
 import 'package:my_wallet/widget/bottom_sheet_list.dart';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
 
 class CreateAccount extends StatefulWidget {
   @override
@@ -23,6 +24,7 @@ class CreateAccount extends StatefulWidget {
 class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAccountPresenter> implements CreateAccountDataView {
   _CreateAccountState() : super(CreateAccountPresenter());
 
+  final GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
   final _nf = NumberFormat("\$#,##0.00");
 
   AccountType _type = AccountType.paymentAccount;
@@ -30,11 +32,28 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
   double _amount = 0;
 
   bool showNumberInputPad = false;
+  var keyboardSubscriptionIndex;
 
   init() {
     presenter.dataView = this;
   }
 
+  @override
+  void initState() {
+    super.initState();
+
+    keyboardSubscriptionIndex = KeyboardVisibilityNotification().addNewListener(onChange: (visible) {
+      if(visible) numPadKey.currentState.hide();
+      else numPadKey.currentState.show();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    KeyboardVisibilityNotification().removeListener(keyboardSubscriptionIndex);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,16 +93,14 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
               ],
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: NumberInputPad(_onNumberInput, () {}, null, null),
-          )
+          NumberInputPad(numPadKey, _onNumberInput, null, null, showNumPad: true,)
         ],
       )
     );
   }
 
   void _showAccountTypeSelection() {
+    numPadKey.currentState.hide();
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(AccountType.all, (f) =>
             Align(
@@ -94,6 +111,8 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
                 ),
                 onTap: () {
                   setState(() => _type = f);
+
+                  numPadKey.currentState.show();
 
                   Navigator.pop(context);
                 },
@@ -122,7 +141,9 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
           actions: <Widget>[
             FlatButton(
               child: Text("Cancel", style: TextStyle(color: Colors.white.withOpacity(0.5)),),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
             FlatButton(
               child: Text("Choose this name"),
@@ -131,7 +152,7 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
                 setState(() {
                   _name = _nameTextController.text;
                   });
-                },
+              },
             )
           ],
         )

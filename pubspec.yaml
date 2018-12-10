@@ -26,6 +26,8 @@ dependencies:
   firebase_database: any
   shared_preferences: any
   gradient_app_bar: any
+  auto_size_text: any
+  keyboard_visibility: any
 
 dev_dependencies:
   flutter_test:

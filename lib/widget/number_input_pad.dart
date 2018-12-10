@@ -4,26 +4,30 @@ import 'package:my_wallet/app_theme.dart' as theme;
 
 class NumberInputPad extends StatefulWidget {
   final Function(String, String) _onValueChanged;
-  final Function _onOkClicked;
   final String _number;
   final String _decimal;
+  final bool showNumPad;
 
-  NumberInputPad(this._onValueChanged, this._onOkClicked, this._number, this._decimal);
+  NumberInputPad(GlobalKey<NumberInputPadState> key, this._onValueChanged, this._number, this._decimal, {this.showNumPad = false}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _NumberInputPadState();
+    return NumberInputPadState();
   }
 }
 
-class _NumberInputPadState extends State<NumberInputPad> {
+class NumberInputPadState extends State<NumberInputPad> {
   String number = "";
   String decimal = "";
   bool isDecimal = false;
 
+  bool _showNumPad = true;
+
   @override
   void initState() {
     super.initState();
+
+    _showNumPad = widget.showNumPad;
 
     number = widget._number;
     decimal = widget._decimal;
@@ -38,26 +42,29 @@ class _NumberInputPadState extends State<NumberInputPad> {
   Widget build(BuildContext context) {
     FocusScope.of(context).requestFocus(new FocusNode());
 
-    final numbers = ["1", "2", "3", "C", "4", "5", "6", "7", "8", "9", ".", "0", "OK"];
+    final numbers = ["1", "2", "3", "C", "4", "5", "6", "7", "8", "9", "0", "."];
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [
-          theme.darkBlue,
-          theme.darkBlue.withOpacity(0.89)
-        ],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight)
-      ),
-      child: StaggeredGridView.countBuilder(
-        shrinkWrap: true,
-        primary: false,
-        crossAxisCount: 4,
-        itemCount: numbers.length,
-        itemBuilder: (BuildContext context, int index) => _createButton(numbers[index], _onButtonClick),
-        staggeredTileBuilder: (int index) => new StaggeredTile.count(_isDoubleWidth(index) ? 2 : 1, _isDoubleHeight(index) ? 3 : 1),
-        crossAxisSpacing: 0.3,
-      ),
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: _showNumPad ? Container(
+        decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              theme.darkBlue,
+              theme.darkBlue.withOpacity(0.89)
+            ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight)
+        ),
+        child: StaggeredGridView.countBuilder(
+          shrinkWrap: true,
+          primary: false,
+          crossAxisCount: 4,
+          itemCount: numbers.length,
+          itemBuilder: (BuildContext context, int index) => _createButton(numbers[index], _onButtonClick),
+          staggeredTileBuilder: (int index) => new StaggeredTile.count(_isDoubleWidth(index) ? 2 : 1, _isDoubleHeight(index) ? 3 : 1),
+          crossAxisSpacing: 0.3,
+        ),
+      ) : null,
     );
   }
 
@@ -76,7 +83,7 @@ class _NumberInputPadState extends State<NumberInputPad> {
   }
 
   bool _isDoubleWidth(int index) {
-    return index == 11;
+    return index == 10 || index == 11;
   }
 
   void _onButtonClick(String value) {
@@ -110,11 +117,25 @@ class _NumberInputPadState extends State<NumberInputPad> {
       case ".":
         isDecimal = true;
         break;
-      case "OK":
-        widget._onOkClicked();
-        break;
     }
 
     widget._onValueChanged(number, decimal);
+  }
+
+  void toggleVisiblity() {
+    if(_showNumPad) hide();
+    else show();
+  }
+
+  void hide() {
+    setState(() {
+      _showNumPad = false;
+    });
+  }
+
+  void show() {
+    setState(() {
+      _showNumPad = true;
+    });
   }
 }

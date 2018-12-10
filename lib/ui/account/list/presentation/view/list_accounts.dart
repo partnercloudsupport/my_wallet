@@ -59,24 +59,34 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
         ],
         leading: isEditMode ? Text("", style: TextStyle(color: Colors.transparent),) : null,
       ),
-      body: ListView.builder(
-          itemCount: _accounts.length,
-          itemBuilder: (context, index) => Container(
-            child: ListTile(
-              title: Text(_accounts[index].name, style: TextStyle(fontSize: 18.0, color: theme.darkBlue),),
-              subtitle: Text("${_nf.format(_accounts[index].balance)}"),
-              trailing: isEditMode ? IconButton(
-                onPressed: () {
-                  _deleteAccount(_accounts[index]);
-                },
-                icon: Icon(Icons.close, color: theme.pinkAccent,),
-              ) : null,
-              onTap: () => widget.selectionMode ? Navigator.pop(context, _accounts[index]) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(_accounts[index].name, accountId: _accounts[index].id,))),
-            ),
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: theme.blueGrey)),
-            ),
-          )
+      body: Container(
+        decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              theme.darkBlue,
+              theme.darkBlue.withOpacity(0.8)
+            ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight)
+        ),
+        padding: EdgeInsets.all(10.0),
+        child: ListView.builder(
+            itemCount: _accounts.length,
+            itemBuilder: (context, index) => Card(
+              color: Colors.white.withOpacity(0.5),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.0), side: BorderSide(width: 1.0, color: Colors.white)),
+              child: ListTile(
+                title: Text(_accounts[index].name, style: TextStyle(fontSize: 18.0, color: theme.darkBlue),),
+                subtitle: Text("${_nf.format(_accounts[index].balance)}"),
+                trailing: isEditMode ? IconButton(
+                  onPressed: () {
+                    _deleteAccount(_accounts[index]);
+                  },
+                  icon: Icon(Icons.close, color: theme.pinkAccent,),
+                ) : null,
+                onTap: () => widget.selectionMode ? Navigator.pop(context, _accounts[index]) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(_accounts[index].name, accountId: _accounts[index].id,))),
+              ),
+            )
+        ),
       ),
       floatingActionButton: isEditMode ? RaisedButton(onPressed: () => Navigator.pushNamed(context, routes.AddAccount)
           .then((value) {
