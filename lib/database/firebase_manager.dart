@@ -27,6 +27,7 @@ const _accountId = "accountId";
 const _categoryId = "categoryId";
 const _amount = "amount";
 const _desc = "desc";
+
 Future<void> init() async {
   if (_isInit) return;
 
@@ -35,146 +36,63 @@ Future<void> init() async {
       name: Platform.isIOS ? "MyWallet" : "My Wallet",
       options: Platform.isIOS
           ? const FirebaseOptions(
-        googleAppID: fbConfig.firebase_ios_app_id,
-        gcmSenderID: fbConfig.firebase_gcm_sender_id,
-        projectID: fbConfig.firebase_project_id,
-        databaseURL: fbConfig.firebase_database_url,
-      )
+              googleAppID: fbConfig.firebase_ios_app_id,
+              gcmSenderID: fbConfig.firebase_gcm_sender_id,
+              projectID: fbConfig.firebase_project_id,
+              databaseURL: fbConfig.firebase_database_url,
+            )
           : const FirebaseOptions(
-        googleAppID: fbConfig.firebase_android_app_id,
-        apiKey: fbConfig.firebase_api_key,
-        projectID: fbConfig.firebase_project_id,
-        databaseURL: fbConfig.firebase_database_url,
-      ));
+              googleAppID: fbConfig.firebase_android_app_id,
+              apiKey: fbConfig.firebase_api_key,
+              projectID: fbConfig.firebase_project_id,
+              databaseURL: fbConfig.firebase_database_url,
+            ));
   _database = FirebaseDatabase(app: _app);
   _auth = FirebaseAuth.fromApp(_app);
 
   // register listener to Account
-  _database
-      .reference()
-      .child(_Account)
-      .onChildAdded
-      .listen(_onAccountAdded);
-  _database
-      .reference()
-      .child(_Account)
-      .onChildChanged
-      .listen(_onAccountChanged);
-  _database
-      .reference()
-      .child(_Account)
-      .onChildMoved
-      .listen(_onAccountMoved);
-  _database
-      .reference()
-      .child(_Account)
-      .onChildRemoved
-      .listen(_onAccountRemoved);
+  _database.reference().child(_Account).onChildAdded.listen(_onAccountAdded);
+  _database.reference().child(_Account).onChildChanged.listen(_onAccountChanged);
+  _database.reference().child(_Account).onChildMoved.listen(_onAccountMoved);
+  _database.reference().child(_Account).onChildRemoved.listen(_onAccountRemoved);
 
   // register listener to Category
-  _database
-      .reference()
-      .child(_Category)
-      .onChildAdded
-      .listen(_onCategoryAdded);
-  _database
-      .reference()
-      .child(_Category)
-      .onChildChanged
-      .listen(_onCategoryChanged);
-  _database
-      .reference()
-      .child(_Category)
-      .onChildMoved
-      .listen(_onCategoryMoved);
-  _database
-      .reference()
-      .child(_Category)
-      .onChildRemoved
-      .listen(_onCategoryRemoved);
+  _database.reference().child(_Category).onChildAdded.listen(_onCategoryAdded);
+  _database.reference().child(_Category).onChildChanged.listen(_onCategoryChanged);
+  _database.reference().child(_Category).onChildMoved.listen(_onCategoryMoved);
+  _database.reference().child(_Category).onChildRemoved.listen(_onCategoryRemoved);
 
   // register listener to Transactions
-  _database
-      .reference()
-      .child(_Transaction)
-      .onChildAdded
-      .listen(_onTransactionAdded);
-  _database
-      .reference()
-      .child(_Transaction)
-      .onChildChanged
-      .listen(_onTransactionChanged);
-  _database
-      .reference()
-      .child(_Transaction)
-      .onChildMoved
-      .listen(_onTransactionMoved);
-  _database
-      .reference()
-      .child(_Transaction)
-      .onChildRemoved
-      .listen(_onTransactionRemoved);
+  _database.reference().child(_Transaction).onChildAdded.listen(_onTransactionAdded);
+  _database.reference().child(_Transaction).onChildChanged.listen(_onTransactionChanged);
+  _database.reference().child(_Transaction).onChildMoved.listen(_onTransactionMoved);
+  _database.reference().child(_Transaction).onChildRemoved.listen(_onTransactionRemoved);
 }
 
 // ####################################################################################################
 // private helper
 Map<String, dynamic> _AccountToMap(Account acc) {
-  return {
-    _name: acc.name,
-    _type: acc.type.id,
-    _balance: acc.balance,
-    _currency: acc.currency
-  };
+  return {_name: acc.name, _type: acc.type.id, _balance: acc.balance, _currency: acc.currency};
 }
 
 Account _snapshotToAccount(DataSnapshot snapshot) {
-  return Account(
-      _toId(snapshot),
-      snapshot.value[_name],
-      double.parse("${snapshot.value[_balance]}"),
-      AccountType.all[snapshot.value[_type]],
-      snapshot.value[_currency]
-  );
+  return Account(_toId(snapshot), snapshot.value[_name], double.parse("${snapshot.value[_balance]}"), AccountType.all[snapshot.value[_type]], snapshot.value[_currency]);
 }
 
 Map<String, dynamic> _CategoryToMap(AppCategory cat) {
-  return {
-    _name: cat.name,
-    _colorHex: cat.colorHex,
-    _balance: cat.balance
-  };
+  return {_name: cat.name, _colorHex: cat.colorHex, _balance: cat.balance};
 }
 
 AppCategory _snapshotToCategory(DataSnapshot snapshot) {
-  return AppCategory(
-      _toId(snapshot),
-      snapshot.value[_name],
-      snapshot.value[_colorHex],
-      double.parse("${snapshot.value[_balance]}")
-  );
+  return AppCategory(_toId(snapshot), snapshot.value[_name], snapshot.value[_colorHex], double.parse("${snapshot.value[_balance]}"));
 }
 
 Map<String, dynamic> _TransactionToMap(AppTransaction trans) {
-  return {
-    _dateTime: trans.dateTime.millisecondsSinceEpoch,
-    _accountId: trans.accountId,
-    _categoryId: trans.categoryId,
-    _amount: trans.amount,
-    _desc: trans.desc,
-    _type: trans.type.id
-  };
+  return {_dateTime: trans.dateTime.millisecondsSinceEpoch, _accountId: trans.accountId, _categoryId: trans.categoryId, _amount: trans.amount, _desc: trans.desc, _type: trans.type.id};
 }
 
 AppTransaction _snapshotToTransaction(DataSnapshot snapshot) {
-  return AppTransaction(
-      _toId(snapshot),
-      DateTime.fromMillisecondsSinceEpoch(snapshot.value[_dateTime]),
-      snapshot.value[_accountId],
-      snapshot.value[_categoryId],
-      double.parse("${snapshot.value[_amount]}"),
-      snapshot.value[_desc],
-      TransactionType.all[snapshot.value[_type]]
-  );
+  return AppTransaction(_toId(snapshot), DateTime.fromMillisecondsSinceEpoch(snapshot.value[_dateTime]), snapshot.value[_accountId], snapshot.value[_categoryId], double.parse("${snapshot.value[_amount]}"), snapshot.value[_desc], TransactionType.all[snapshot.value[_type]]);
 }
 
 int _toId(DataSnapshot snapshot) {
@@ -182,50 +100,42 @@ int _toId(DataSnapshot snapshot) {
 }
 
 void _onAccountAdded(Event event) {
-  db.insertAccount(_snapshotToAccount(event.snapshot))
-      .catchError((e) => _onAccountChanged(event));
+  db.insertAccount(_snapshotToAccount(event.snapshot)).catchError((e) => _onAccountChanged(event));
 }
 
 void _onAccountChanged(Event event) {
   db.updateAccount(_snapshotToAccount(event.snapshot));
 }
 
-void _onAccountMoved(Event event) {
-}
+void _onAccountMoved(Event event) {}
 
 void _onAccountRemoved(Event event) {
   db.deleteAccount(int.parse(event.snapshot.key));
 }
 
 void _onCategoryAdded(Event event) {
-  db.insertCagetory(_snapshotToCategory(event.snapshot))
-      .catchError((e) => _onCategoryChanged(event));
+  db.insertCagetory(_snapshotToCategory(event.snapshot)).catchError((e) => _onCategoryChanged(event));
 }
 
 void _onCategoryChanged(Event event) {
   db.updateCategory(_snapshotToCategory(event.snapshot));
 }
 
-void _onCategoryMoved(Event event) {
-
-}
+void _onCategoryMoved(Event event) {}
 
 void _onCategoryRemoved(Event event) {
   db.deleteCategory(_toId(event.snapshot));
 }
 
 void _onTransactionAdded(Event event) {
-  db.insertTransaction(_snapshotToTransaction(event.snapshot))
-      .catchError((e) => _onTransactionChanged(event));
+  db.insertTransaction(_snapshotToTransaction(event.snapshot)).catchError((e) => _onTransactionChanged(event));
 }
 
 void _onTransactionChanged(Event event) {
   db.updateTransaction(_snapshotToTransaction(event.snapshot));
 }
 
-void _onTransactionMoved(Event event) {
-
-}
+void _onTransactionMoved(Event event) {}
 
 void _onTransactionRemoved(Event event) {
   db.deleteTransaction(_toId(event.snapshot));
@@ -234,6 +144,7 @@ void _onTransactionRemoved(Event event) {
 // ####################################################################################################
 // Account
 Lock _lock = Lock();
+
 Future<bool> addAccount(Account acc) async {
   return _lock.synchronized(() async {
     DatabaseReference _ref = _database.reference().child(_Account);
@@ -341,23 +252,15 @@ Future<bool> deleteCategory(AppCategory cat) async {
 }
 
 Future<bool> getCurrentUser() async {
-//  FirebaseUser user = await _auth.createUserWithEmailAndPassword(email: "susu@mama.com", password: "mamama");
-//  if(user != null) {
-//    UserUpdateInfo update = UserUpdateInfo();
-//    update.displayName = "Susu";
-//    await user.updateProfile(update);
-//  }
+  try {
+    FirebaseUser user = await _auth.signInWithEmailAndPassword(email: "susu@mama.com", password: "mamama");
 
-try {
-  FirebaseUser user = await _auth.signInWithEmailAndPassword(email: "susu@mama.com", password: "mamama");
-
-  if (user != null) {
-    print("User has display name as ${user.displayName}");
+    if (user != null) {
+      print("User has display name as ${user.displayName}");
+    }
+  } catch (e) {
+    print("Error: ${e.toString()}");
   }
-} catch(e) {
-  print("Error: ${e.toString()}");
-
-}
 
   return true;
 }
@@ -365,7 +268,8 @@ try {
 Future<User> login(String email, String password, {bool createIfNeeded}) async {
   FirebaseUser user = await _auth.signInWithEmailAndPassword(email: email, password: password);
 
-  if(user != null) {
+  if (user != null) {
+    UserUpdateInfo info = UserUpdateInfo();
     return User(user.uid, user.email, user.displayName);
   }
 
@@ -374,4 +278,22 @@ Future<User> login(String email, String password, {bool createIfNeeded}) async {
 
 Future<bool> checkCurrentUser() async {
   return await _auth.currentUser() != null;
+}
+
+Future<bool> registerEmail(String email, String password) async {
+  FirebaseUser user = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+
+  return user != null;
+}
+
+Future<bool> updateDisplayName(String displayName) async {
+  FirebaseUser user = await _auth.currentUser();
+
+  if(user == null) throw Exception("No user available");
+
+  UserUpdateInfo userUpdateInfo = UserUpdateInfo();
+  userUpdateInfo.displayName = displayName;
+  await user.updateProfile(userUpdateInfo);
+
+  return true;
 }
