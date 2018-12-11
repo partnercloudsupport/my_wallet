@@ -54,29 +54,24 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(10.0),
-        child: ListView.builder(
+          padding: EdgeInsets.all(10.0),
+          child: ListView.builder(
             itemCount: _categories.length,
-            itemBuilder: (_, index) => Card(
-                  color: Colors.white.withOpacity(0.5),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.0), side: BorderSide(width: 1.0, color: Colors.white)),
-                  child: ListTile(
-                    title: Text(
-                      _categories[index].name,
-                      style: TextStyle(color: AppTheme.darkBlue),
-                    ),
-                    onTap: () => widget.returnValue
-                        ? Navigator.pop(context, _categories[index])
-                        : Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => TransactionList(
-                                      _categories[index].name,
-                                      categoryId: _categories[index].id,
-                                    ))),
-                  ),
-                )),
-      ),
+            itemBuilder: (_, index) => CardListTile(
+                  title: _categories[index].name,
+                  onTap: () => widget.returnValue
+                      ? Navigator.pop(context, _categories[index])
+                      : Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => TransactionList(
+                                  _categories[index].name,
+                                  categoryId: _categories[index].id,
+                                ),
+                          ),
+                        ),
+                ),
+          )),
       floatingActionButton: isEditMode
           ? RoundedButton(
               onPressed: () => Navigator.pushNamed(context, routes.CreateCategory).then((value) {

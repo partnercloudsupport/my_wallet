@@ -58,20 +58,16 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
         padding: EdgeInsets.all(10.0),
         child: ListView.builder(
             itemCount: _accounts.length,
-            itemBuilder: (context, index) => Card(
-              color: Colors.white.withOpacity(0.5),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.0), side: BorderSide(width: 1.0, color: Colors.white)),
-              child: ListTile(
-                title: Text(_accounts[index].name, style: TextStyle(fontSize: 18.0, color: AppTheme.darkBlue),),
-                subtitle: Text("${_nf.format(_accounts[index].balance)}"),
-                trailing: isEditMode ? IconButton(
-                  onPressed: () {
-                    _deleteAccount(_accounts[index]);
-                  },
-                  icon: Icon(Icons.close, color: AppTheme.pinkAccent,),
-                ) : null,
+            itemBuilder: (context, index) => CardListTile(
+              title: _accounts[index].name,
                 onTap: () => widget.selectionMode ? Navigator.pop(context, _accounts[index]) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(_accounts[index].name, accountId: _accounts[index].id,))),
-              ),
+              subTitle: "${_nf.format(_accounts[index].balance)}",
+              trailing: isEditMode ? IconButton(
+                onPressed: () {
+                  _deleteAccount(_accounts[index]);
+                },
+                icon: Icon(Icons.close, color: AppTheme.pinkAccent,),
+              ) : null,
             )
         ),
       ),

@@ -15,7 +15,6 @@ class MyWalletHome extends StatefulWidget {
 }
 
 class _MyWalletState extends State<MyWalletHome> {
-
   TextStyle titleStyle = TextStyle(color: AppTheme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
   List<ExpenseEntity> homeEntities = [];
 
@@ -24,7 +23,6 @@ class _MyWalletState extends State<MyWalletHome> {
   final overviewRatio = 0.15;
   final chartRatio = 0.5;
   final titleHeight = 22.0;
-
 
   @override
   Widget build(BuildContext context) {
@@ -56,20 +54,23 @@ class _MyWalletState extends State<MyWalletHome> {
     list.add(SliverAppBar(
       expandedHeight: MediaQuery.of(context).size.height * (overviewRatio + chartRatio) + titleHeight,
       pinned: true,
-      flexibleSpace: FlexibleSpaceBar(
-        centerTitle: true,
-        title: SizedBox(
-          height: titleHeight,
-          child: Center(
-            child: Text(_df.format(DateTime.now()), style: Theme.of(context).textTheme.title,),
+      flexibleSpace: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(gradient: AppTheme.bgGradient),
+        child: FlexibleSpaceBar(
+          centerTitle: true,
+          title: SizedBox(
+            height: titleHeight,
+            width: MediaQuery.of(context).size.width,
+            child: Center(
+              child: Text(
+                _df.format(DateTime.now()),
+                style: Theme.of(context).textTheme.title,
+              ),
+            ),
           ),
-        ),
-        collapseMode: CollapseMode.parallax,
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: AppTheme.bgGradient
-          ),
-          child: ListView(
+          collapseMode: CollapseMode.parallax,
+          background: ListView(
             physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
               HomeOverview(titleStyle, MediaQuery.of(context).size.height * overviewRatio),
@@ -86,16 +87,12 @@ class _MyWalletState extends State<MyWalletHome> {
       ),
     );
 
-    return CustomScrollView(
-        slivers: list
-    );
+    return CustomScrollView(slivers: list);
   }
 }
 
 class _LeftDrawer extends StatelessWidget {
-  final drawerListItems = {
-    "Categories": routes.ListCategories,
-    "Accounts": routes.ListAccounts};
+  final drawerListItems = {"Categories": routes.ListCategories, "Accounts": routes.ListAccounts};
 
   @override
   Widget build(BuildContext context) {
@@ -108,12 +105,12 @@ class _LeftDrawer extends StatelessWidget {
         shrinkWrap: true,
         children: drawerListItems.keys
             .map((f) => ListTile(
-          title: Text(
-            f,
-            style: Theme.of(context).textTheme.title.apply(color: Colors.white),
-          ),
-          onTap: () => Navigator.popAndPushNamed(context, drawerListItems[f]),
-        ))
+                  title: Text(
+                    f,
+                    style: Theme.of(context).textTheme.title.apply(color: Colors.white),
+                  ),
+                  onTap: () => Navigator.popAndPushNamed(context, drawerListItems[f]),
+                ))
             .toList(),
       ),
     );

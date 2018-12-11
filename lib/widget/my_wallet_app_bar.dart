@@ -41,15 +41,26 @@ class MyWalletAppBar extends GradientAppBar {
 //    leading: leading,);
 //}
 //
-class MyWalletSliverAppBar extends SliverAppBar {
-  MyWalletSliverAppBar(
-      {String title,
-        String subTitle,
-        List<Widget> actions,
-        Widget leading}
-      ) : super(
-      title: Text("$title", style: TextStyle(color: Colors.white),),
-      actions: actions,
-      leading: leading
-  );
-}
+//class MyWalletSliverAppBar extends SliverAppBar {
+//  MyWalletSliverAppBar(
+//      {String title,
+//        String subTitle,
+//        List<Widget> actions,
+//        Widget leading,
+//      double expandedHeight,
+//      bool pinned,
+//      Widget flexibleSpace}
+//      ) : super(
+//      title: Container(
+//        child: Text("$title", style: TextStyle(color: Colors.white),),
+//        decoration: BoxDecoration(
+//          gradient: AppTheme.bgGradient
+//        ),
+//      ),
+//      actions: actions,
+//      leading: leading,
+//      expandedHeight: expandedHeight,
+//      pinned: pinned,
+//      flexibleSpace: flexibleSpace
+//  );
+//}
