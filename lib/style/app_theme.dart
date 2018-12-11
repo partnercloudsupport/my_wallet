@@ -104,6 +104,14 @@ class AppTheme {
 //    Typography typograph
       );
 
+  static final bgGradient = LinearGradient(
+      colors: [
+        darkBlue,
+        darkBlue.withOpacity(0.8)],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight
+      );
+
   static int hexToInt(String hex) {
     hex = hex.replaceFirst("#", "");
     if (hex.length < 8) hex = "FF$hex";

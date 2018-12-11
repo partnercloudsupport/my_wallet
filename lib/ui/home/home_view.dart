@@ -30,7 +30,7 @@ class _MyWalletState extends State<MyWalletHome> {
   Widget build(BuildContext context) {
     var platform = Theme.of(context).platform;
 
-    return Scaffold(
+    return PlainScaffold(
       body: _generateMainBody(),
       drawer: _LeftDrawer(),
       floatingActionButton: Padding(

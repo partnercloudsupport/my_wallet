@@ -51,7 +51,7 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlainScaffold(
       appBar: MyWalletAppBar(
         title: "Create Account",
         actions: <Widget>[

@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:my_wallet/app_material.dart';
 
 import 'package:my_wallet/ui/home/home_view.dart';
 import 'package:my_wallet/widget/my_wallet_app_bar.dart';
 
-import 'package:my_wallet/app_material.dart';
 import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_view.dart';
 
 import 'package:my_wallet/ui/account/list/presentation/view/list_accounts.dart';
@@ -19,7 +18,7 @@ void main() async {
   await fm.init();
 
   var user = await fm.checkCurrentUser();
-  runApp(MyApp(user));
+  runApp(MyApp(true));
 }
 
 
@@ -62,7 +61,7 @@ class MyApp extends StatelessWidget {
             case routes.CreateCategory:
               return CreateCategory();
             default:
-              return Scaffold(
+              return PlainScaffold(
                 appBar: MyWalletAppBar(
                   title: "Coming Soon",
                 ),

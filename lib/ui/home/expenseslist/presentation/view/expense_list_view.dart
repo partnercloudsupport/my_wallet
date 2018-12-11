@@ -52,15 +52,18 @@ class _ExpensesListViewState extends CleanArchitectureView<ExpensesListView, Exp
   @override
   Widget build(BuildContext context) {
 
-    return ListView(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      children: homeEntities.map((f) => ListTile(
-        title: Text(f.name, style: TextStyle(color: AppTheme.darkBlue),),
-        leading: Icon(Icons.map, color: AppTheme.darkBlue,),
-        trailing: Text(_nf.format(f.amount), style: TextStyle(color: AppTheme.tealAccent),),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionList(f.name, categoryId: f.categoryId,))),
-      )).toList(),
+    return Container(
+      color: AppTheme.white,
+      child: ListView(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        children: homeEntities.map((f) => ListTile(
+          title: Text(f.name, style: TextStyle(color: AppTheme.darkBlue),),
+          leading: Icon(Icons.map, color: AppTheme.darkBlue,),
+          trailing: Text(_nf.format(f.amount), style: TextStyle(color: AppTheme.tealAccent),),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionList(f.name, categoryId: f.categoryId,))),
+        )).toList(),
+      ),
     );
   }
 

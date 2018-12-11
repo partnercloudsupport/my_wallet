@@ -39,7 +39,7 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlainScaffold(
       appBar: MyWalletAppBar(
         title: widget._title,
         actions: <Widget>[

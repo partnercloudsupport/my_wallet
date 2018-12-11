@@ -27,7 +27,7 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlainScaffold(
         body: Stack(
       children: <Widget>[
         ListView(

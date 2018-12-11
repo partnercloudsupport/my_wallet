@@ -39,7 +39,7 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlainScaffold(
       appBar: MyWalletAppBar(
         title: widget._title,
         actions: <Widget>[

@@ -27,69 +27,61 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        alignment: Alignment.center,
+    return GradientScaffold(
+      body: Padding(
         padding: EdgeInsets.all(20.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [
-            AppTheme.darkBlue,
-            AppTheme.darkBlue.withOpacity(0.8)
-          ])
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            FlutterLogo(
-              size: 150.0,
-              curve: Curves.bounceInOut,
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    hintText: "Email Address",
-                  ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          FlutterLogo(
+            size: 150.0,
+            curve: Curves.bounceInOut,
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  hintText: "Email Address",
                 ),
-                TextField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                      hintText: "Password",
-                      suffixIcon: IconButton(icon: Icon(Icons.remove_red_eye, color: _obscureText ? AppTheme.white : AppTheme.blueGrey,), onPressed: () => setState(() => _obscureText = !_obscureText))
-                  ),
-                  keyboardType: TextInputType.text,
-                  obscureText: _obscureText,
-                )
-              ],
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                FlatButton(
-                  onPressed: _signIn,
-                  child: Padding(padding: EdgeInsets.all(12.0), child: _signingIn ? SizedBox(
-                    width: 15.0,
-                    height: 15.0,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
-                    ),
-                  ) : Text("Sign In", style: TextStyle(color: AppTheme.white),),),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0), side: BorderSide(color: AppTheme.white, width: 0.5)),
-                  color: AppTheme.blue,
+              ),
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(
+                    hintText: "Password",
+                    suffixIcon: IconButton(icon: Icon(Icons.remove_red_eye, color: _obscureText ? AppTheme.white : AppTheme.blueGrey,), onPressed: () => setState(() => _obscureText = !_obscureText))
                 ),
-                FlatButton(
-                  onPressed: _register,
-                  child: Padding(padding: EdgeInsets.all(12.0), child: Text("Register new account", style: TextStyle(color: AppTheme.darkBlue),),),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
-                  color: AppTheme.white,
-                )
-              ],),
-          ],
-        ),
-      ),
+                keyboardType: TextInputType.text,
+                obscureText: _obscureText,
+              )
+            ],
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              FlatButton(
+                onPressed: _signIn,
+                child: Padding(padding: EdgeInsets.all(12.0), child: _signingIn ? SizedBox(
+                  width: 15.0,
+                  height: 15.0,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.0,
+                  ),
+                ) : Text("Sign In", style: TextStyle(color: AppTheme.white),),),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0), side: BorderSide(color: AppTheme.white, width: 0.5)),
+                color: AppTheme.blue,
+              ),
+              FlatButton(
+                onPressed: _register,
+                child: Padding(padding: EdgeInsets.all(12.0), child: Text("Register new account", style: TextStyle(color: AppTheme.darkBlue),),),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
+                color: AppTheme.white,
+              )
+            ],),
+        ],
+      ),),
     );
   }
 

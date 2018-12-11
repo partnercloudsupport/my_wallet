@@ -53,7 +53,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlainScaffold(
       appBar: MyWalletAppBar(
         title: widget.title,
       ),

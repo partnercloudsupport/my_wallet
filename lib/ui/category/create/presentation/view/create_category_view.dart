@@ -21,7 +21,7 @@ class _CreateCategoryState extends CleanArchitectureView<CreateCategory, CreateC
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlainScaffold(
       appBar: MyWalletAppBar(
         title: "Create Category",
         actions: <Widget>[

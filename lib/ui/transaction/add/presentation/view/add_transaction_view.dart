@@ -78,7 +78,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlainScaffold(
       appBar: MyWalletAppBar(
         title: "Create Transaction",
         actions: <Widget>[
