@@ -26,7 +26,7 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
   ];
 
   ChartTitleEntity entity;
-  NumberFormat _nf = NumberFormat("#,##0.00");
+  NumberFormat _nf = NumberFormat("\$#,##0.00");
 
   @override
   void init() {
@@ -52,6 +52,7 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
   @override
   Widget build(BuildContext context) {
     var textStyle = Theme.of(context).textTheme.title;
+    var subTitleStyle = textStyle.apply(fontSizeFactor: 0.7, color: AppTheme.white);
 
     return TabBar(
               tabs: <Widget>[
@@ -65,7 +66,7 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
                         style: textStyle.apply(color: AppTheme.tealAccent),
                         maxLines: 1,
                       ),
-                      Text("${entity == null ? "\$0.00" : _nf.format(entity.incomeAmount)}",)
+                      Text("${entity == null ? "\$0.00" : _nf.format(entity.incomeAmount)}", style: subTitleStyle,)
                     ],
                   ),
                 ),
@@ -79,7 +80,7 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
                         style: textStyle.apply(color: AppTheme.pinkAccent),
                         maxLines: 1,
                       ),
-                      Text("${entity == null ? "\$0.00" : _nf.format(entity.expensesAmount)}",)
+                      Text("${entity == null ? "\$0.00" : _nf.format(entity.expensesAmount)}", style: subTitleStyle,)
                     ],
                   ),
                 ),
@@ -92,7 +93,7 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
                       style: textStyle.apply(color: AppTheme.brightGreen),
                         maxLines: 1,
                       ),
-                      Text("${entity == null ? "\$0.00" : _nf.format(entity.savingAmount)}")
+                      Text("${entity == null ? "\$0.00" : _nf.format(entity.savingAmount)}", style: subTitleStyle,)
                     ],
                   ),
                 )
