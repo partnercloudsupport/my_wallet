@@ -9,6 +9,9 @@ const brightPink = Color(0xFFFF4081);
 const blueGrey = Color(0xFF9A9AAC);
 const brightGreen = Color(0xFF00FF00);
 const white = Color(0xFFFFFFFF);
+const black = Color(0xFF000000);
+const facebookColor = Color(0xFF3B5998);
+const googleColor = Color(0xFFDB4437);
 
 ThemeData appTheme = ThemeData(
     brightness: Brightness.dark,
