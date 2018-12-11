@@ -39,7 +39,7 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
 
   @override
   Widget build(BuildContext context) {
-    return PlainScaffold(
+    return GradientScaffold(
       appBar: MyWalletAppBar(
         title: widget._title,
         actions: <Widget>[
@@ -53,38 +53,42 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
           )
         ],
       ),
-    body: Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [
-          AppTheme.darkBlue,
-          AppTheme.darkBlue.withOpacity(0.8)
-        ],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight)
+      body: Padding(
+        padding: EdgeInsets.all(10.0),
+        child: ListView.builder(
+            itemCount: _categories.length,
+            itemBuilder: (_, index) => Card(
+                  color: Colors.white.withOpacity(0.5),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.0), side: BorderSide(width: 1.0, color: Colors.white)),
+                  child: ListTile(
+                    title: Text(
+                      _categories[index].name,
+                      style: TextStyle(color: AppTheme.darkBlue),
+                    ),
+                    onTap: () => widget.returnValue
+                        ? Navigator.pop(context, _categories[index])
+                        : Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => TransactionList(
+                                      _categories[index].name,
+                                      categoryId: _categories[index].id,
+                                    ))),
+                  ),
+                )),
       ),
-      padding: EdgeInsets.all(10.0),
-      child: ListView.builder(
-        itemCount: _categories.length,
-        itemBuilder: (_, index) => Card(
-          color: Colors.white.withOpacity(0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.0), side: BorderSide(width: 1.0, color: Colors.white)),
-          child: ListTile(
-            title: Text(_categories[index].name, style: TextStyle(color: AppTheme.darkBlue),),
-            onTap: () => widget.returnValue
-                ? Navigator.pop(context, _categories[index])
-                : Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionList(_categories[index].name, categoryId: _categories[index].id,))),
-          ),
-        )
-      ),
-    ),
-        floatingActionButton: isEditMode ? RaisedButton(onPressed: () => Navigator.pushNamed(context, routes.CreateCategory)
-            .then((value) {
-          if(value != null) _loadCategories();
-        }),
-          child: Text(("Create Category"),),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
-          color: AppTheme.pinkAccent,) : null,
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: isEditMode
+          ? RoundedButton(
+              onPressed: () => Navigator.pushNamed(context, routes.CreateCategory).then((value) {
+                    if (value != null) _loadCategories();
+                  }),
+              child: Text(
+                ("Create Category"),
+              ),
+              color: AppTheme.pinkAccent,
+            )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -93,15 +97,19 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
   }
 
   void onCategoriesLoaded(List<AppCategory> value) {
-    if(value != null) setState(() {
-      _categories = value;
-    });
+    if (value != null)
+      setState(() {
+        _categories = value;
+      });
   }
 
   int stageCrossAxisCellCount(String name) {
-    if(name.length > 12) return 3;
-    else if(name.length > 7) return 2;
-    else return 1;
+    if (name.length > 12)
+      return 3;
+    else if (name.length > 7)
+      return 2;
+    else
+      return 1;
   }
 
   int stageMainAxisCellCount(String name) {

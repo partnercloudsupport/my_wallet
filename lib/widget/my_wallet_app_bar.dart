@@ -19,8 +19,8 @@ class MyWalletAppBar extends GradientAppBar {
     actions: actions,
     centerTitle: true,
     leading: leading,
-    backgroundColorStart: AppTheme.darkBlue,
-    backgroundColorEnd: AppTheme.darkBlue.withOpacity(0.8));
+    backgroundColorStart: AppTheme.bgGradient.colors[0],
+    backgroundColorEnd: AppTheme.bgGradient.colors[1]);
 }
 //class MyWalletAppBar extends AppBar {
 //  MyWalletAppBar(

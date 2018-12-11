@@ -30,12 +30,12 @@ class _MyWalletState extends State<MyWalletHome> {
   Widget build(BuildContext context) {
     var platform = Theme.of(context).platform;
 
-    return PlainScaffold(
+    return GradientScaffold(
       body: _generateMainBody(),
       drawer: _LeftDrawer(),
       floatingActionButton: Padding(
         padding: EdgeInsets.all(platform == TargetPlatform.iOS ? 10.0 : 0.0),
-        child: RaisedButton(
+        child: RoundedButton(
           onPressed: () => Navigator.pushNamed(context, routes.AddTransaction),
           child: Container(
             margin: EdgeInsets.all(10.0),
@@ -43,7 +43,6 @@ class _MyWalletState extends State<MyWalletHome> {
               "Add Transaction",
             ),
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
           color: AppTheme.pinkAccent,
         ),
       ),
@@ -68,12 +67,7 @@ class _MyWalletState extends State<MyWalletHome> {
         collapseMode: CollapseMode.parallax,
         background: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              AppTheme.white.withOpacity(0.0),
-              AppTheme.white.withOpacity(0.2)
-            ],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight)
+            gradient: AppTheme.bgGradient
           ),
           child: ListView(
             physics: NeverScrollableScrollPhysics(),

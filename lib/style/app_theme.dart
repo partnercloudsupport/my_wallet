@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-export 'package:flutter/material.dart';
-
 class AppTheme {
   static const darkBlue = Color(0xFF292787);
   static const blue = Color(0xFF3E3C93);
@@ -30,7 +28,7 @@ class AppTheme {
         800: Color(0xff1c1b5e),
         900: Color(0xff181751),
       }),
-      primaryColor: darkBlue,
+      primaryColor: white,
 //  primaryColorBrightness: Brightness.dark,
 //    Color primaryColorLight,
       primaryColorDark: Color(0xFF181751),
@@ -87,11 +85,13 @@ class AppTheme {
           caption: TextStyle(color: blueGrey),
           subtitle: TextStyle(color: blueGrey),
           subhead: TextStyle(color: blueGrey),
-          overline: TextStyle(color: blueGrey))
+          overline: TextStyle(color: blueGrey)),
 //    TextTheme accentTextTheme,
 //    InputDecorationTheme inputDecorationTheme,
 //    IconThemeData iconTheme,
-//    IconThemeData primaryIconTheme,
+    primaryIconTheme: IconThemeData(
+      color: white,
+  ) ,
 //    IconThemeData accentIconTheme,
 //    SliderThemeData sliderTheme,
 //    TabBarTheme tabBarTheme,
@@ -100,14 +100,17 @@ class AppTheme {
 //    MaterialTapTargetSize materialTapTargetSize,
 //    PageTransitionsTheme pageTransitionsTheme,
 //    ColorScheme colorScheme,
-//    DialogTheme dialogTheme,
+    dialogTheme: DialogTheme(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+    ),
 //    Typography typograph
       );
 
   static final bgGradient = LinearGradient(
       colors: [
-        darkBlue,
-        darkBlue.withOpacity(0.8)],
+        Color(0xFF330867),
+        Color(0xFF30cfd0),
+        ],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight
       );

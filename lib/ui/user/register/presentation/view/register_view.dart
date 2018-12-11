@@ -69,26 +69,26 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
                 mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
                   Expanded(
-                    child: FlatButton(
+                    child: RoundedButton(
                       onPressed: _onFacebookButtonPressed,
                       padding: EdgeInsets.all(10.0),
                       child: Icon(
                         MyFlutterApp.facebook_rect,
                         color: AppTheme.white,
                       ),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+                      radius: 5.0,
                       color: AppTheme.facebookColor,
                     ),
                   ),
                   Expanded(
-                    child: FlatButton(
+                    child: RoundedButton(
                       onPressed: _onGoogleButtonPressed,
                       padding: EdgeInsets.all(10.0),
                       child: Icon(
                         MyFlutterApp.googleplus_rect,
                         color: AppTheme.white,
                       ),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+                      radius: 5.0,
                       color: AppTheme.googleColor,
                     ),
                   ),

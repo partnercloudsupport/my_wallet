@@ -39,7 +39,7 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
 
   @override
   Widget build(BuildContext context) {
-    return PlainScaffold(
+    return GradientScaffold(
       appBar: MyWalletAppBar(
         title: widget._title,
         actions: <Widget>[
@@ -54,15 +54,7 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
         ],
         leading: isEditMode ? Text("", style: TextStyle(color: Colors.transparent),) : null,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              AppTheme.darkBlue,
-              AppTheme.darkBlue.withOpacity(0.8)
-            ],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight)
-        ),
+      body: Padding(
         padding: EdgeInsets.all(10.0),
         child: ListView.builder(
             itemCount: _accounts.length,
@@ -83,12 +75,11 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
             )
         ),
       ),
-      floatingActionButton: isEditMode ? RaisedButton(onPressed: () => Navigator.pushNamed(context, routes.AddAccount)
+      floatingActionButton: isEditMode ? RoundedButton(onPressed: () => Navigator.pushNamed(context, routes.AddAccount)
           .then((value) {
             if(value != null) _loadAllAccounts();
           }),
         child: Text(("Create Account"),),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
         color: AppTheme.pinkAccent,) : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );

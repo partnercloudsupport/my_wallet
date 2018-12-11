@@ -123,7 +123,6 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
         context: context,
         builder: (context) => AlertDialog(
           title: Text("Enter your account name", style: Theme.of(context).textTheme.title.apply(color: Colors.white),),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
           content: TextField(
             controller: _nameTextController,
             decoration: InputDecoration(

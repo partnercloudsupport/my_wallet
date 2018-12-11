@@ -1,4 +1,5 @@
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter/material.dart';
 import 'package:my_wallet/style/app_theme.dart';
 
 class NumberInputPad extends StatefulWidget {
@@ -41,18 +42,16 @@ class NumberInputPadState extends State<NumberInputPad> {
   Widget build(BuildContext context) {
     FocusScope.of(context).requestFocus(new FocusNode());
 
-    final numbers = ["1", "2", "3", "C", "4", "5", "6", "7", "8", "9", "0", "."];
+    final numbers = [
+      "1", "2", "3", "C",
+      "4", "5", "6", "7",
+      "8", "9", "0", "."];
 
     return Align(
       alignment: Alignment.bottomCenter,
       child: _showNumPad ? Container(
         decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              AppTheme.darkBlue,
-              AppTheme.darkBlue.withOpacity(0.89)
-            ],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight)
+            gradient: AppTheme.bgGradient
         ),
         child: StaggeredGridView.countBuilder(
           shrinkWrap: true,

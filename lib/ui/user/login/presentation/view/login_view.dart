@@ -61,7 +61,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              FlatButton(
+              RoundedButton(
                 onPressed: _signIn,
                 child: Padding(padding: EdgeInsets.all(12.0), child: _signingIn ? SizedBox(
                   width: 15.0,
@@ -70,13 +70,11 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
                     strokeWidth: 2.0,
                   ),
                 ) : Text("Sign In", style: TextStyle(color: AppTheme.white),),),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0), side: BorderSide(color: AppTheme.white, width: 0.5)),
                 color: AppTheme.blue,
               ),
-              FlatButton(
+              RoundedButton(
                 onPressed: _register,
                 child: Padding(padding: EdgeInsets.all(12.0), child: Text("Register new account", style: TextStyle(color: AppTheme.darkBlue),),),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
                 color: AppTheme.white,
               )
             ],),
