@@ -1,6 +1,8 @@
 import 'package:my_wallet/ui/user/login/data/login_repository.dart';
 import 'package:my_wallet/ca/domain/ca_use_case.dart';
 
+import 'package:flutter/services.dart';
+
 class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
   LoginUseCase() : super(LoginRepository());
 
@@ -8,8 +10,8 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
     try {
       do {
 
-        if(!await repo.validateEmail(email)) break;
-        if(!await repo.validatePassword(password)) break;
+        await repo.validateEmail(email);
+        await repo.validatePassword(password);
 
         User user = await repo.signinToFirebase(email, password);
 
@@ -17,7 +19,7 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         onNext(true);
       } while(false);
-    } catch(e) {
+    } on PlatformException catch(e) {
       onError(e);
     }
   }
