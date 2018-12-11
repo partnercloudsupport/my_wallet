@@ -1,5 +1,5 @@
 import 'package:my_wallet/ui/account/list/domain/list_accounts_use_case.dart';
-import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/ca/presentation/presenter/ca_presenter.dart';
 import 'package:my_wallet/ui/account/list/presentation/view/list_account_dataview.dart';
 

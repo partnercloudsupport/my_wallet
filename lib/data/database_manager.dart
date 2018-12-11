@@ -1,9 +1,9 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/data/data.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:my_wallet/data_observer.dart';
+import 'package:my_wallet/data/data_observer.dart';
 
 // #############################################################################################################################
 // database manager

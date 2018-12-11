@@ -1,9 +1,4 @@
-import 'package:flutter/material.dart';
-
-import 'package:my_wallet/widget/my_wallet_app_bar.dart';
-import 'package:my_wallet/database/data.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
-import 'package:my_wallet/routes.dart' as routes;
+import 'package:my_wallet/data/data.dart';
 
 import 'package:my_wallet/ui/category/list/presentation/presenter/list_category_presenter.dart';
 
@@ -61,8 +56,8 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
     body: Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: [
-          theme.darkBlue,
-          theme.darkBlue.withOpacity(0.8)
+          AppTheme.darkBlue,
+          AppTheme.darkBlue.withOpacity(0.8)
         ],
         begin: Alignment.centerLeft,
         end: Alignment.centerRight)
@@ -74,7 +69,7 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
           color: Colors.white.withOpacity(0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.0), side: BorderSide(width: 1.0, color: Colors.white)),
           child: ListTile(
-            title: Text(_categories[index].name, style: TextStyle(color: theme.darkBlue),),
+            title: Text(_categories[index].name, style: TextStyle(color: AppTheme.darkBlue),),
             onTap: () => widget.returnValue
                 ? Navigator.pop(context, _categories[index])
                 : Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionList(_categories[index].name, categoryId: _categories[index].id,))),
@@ -88,7 +83,7 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
         }),
           child: Text(("Create Category"),),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
-          color: theme.pinkAccent,) : null,
+          color: AppTheme.pinkAccent,) : null,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }

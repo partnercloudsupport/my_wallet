@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ui/user/login/presentation/view/login_data_view.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/user/login/presentation/presenter/login_presenter.dart';
@@ -35,8 +33,8 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
         padding: EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           gradient: LinearGradient(colors: [
-            theme.darkBlue,
-            theme.darkBlue.withOpacity(0.8)
+            AppTheme.darkBlue,
+            AppTheme.darkBlue.withOpacity(0.8)
           ])
         ),
         child: Column(
@@ -59,7 +57,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
                   controller: _passwordController,
                   decoration: InputDecoration(
                       hintText: "Password",
-                      suffixIcon: IconButton(icon: Icon(Icons.remove_red_eye, color: _obscureText ? theme.white : theme.blueGrey,), onPressed: () => setState(() => _obscureText = !_obscureText))
+                      suffixIcon: IconButton(icon: Icon(Icons.remove_red_eye, color: _obscureText ? AppTheme.white : AppTheme.blueGrey,), onPressed: () => setState(() => _obscureText = !_obscureText))
                   ),
                   keyboardType: TextInputType.text,
                   obscureText: _obscureText,
@@ -78,15 +76,15 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
                     child: CircularProgressIndicator(
                       strokeWidth: 2.0,
                     ),
-                  ) : Text("Sign In", style: TextStyle(color: theme.white),),),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0), side: BorderSide(color: theme.white, width: 0.5)),
-                  color: theme.blue,
+                  ) : Text("Sign In", style: TextStyle(color: AppTheme.white),),),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0), side: BorderSide(color: AppTheme.white, width: 0.5)),
+                  color: AppTheme.blue,
                 ),
                 FlatButton(
                   onPressed: _register,
-                  child: Padding(padding: EdgeInsets.all(12.0), child: Text("Register new account", style: TextStyle(color: theme.darkBlue),),),
+                  child: Padding(padding: EdgeInsets.all(12.0), child: Text("Register new account", style: TextStyle(color: AppTheme.darkBlue),),),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
-                  color: theme.white,
+                  color: AppTheme.white,
                 )
               ],),
           ],

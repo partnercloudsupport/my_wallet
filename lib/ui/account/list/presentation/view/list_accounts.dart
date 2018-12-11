@@ -1,11 +1,6 @@
-import 'package:flutter/material.dart';
-
-import 'package:my_wallet/app_theme.dart' as theme;
-import 'package:my_wallet/widget/my_wallet_app_bar.dart';
-import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/data/data.dart';
 import 'package:intl/intl.dart';
 import 'package:my_wallet/ui/account/list/presentation/presenter/list_accounts_presenter.dart';
-import 'package:my_wallet/routes.dart' as routes;
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/account/list/presentation/view/list_account_dataview.dart';
@@ -62,8 +57,8 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
       body: Container(
         decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
-              theme.darkBlue,
-              theme.darkBlue.withOpacity(0.8)
+              AppTheme.darkBlue,
+              AppTheme.darkBlue.withOpacity(0.8)
             ],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight)
@@ -75,13 +70,13 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
               color: Colors.white.withOpacity(0.5),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.0), side: BorderSide(width: 1.0, color: Colors.white)),
               child: ListTile(
-                title: Text(_accounts[index].name, style: TextStyle(fontSize: 18.0, color: theme.darkBlue),),
+                title: Text(_accounts[index].name, style: TextStyle(fontSize: 18.0, color: AppTheme.darkBlue),),
                 subtitle: Text("${_nf.format(_accounts[index].balance)}"),
                 trailing: isEditMode ? IconButton(
                   onPressed: () {
                     _deleteAccount(_accounts[index]);
                   },
-                  icon: Icon(Icons.close, color: theme.pinkAccent,),
+                  icon: Icon(Icons.close, color: AppTheme.pinkAccent,),
                 ) : null,
                 onTap: () => widget.selectionMode ? Navigator.pop(context, _accounts[index]) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(_accounts[index].name, accountId: _accounts[index].id,))),
               ),
@@ -94,7 +89,7 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
           }),
         child: Text(("Create Account"),),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
-        color: theme.pinkAccent,) : null,
+        color: AppTheme.pinkAccent,) : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }

@@ -1,6 +1,5 @@
 import 'package:my_wallet/ca/domain/ca_use_case.dart';
 import 'package:my_wallet/ui/transaction/add/data/add_transaction_repository.dart';
-import 'package:my_wallet/database/data.dart';
 import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
 
 class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepository> {

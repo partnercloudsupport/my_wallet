@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:my_wallet/app_theme.dart' as theme;
-
 import 'package:my_wallet/ui/home/home_view.dart';
 import 'package:my_wallet/widget/my_wallet_app_bar.dart';
-import 'package:my_wallet/routes.dart' as routes;
 
+import 'package:my_wallet/app_material.dart';
 import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_view.dart';
 
 import 'package:my_wallet/ui/account/list/presentation/view/list_accounts.dart';
@@ -14,7 +12,7 @@ import 'package:my_wallet/ui/account/create/presentation/view/create_account_vie
 import 'package:my_wallet/ui/category/list/presentation/view/list_category.dart';
 import 'package:my_wallet/ui/category/create/presentation/view/create_category_view.dart';
 
-import 'package:my_wallet/database/firebase_manager.dart' as fm;
+import 'package:my_wallet/data/firebase_manager.dart' as fm;
 import 'package:my_wallet/ui/user/login/presentation/view/login_view.dart';
 
 void main() async {
@@ -34,7 +32,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: theme.appTheme,
+      theme: AppTheme.appTheme,
       home: hasUser ? MyWalletHome() : Login(),
       debugShowCheckedModeBanner: false,
       showPerformanceOverlay: false,

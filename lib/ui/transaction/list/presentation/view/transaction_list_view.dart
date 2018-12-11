@@ -1,13 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/presenter/transaction_list_presenter.dart';
-import 'package:my_wallet/database/data.dart';
-import 'package:my_wallet/widget/my_wallet_app_bar.dart';
+import 'package:my_wallet/data/data.dart';
 import 'package:intl/intl.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_data_view.dart';
 import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_view.dart';
-import 'package:my_wallet/data_observer.dart' as observer;
+import 'package:my_wallet/data/data_observer.dart' as observer;
 
 class TransactionList extends StatefulWidget {
   final String title;
@@ -64,9 +61,9 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
           itemCount: entities.length,
           itemBuilder: (context, index) => Container(
             child: ListTile(
-              title: Text(entities[index].desc, style: Theme.of(context).textTheme.body2.apply(color: theme.darkBlue),),
+              title: Text(entities[index].desc, style: Theme.of(context).textTheme.body2.apply(color: AppTheme.darkBlue),),
               subtitle: Text(df.format(entities[index].dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
-              trailing: Text("\$${nf.format(entities[index].amount)}", style: Theme.of(context).textTheme.title.apply(color: theme.darkBlue),),
+              trailing: Text("\$${nf.format(entities[index].amount)}", style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AddTransaction(transactionId: entities[index].id,))),
             ),
             color: index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.2),

@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
+import 'package:my_wallet/app_material.dart';
+
 import 'package:intl/intl.dart';
 
 import 'package:my_wallet/ui/home/overview/presentation/view/overview_view.dart';
 import 'package:my_wallet/ui/home/chart/chart_row_view.dart';
-import 'package:my_wallet/routes.dart' as routes;
 import 'package:my_wallet/ui/home/expenseslist/data/expense_list_entity.dart';
 import 'package:my_wallet/ui/home/expenseslist/presentation/view/expense_list_view.dart';
 
@@ -17,7 +16,7 @@ class MyWalletHome extends StatefulWidget {
 
 class _MyWalletState extends State<MyWalletHome> {
 
-  TextStyle titleStyle = TextStyle(color: theme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
+  TextStyle titleStyle = TextStyle(color: AppTheme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
   List<ExpenseEntity> homeEntities = [];
 
   DateFormat _df = DateFormat("MMM, yyyy");
@@ -45,7 +44,7 @@ class _MyWalletState extends State<MyWalletHome> {
             ),
           ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
-          color: theme.pinkAccent,
+          color: AppTheme.pinkAccent,
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -70,8 +69,8 @@ class _MyWalletState extends State<MyWalletHome> {
         background: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
-              theme.white.withOpacity(0.0),
-              theme.white.withOpacity(0.2)
+              AppTheme.white.withOpacity(0.0),
+              AppTheme.white.withOpacity(0.2)
             ],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight)

@@ -1,17 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:my_wallet/widget/my_wallet_app_bar.dart';
-import 'package:my_wallet/database/data.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
+import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 
 import 'package:my_wallet/ui/account/create/presentation/presenter/create_account_presenter.dart';
 import 'package:my_wallet/ui/account/create/presentation/view/create_account_dataview.dart';
 
-import 'package:my_wallet/widget/conversation_row.dart';
-import 'package:my_wallet/widget/number_input_pad.dart';
 import 'package:intl/intl.dart';
 
-import 'package:my_wallet/widget/bottom_sheet_list.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 
 class CreateAccount extends StatefulWidget {
@@ -78,17 +72,17 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
                 ConversationRow(
                     "Create new",
                     _type.name,
-                    theme.darkBlue,
+                    AppTheme.darkBlue,
                     onPressed: _showAccountTypeSelection),
                 ConversationRow(
                     "with name",
                     _name == null || _name.isEmpty ? "Enter a name" : _name,
-                    theme.darkBlue,
+                    AppTheme.darkBlue,
                     onPressed: _showAccountNameDialog,),
                 ConversationRow(
                   "and intial amount",
                   _nf.format(_amount),
-                  theme.brightPink,
+                  AppTheme.brightPink,
                 style: Theme.of(context).textTheme.display2,),
               ],
             ),
@@ -107,7 +101,7 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
               child: InkWell(
                 child: Padding(
                     padding: EdgeInsets.all(10.0),
-                    child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: theme.darkBlue))
+                    child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue))
                 ),
                 onTap: () {
                   setState(() => _type = f);
@@ -133,9 +127,9 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
           content: TextField(
             controller: _nameTextController,
             decoration: InputDecoration(
-                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: theme.tealAccent)),
-                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: theme.tealAccent)),
-                border: UnderlineInputBorder(borderSide: BorderSide(color: theme.tealAccent))
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.tealAccent)),
+                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.tealAccent)),
+                border: UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.tealAccent))
             ),
           ),
           actions: <Widget>[

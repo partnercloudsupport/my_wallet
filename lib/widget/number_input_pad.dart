@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
+import 'package:my_wallet/style/app_theme.dart';
 
 class NumberInputPad extends StatefulWidget {
   final Function(String, String) _onValueChanged;
@@ -49,8 +48,8 @@ class NumberInputPadState extends State<NumberInputPad> {
       child: _showNumPad ? Container(
         decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
-              theme.darkBlue,
-              theme.darkBlue.withOpacity(0.89)
+              AppTheme.darkBlue,
+              AppTheme.darkBlue.withOpacity(0.89)
             ],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight)

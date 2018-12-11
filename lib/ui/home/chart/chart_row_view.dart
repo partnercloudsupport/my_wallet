@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:my_wallet/app_material.dart';
 
 import 'package:my_wallet/ui/home/chart/transactions/presentation/view/chart_transaction.dart';
 import 'package:my_wallet/ui/home/chart/title/presentation/view/chart_title_view.dart';

@@ -1,6 +1,6 @@
 import 'package:my_wallet/ui/home/chart/saving/data/chart_saving_entity.dart';
-import 'package:my_wallet/database/database_manager.dart' as _db;
-import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/data/database_manager.dart' as _db;
+import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/utils.dart' as Utils;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_wallet/shared_pref/shared_preference.dart';

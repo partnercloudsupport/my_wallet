@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
+import 'package:my_wallet/style/app_theme.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 class ConversationRow extends StatelessWidget {
@@ -44,9 +44,9 @@ class DateTimeRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           _Description("on"),
-          _Data(_dateFormat.format(_date), theme.darkBlue, onPressed: _onDatePressed,),
+          _Data(_dateFormat.format(_date), AppTheme.darkBlue, onPressed: _onDatePressed,),
           _Description("at"),
-          _Data(_timeFormat.format(_date), theme.darkBlue, onPressed: _onTimePressed,),
+          _Data(_timeFormat.format(_date), AppTheme.darkBlue, onPressed: _onTimePressed,),
         ],
       ),
     );
@@ -63,7 +63,7 @@ class _Description extends StatelessWidget {
   Widget build(BuildContext context) {
     return
       Padding(
-        child: Text(_title, style: Theme.of(context).textTheme.subhead.apply(color: theme.blueGrey)),
+        child: Text(_title, style: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey)),
         padding: EdgeInsets.all(8.0),
       );
   }

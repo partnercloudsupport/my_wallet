@@ -1,12 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'dart:io' show Platform;
 import 'package:firebase_database/firebase_database.dart';
-import 'package:my_wallet/database/data.dart';
-import 'package:my_wallet/database/database_manager.dart' as db;
-import 'package:my_wallet/database/firebase_config.dart' as fbConfig;
+import 'package:my_wallet/data/data.dart';
+import 'package:my_wallet/data/database_manager.dart' as db;
+import 'package:my_wallet/data/firebase_config.dart' as fbConfig;
 import 'package:synchronized/synchronized.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/data/data.dart';
 
 FirebaseDatabase _database;
 FirebaseAuth _auth;

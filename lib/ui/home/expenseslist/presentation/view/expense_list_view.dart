@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:intl/intl.dart';
-import 'package:my_wallet/data_observer.dart' as observer;
+import 'package:my_wallet/data/data_observer.dart' as observer;
 
-import 'package:my_wallet/routes.dart' as routes;
 import 'package:my_wallet/ui/home/expenseslist/data/expense_list_entity.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
 
@@ -27,7 +24,7 @@ class _ExpensesListViewState extends CleanArchitectureView<ExpensesListView, Exp
     observer.tableCategory
   ];
 
-  TextStyle titleStyle = TextStyle(color: theme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
+  TextStyle titleStyle = TextStyle(color: AppTheme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
   List<ExpenseEntity> homeEntities = [];
 
   NumberFormat _nf = NumberFormat("\$#,##0.00");
@@ -59,9 +56,9 @@ class _ExpensesListViewState extends CleanArchitectureView<ExpensesListView, Exp
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       children: homeEntities.map((f) => ListTile(
-        title: Text(f.name, style: TextStyle(color: theme.darkBlue),),
-        leading: Icon(Icons.map, color: theme.darkBlue,),
-        trailing: Text(_nf.format(f.amount), style: TextStyle(color: theme.tealAccent),),
+        title: Text(f.name, style: TextStyle(color: AppTheme.darkBlue),),
+        leading: Icon(Icons.map, color: AppTheme.darkBlue,),
+        trailing: Text(_nf.format(f.amount), style: TextStyle(color: AppTheme.tealAccent),),
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionList(f.name, categoryId: f.categoryId,))),
       )).toList(),
     );

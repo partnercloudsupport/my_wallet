@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ui/home/chart/title/data/chart_title_entity.dart';
 import 'package:my_wallet/ui/home/chart/title/presentation/presenter/chart_title_presenter.dart';
 import 'package:intl/intl.dart';
-import 'package:my_wallet/data_observer.dart' as observer;
+import 'package:my_wallet/data/data_observer.dart' as observer;
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/home/chart/title/presentation/view/chart_title_data_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -64,7 +62,7 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
                     children: <Widget>[
                       AutoSizeText(
                         "Income",
-                        style: textStyle.apply(color: theme.tealAccent),
+                        style: textStyle.apply(color: AppTheme.tealAccent),
                         maxLines: 1,
                       ),
                       Text("${entity == null ? "\$0.00" : _nf.format(entity.incomeAmount)}",)
@@ -78,7 +76,7 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
                     children: <Widget>[
                       AutoSizeText(
                         "Expense",
-                        style: textStyle.apply(color: theme.pinkAccent),
+                        style: textStyle.apply(color: AppTheme.pinkAccent),
                         maxLines: 1,
                       ),
                       Text("${entity == null ? "\$0.00" : _nf.format(entity.expensesAmount)}",)
@@ -91,7 +89,7 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       AutoSizeText("Saving",
-                      style: textStyle.apply(color: theme.brightGreen),
+                      style: textStyle.apply(color: AppTheme.brightGreen),
                         maxLines: 1,
                       ),
                       Text("${entity == null ? "\$0.00" : _nf.format(entity.savingAmount)}")

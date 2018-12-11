@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:my_wallet/widget/my_wallet_app_bar.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ui/category/create/presentation/presenter/create_category_presenter.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/category/create/presentation/view/create_category_data_view.dart';
@@ -41,9 +38,9 @@ class _CreateCategoryState extends CleanArchitectureView<CreateCategory, CreateC
               onChanged: _onNameChanged,
               decoration: InputDecoration(
                 hintText: "Category Name",
-                hintStyle: Theme.of(context).textTheme.subhead.apply(color: theme.blueGrey),
-                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: theme.darkBlue, width: 1.0)),
-                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: theme.darkBlue, width: 1.0)),
+                hintStyle: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.darkBlue, width: 1.0)),
+                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.darkBlue, width: 1.0)),
               ),
             ),
           ),

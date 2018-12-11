@@ -1,10 +1,7 @@
-import 'package:flutter/material.dart';
-
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/user/register/presentation/presenter/register_presenter.dart';
 import 'package:my_wallet/ui/user/register/presentation/view/register_data_view.dart';
 
-import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/font/my_flutter_app_icons.dart';
 
 class Register extends StatefulWidget {
@@ -41,7 +38,7 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
               child: IconButton(
                 padding: EdgeInsets.all(20.0),
                 icon: Icon(Icons.arrow_back,
-                color: theme.blueGrey),
+                color: AppTheme.blueGrey),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -51,7 +48,7 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
                 padding: EdgeInsets.only(top: 10.0, bottom: 20.0),
                 child: Text(
                   "Create your account",
-                  style: Theme.of(context).textTheme.display1.apply(color: theme.black),
+                  style: Theme.of(context).textTheme.display1.apply(color: AppTheme.black),
                 ),
               ),
             ),
@@ -61,7 +58,7 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
                   padding: EdgeInsets.only(top: 00.0, bottom: 10.0),
                   child: Text(
                     "Signup with Social Network or Email",
-                    style: Theme.of(context).textTheme.title.apply(color: theme.blueGrey),
+                    style: Theme.of(context).textTheme.title.apply(color: AppTheme.blueGrey),
                   ),
                 )
             ),
@@ -77,10 +74,10 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
                       padding: EdgeInsets.all(10.0),
                       child: Icon(
                         MyFlutterApp.facebook_rect,
-                        color: theme.white,
+                        color: AppTheme.white,
                       ),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-                      color: theme.facebookColor,
+                      color: AppTheme.facebookColor,
                     ),
                   ),
                   Expanded(
@@ -89,10 +86,10 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
                       padding: EdgeInsets.all(10.0),
                       child: Icon(
                         MyFlutterApp.googleplus_rect,
-                        color: theme.white,
+                        color: AppTheme.white,
                       ),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-                      color: theme.googleColor,
+                      color: AppTheme.googleColor,
                     ),
                   ),
                 ],
@@ -105,20 +102,20 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
                   Expanded(
                     child: Container(
                       height: 1.0,
-                      color: theme.blueGrey,
+                      color: AppTheme.blueGrey,
                     ),
                   ),
                   Padding(
                     padding: EdgeInsets.all(5.0),
                     child: Text(
                       "OR",
-                      style: Theme.of(context).textTheme.title.apply(color: theme.blueGrey),
+                      style: Theme.of(context).textTheme.title.apply(color: AppTheme.blueGrey),
                     ),
                   ),
                   Expanded(
                     child: Container(
                       height: 1.0,
-                      color: theme.blueGrey,
+                      color: AppTheme.blueGrey,
                     ),
                   )
                 ],
@@ -126,51 +123,51 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
             ),
             Container(
               height: 0.5,
-              color: theme.blueGrey,
+              color: AppTheme.blueGrey,
             ),
             Padding(
               padding: EdgeInsets.only(left: 20.0, top: 10.0, bottom: 10.0),
               child: Text(
                 "NAME",
-                style: Theme.of(context).textTheme.title.apply(color: theme.black),
+                style: Theme.of(context).textTheme.title.apply(color: AppTheme.black),
               ),
             ),
             Padding(
               padding: EdgeInsets.only(left: 20.0, bottom: 10.0),
               child: TextField(
                 controller: _displayNameController,
-                decoration: InputDecoration(hintText: "Sample Name", hintStyle: Theme.of(context).textTheme.title.apply(color: theme.blueGrey)),
-                style: Theme.of(context).textTheme.title.apply(color: theme.black),
+                decoration: InputDecoration(hintText: "Sample Name", hintStyle: Theme.of(context).textTheme.title.apply(color: AppTheme.blueGrey)),
+                style: Theme.of(context).textTheme.title.apply(color: AppTheme.black),
               ),
             ),
             Container(
               height: 0.5,
-              color: theme.blueGrey,
+              color: AppTheme.blueGrey,
             ),
             Padding(
               padding: EdgeInsets.only(left: 20.0, top: 10.0, bottom: 10.0),
               child: Text(
                 "EMAIL ADDRESS",
-                style: Theme.of(context).textTheme.title.apply(color: theme.black),
+                style: Theme.of(context).textTheme.title.apply(color: AppTheme.black),
               ),
             ),
             Padding(
               padding: EdgeInsets.only(left: 20.0, bottom: 10.0),
               child: TextField(
                 controller: _emailController,
-                decoration: InputDecoration(hintText: "SampleEmail@domain.com", hintStyle: Theme.of(context).textTheme.title.apply(color: theme.blueGrey)),
-                style: Theme.of(context).textTheme.title.apply(color: theme.black),
+                decoration: InputDecoration(hintText: "SampleEmail@domain.com", hintStyle: Theme.of(context).textTheme.title.apply(color: AppTheme.blueGrey)),
+                style: Theme.of(context).textTheme.title.apply(color: AppTheme.black),
               ),
             ),
             Container(
               height: 0.5,
-              color: theme.blueGrey,
+              color: AppTheme.blueGrey,
             ),
             Padding(
               padding: EdgeInsets.only(left: 20.0, top: 10.0, bottom: 10.0),
               child: Text(
                 "PASSWORD",
-                style: Theme.of(context).textTheme.title.apply(color: theme.black),
+                style: Theme.of(context).textTheme.title.apply(color: AppTheme.black),
               ),
             ),
             Padding(
@@ -179,16 +176,16 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
                 controller: _passwordController,
                 decoration: InputDecoration(
                     hintText: "samplepassword",
-                    hintStyle: Theme.of(context).textTheme.title.apply(color: theme.blueGrey),
-                    suffixIcon: IconButton(icon: Icon(Icons.remove_red_eye, color: _obscureText ? theme.blueGrey : theme.blueGrey.withOpacity(0.4),), onPressed: () => setState(() => _obscureText = !_obscureText))
+                    hintStyle: Theme.of(context).textTheme.title.apply(color: AppTheme.blueGrey),
+                    suffixIcon: IconButton(icon: Icon(Icons.remove_red_eye, color: _obscureText ? AppTheme.blueGrey : AppTheme.blueGrey.withOpacity(0.4),), onPressed: () => setState(() => _obscureText = !_obscureText))
                 ),
                 obscureText: _obscureText,
-                style: Theme.of(context).textTheme.title.apply(color: theme.black),
+                style: Theme.of(context).textTheme.title.apply(color: AppTheme.black),
               ),
             ),
             Container(
               height: 0.5,
-              color: theme.blueGrey,
+              color: AppTheme.blueGrey,
             ),
             Padding(
               padding: EdgeInsets.only(top: 20.0, left: 5.0, right: 5.0),
@@ -199,7 +196,7 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
                         padding: EdgeInsets.all(15.0),
                         onPressed: _registerEmail,
                         child: Text("Register"),
-                        color: theme.darkBlue,))
+                        color: AppTheme.darkBlue,))
                 ],
               ),
             )

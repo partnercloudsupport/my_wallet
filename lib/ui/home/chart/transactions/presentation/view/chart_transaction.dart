@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart';
 import 'package:my_wallet/ui/home/chart/transactions/data/transaction_entity.dart';
 import 'package:my_wallet/ui/home/chart/transactions/presentation/presenter/transaction_presenter.dart';
-import 'package:my_wallet/data_observer.dart' as observer;
+import 'package:my_wallet/data/data_observer.dart' as observer;
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/home/chart/transactions/presentation/view/chart_transaction_dataview.dart';
+import 'package:my_wallet/data/data.dart';
 
 class TransactionChart extends StatefulWidget {
   final List<TransactionType> _type;

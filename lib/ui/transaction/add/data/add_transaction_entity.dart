@@ -1,5 +1,5 @@
-import 'package:my_wallet/database/data.dart';
-export 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/data/data.dart';
+export 'package:my_wallet/data/data.dart';
 
 class TransactionDetail {
   final int id;

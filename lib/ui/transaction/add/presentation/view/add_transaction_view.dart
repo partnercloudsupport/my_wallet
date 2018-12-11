@@ -1,17 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:my_wallet/widget/my_wallet_app_bar.dart';
-import 'package:my_wallet/database/data.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_data_view.dart';
 import 'package:my_wallet/ui/transaction/add/presentation/presenter/add_transaction_presenter.dart';
-import 'package:my_wallet/data_observer.dart' as observer;
+import 'package:my_wallet/data/data_observer.dart' as observer;
 import 'package:flutter/cupertino.dart';
 import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
 import 'package:intl/intl.dart';
-import 'package:my_wallet/widget/number_input_pad.dart';
-import 'package:my_wallet/widget/conversation_row.dart';
-import 'package:my_wallet/widget/bottom_sheet_list.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 
 class AddTransaction extends StatefulWidget {
@@ -104,23 +97,23 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                   ConversationRow(
                       widget.transactionId == null ? "Create new" : "An",
                       _type.name,
-                      theme.darkBlue,
+                      AppTheme.darkBlue,
                       onPressed: _showTransactionTypeSelection),
                   ConversationRow(
                     widget.transactionId == null ? "of" : "valued of",
                     _numberFormat.format(_toNumber(_number, _decimal)),
-                    TransactionType.isIncome(_type) ? theme.tealAccent : TransactionType.isExpense(_type) ? theme.pinkAccent : theme.blueGrey,
+                    TransactionType.isIncome(_type) ? AppTheme.tealAccent : TransactionType.isExpense(_type) ? AppTheme.pinkAccent : AppTheme.blueGrey,
                     style: Theme.of(context).textTheme.display2,
                     onPressed: () => numPadKey.currentState.show(),),
                   ConversationRow(
                     "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
                     _account == null ? "Select Account" : _account.name,
-                    theme.darkGreen,
+                    AppTheme.darkGreen,
                     onPressed: _showSelectAccount,),
                   ConversationRow(
                     "for",
                       _category == null ? "Select Category" : _category.name,
-                      theme.brightPink,
+                      AppTheme.brightPink,
                       onPressed: _showSelectCategory
                   ),
                   DateTimeRow(_date, _showDatePicker, _showTimePicker)
@@ -142,7 +135,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
               child: InkWell(
                 child: Padding(
                   padding: EdgeInsets.all(10.0),
-                  child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: theme.darkBlue))
+                  child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue))
                 ),
                 onTap: () {
                   setState(() => _type = f);
@@ -164,7 +157,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
         BottomViewContent(_accountList, (f) => Align(
           child: InkWell(
             child: Padding(padding: EdgeInsets.all(10.0),
-              child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: theme.darkGreen), overflow: TextOverflow.ellipsis, maxLines: 1,) //Data(f.name, theme.darkGreen)
+              child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkGreen), overflow: TextOverflow.ellipsis, maxLines: 1,) //Data(f.name, theme.darkGreen)
             ),
             onTap: () {
               setState(() => _account = f);
@@ -184,7 +177,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
         BottomViewContent(_categoryList, (f) => Align(
           child: InkWell(
             child: Padding(padding: EdgeInsets.all(10.0),
-                child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: theme.brightPink), overflow: TextOverflow.ellipsis, maxLines: 1,)
+                child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.brightPink), overflow: TextOverflow.ellipsis, maxLines: 1,)
             ),
             onTap: () {
               setState(() => _category = f);

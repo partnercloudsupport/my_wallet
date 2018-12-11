@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_wallet/database/data.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
+import 'package:my_wallet/data/data.dart';
+import 'package:my_wallet/style/app_theme.dart';
 
 class SelectTransactionType extends StatefulWidget {
   final TransactionType _type;
@@ -39,11 +39,11 @@ class _TransactionTypeState extends State<SelectTransactionType> with TickerProv
           tabs: TransactionType.all.map((f) => Padding(
             padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
             child: Text(f.name,
-              style: TextStyle(color: _type == f ? Colors.white : theme.darkBlue, fontSize: 16.0),),
+              style: TextStyle(color: _type == f ? Colors.white : AppTheme.darkBlue, fontSize: 16.0),),
           )).toList(),
           indicator: BoxDecoration(
             borderRadius: BorderRadius.circular(40.0),
-            color: theme.pinkAccent, //_type == TransactionType.Income ? theme.darkGreen : theme.pinkAccent,
+            color: AppTheme.pinkAccent, //_type == TransactionType.Income ? theme.darkGreen : theme.pinkAccent,
           ),
           controller: _tabController,
         ),

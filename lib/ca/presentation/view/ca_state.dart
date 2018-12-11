@@ -1,5 +1,7 @@
 import 'package:my_wallet/ca/presentation/presenter/ca_presenter.dart';
-import 'package:flutter/material.dart';
+
+import 'package:my_wallet/app_material.dart';
+export 'package:my_wallet/app_material.dart';
 
 abstract class CleanArchitectureView<ST extends StatefulWidget, T extends CleanArchitecturePresenter> extends State<ST> {
   final T presenter;

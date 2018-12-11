@@ -1,3 +1,5 @@
+export 'package:my_wallet/data/data.dart';
+
 class ExpenseEntity {
   final int categoryId;
   final String name;

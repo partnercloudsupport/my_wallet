@@ -1,4 +1,4 @@
-import 'package:my_wallet/database/database_manager.dart' as db;
+import 'package:my_wallet/data/database_manager.dart' as db;
 
 const tableAccount = "table_accounts";
 const tableTransactions = "table_transactions";

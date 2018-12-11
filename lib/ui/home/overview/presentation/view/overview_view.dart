@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
-
 import 'package:my_wallet/ui/home/overview/presentation/presenter/overview_presenter.dart';
 import 'package:intl/intl.dart';
-import 'package:my_wallet/app_theme.dart' as theme;
-import 'package:my_wallet/data_observer.dart' as observer;
+import 'package:my_wallet/data/data_observer.dart' as observer;
 
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/home/overview/presentation/view/overview_callback.dart';
@@ -69,7 +66,7 @@ class _HomeOverviewState extends CleanArchitectureView<HomeOverview, HomeOvervie
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text("Overview", style: widget.titleStyle,),
-          Text("${nf.format(_total)}", style: Theme.of(context).textTheme.headline.apply(fontSizeFactor: 1.8, color: _total <= 0 ? theme.pinkAccent : theme.tealAccent),)
+          Text("${nf.format(_total)}", style: Theme.of(context).textTheme.headline.apply(fontSizeFactor: 1.8, color: _total <= 0 ? AppTheme.pinkAccent : AppTheme.tealAccent),)
         ],
       ),
     );

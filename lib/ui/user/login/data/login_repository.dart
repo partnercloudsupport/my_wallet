@@ -1,10 +1,10 @@
 import 'package:my_wallet/ca/data/ca_repository.dart';
-import 'package:my_wallet/database/firebase_manager.dart' as fm;
-import 'package:my_wallet/database/database_manager.dart' as db;
-import 'package:my_wallet/database/data.dart';
+import 'package:my_wallet/data/firebase_manager.dart' as fm;
+import 'package:my_wallet/data/database_manager.dart' as db;
+import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/utils.dart' as Utils;
 
-export 'package:my_wallet/database/data.dart';
+export 'package:my_wallet/data/data.dart';
 
 class LoginRepository extends CleanArchitectureRepository{
   final _LoginFirebaseRepository _fbRepo = _LoginFirebaseRepository();

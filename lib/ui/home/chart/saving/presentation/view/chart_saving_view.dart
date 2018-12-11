@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
-
 import 'package:my_wallet/ui/home/chart/saving/data/chart_saving_entity.dart';
 import 'package:my_wallet/ui/home/chart/saving/presentation/presenter/chart_saving_presenter.dart';
 import 'package:intl/intl.dart';
 
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/home/chart/saving/presentation/view/chart_saving_data_view.dart';
-import 'package:my_wallet/data_observer.dart' as observer;
+import 'package:my_wallet/data/data_observer.dart' as observer;
 
 class SavingChartView extends StatefulWidget {
   @override
