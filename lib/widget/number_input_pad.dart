@@ -49,19 +49,14 @@ class NumberInputPadState extends State<NumberInputPad> {
 
     return Align(
       alignment: Alignment.bottomCenter,
-      child: _showNumPad ? Container(
-        decoration: BoxDecoration(
-            gradient: AppTheme.bgGradient
-        ),
-        child: StaggeredGridView.countBuilder(
-          shrinkWrap: true,
-          primary: false,
-          crossAxisCount: 4,
-          itemCount: numbers.length,
-          itemBuilder: (BuildContext context, int index) => _createButton(numbers[index], _onButtonClick),
-          staggeredTileBuilder: (int index) => new StaggeredTile.count(_isDoubleWidth(index) ? 2 : 1, _isDoubleHeight(index) ? 3 : 1),
-          crossAxisSpacing: 0.3,
-        ),
+      child: _showNumPad ? StaggeredGridView.countBuilder(
+        shrinkWrap: true,
+        primary: false,
+        crossAxisCount: 4,
+        itemCount: numbers.length,
+        itemBuilder: (BuildContext context, int index) => _createButton(numbers[index], _onButtonClick),
+        staggeredTileBuilder: (int index) => new StaggeredTile.count(_isDoubleWidth(index) ? 2 : 1, _isDoubleHeight(index) ? 3 : 1),
+        crossAxisSpacing: 0.3,
       ) : null,
     );
   }

@@ -78,47 +78,69 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   @override
   Widget build(BuildContext context) {
-    return PlainScaffold(
-      appBar: MyWalletAppBar(
-        title: "Create Transaction",
-        actions: <Widget>[
-          FlatButton(
-            onPressed: _saveTransaction,
-            child: Text("Save",),
-          )
-        ],
-      ),
+    var appBar = MyWalletAppBar(
+      title: "Create Transaction",
+      actions: <Widget>[
+        FlatButton(
+          onPressed: _saveTransaction,
+          child: Text("Save",),
+        )
+      ],
+    );
+
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height - width - appBar.preferredSize.height - 23;
+
+    return GradientScaffold(
+      appBar: appBar,
       body: Stack(
           children: <Widget>[
-            /*Center(
-              child:*/ ListView(
-                shrinkWrap: true,
-                children: <Widget>[
-                  ConversationRow(
-                      widget.transactionId == null ? "Create new" : "An",
-                      _type.name,
-                      AppTheme.darkBlue,
-                      onPressed: _showTransactionTypeSelection),
-                  ConversationRow(
-                    widget.transactionId == null ? "of" : "valued of",
-                    _numberFormat.format(_toNumber(_number, _decimal)),
-                    TransactionType.isIncome(_type) ? AppTheme.tealAccent : TransactionType.isExpense(_type) ? AppTheme.pinkAccent : AppTheme.blueGrey,
-                    style: Theme.of(context).textTheme.display2,
-                    onPressed: () => numPadKey.currentState.show(),),
-                  ConversationRow(
-                    "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
-                    _account == null ? "Select Account" : _account.name,
-                    AppTheme.darkGreen,
-                    onPressed: _showSelectAccount,),
-                  ConversationRow(
-                    "for",
-                      _category == null ? "Select Category" : _category.name,
-                      AppTheme.brightPink,
-                      onPressed: _showSelectCategory
-                  ),
-                  DateTimeRow(_date, _showDatePicker, _showTimePicker)
-                ],
+            SizedBox(
+              width: width,
+              height: height,
+              child: Container(
+                color: AppTheme.white,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      child: ConversationRow(
+                          widget.transactionId == null ? "Create new" : "An",
+                          _type.name,
+                          AppTheme.darkBlue,
+                          onPressed: _showTransactionTypeSelection),
+                    ),
+                    Expanded(
+                      child: ConversationRow(
+                        widget.transactionId == null ? "of" : "valued of",
+                        _numberFormat.format(_toNumber(_number, _decimal)),
+                        TransactionType.isIncome(_type) ? AppTheme.tealAccent : TransactionType.isExpense(_type) ? AppTheme.pinkAccent : AppTheme.blueGrey,
+                        style: Theme.of(context).textTheme.display2,
+                        onPressed: () => numPadKey.currentState.show(),),
+                    ),
+                    Expanded(
+                      child: ConversationRow(
+                        "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
+                        _account == null ? "Select Account" : _account.name,
+                        AppTheme.darkGreen,
+                        onPressed: _showSelectAccount,),
+                    ),
+                    Expanded(
+                      child: ConversationRow(
+                          "for",
+                          _category == null ? "Select Category" : _category.name,
+                          AppTheme.brightPink,
+                          onPressed: _showSelectCategory
+                      ),
+                    ),
+                    Expanded(
+                      child: DateTimeRow(_date, _showDatePicker, _showTimePicker),
+                    ),
+                  ],
+                ),
               ),
+            ),
 //            ),
             NumberInputPad(numPadKey, _onNumberInput, _number, _decimal, showNumPad: true,)
           ],
@@ -167,7 +189,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
               Navigator.pop(context);
             },
           ),
-        )),
+        ),
+        ),
     );
   }
 

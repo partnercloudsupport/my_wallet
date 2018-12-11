@@ -15,13 +15,13 @@ class ConversationRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          _Description(description),
-          _Data(dataText, dataColor, onPressed: onPressed, style: style,)
-        ],
-      ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            _Description(description),
+            _Data(dataText, dataColor, onPressed: onPressed, style: style,)
+          ],
+        ),
     );
   }
 }
@@ -44,9 +44,9 @@ class DateTimeRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           _Description("on"),
-          _Data(_dateFormat.format(_date), AppTheme.darkBlue, onPressed: _onDatePressed,),
+          _Data(_dateFormat.format(_date), AppTheme.darkBlue, onPressed: _onDatePressed, maxFont: 25, minFont: 12,),
           _Description("at"),
-          _Data(_timeFormat.format(_date), AppTheme.darkBlue, onPressed: _onTimePressed,),
+          _Data(_timeFormat.format(_date), AppTheme.darkBlue, onPressed: _onTimePressed,maxFont: 25, minFont: 12,),
         ],
       ),
     );
@@ -63,7 +63,7 @@ class _Description extends StatelessWidget {
   Widget build(BuildContext context) {
     return
       Padding(
-        child: Text(_title, style: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey)),
+        child: AutoSizeText(_title, style: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey)),
         padding: EdgeInsets.all(8.0),
       );
   }
@@ -74,8 +74,10 @@ class _Data extends StatelessWidget {
   final Color _color;
   final TextStyle style;
   final Function onPressed;
+  final double maxFont;
+  final double minFont;
 
-  _Data(this._data, this._color, {this.style, this.onPressed});
+  _Data(this._data, this._color, {this.style, this.onPressed, this.maxFont = 50, this.minFont = 12});
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +91,8 @@ class _Data extends StatelessWidget {
         child: AutoSizeText(
           _data,
           style: style == null ? Theme.of(context).textTheme.title.apply(color: _color) : style.apply(color: _color),
+          maxFontSize: maxFont,
+          minFontSize: minFont,
           maxLines: 1,) ,
       ),
     );

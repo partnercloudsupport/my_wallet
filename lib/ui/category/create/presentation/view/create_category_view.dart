@@ -38,10 +38,11 @@ class _CreateCategoryState extends CleanArchitectureView<CreateCategory, CreateC
               onChanged: _onNameChanged,
               decoration: InputDecoration(
                 hintText: "Category Name",
-                hintStyle: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey),
+                hintStyle: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey.withOpacity(0.6)),
                 enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.darkBlue, width: 1.0)),
                 focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.darkBlue, width: 1.0)),
               ),
+              style: Theme.of(context).textTheme.subhead.apply(color: AppTheme.darkBlue),
             ),
           ),
         ],

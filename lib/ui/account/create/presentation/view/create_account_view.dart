@@ -51,40 +51,52 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
 
   @override
   Widget build(BuildContext context) {
-    return PlainScaffold(
-      appBar: MyWalletAppBar(
-        title: "Create Account",
-        actions: <Widget>[
-          FlatButton(
-            child: Text("Save"),
-            onPressed: _saveAccount,
-          )
-        ],
-      ),
+    var appBar = MyWalletAppBar(
+      title: "Create Account",
+      actions: <Widget>[
+        FlatButton(
+          child: Text("Save"),
+          onPressed: _saveAccount,
+        )
+      ],
+    );
+
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height - width - appBar.preferredSize.height - 24;
+
+    return GradientScaffold(
+      appBar: appBar,
       body: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Center(
-            child: ListView(
-              shrinkWrap: true,
-              children: <Widget>[
-                ConversationRow(
-                    "Create new",
-                    _type.name,
-                    AppTheme.darkBlue,
-                    onPressed: _showAccountTypeSelection),
-                ConversationRow(
+          SizedBox(
+            width: width,
+            height: height,
+            child: Container(
+              alignment: Alignment.center,
+              color: AppTheme.white,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  ConversationRow(
+                      "Create new",
+                      _type.name,
+                      AppTheme.darkBlue,
+                      onPressed: _showAccountTypeSelection),
+                  ConversationRow(
                     "with name",
                     _name == null || _name.isEmpty ? "Enter a name" : _name,
                     AppTheme.darkBlue,
                     onPressed: _showAccountNameDialog,),
-                ConversationRow(
-                  "and intial amount",
-                  _nf.format(_amount),
-                  AppTheme.brightPink,
-                style: Theme.of(context).textTheme.display2,),
-              ],
+                  ConversationRow(
+                    "and intial amount",
+                    _nf.format(_amount),
+                    AppTheme.brightPink,
+                    style: Theme.of(context).textTheme.display2,),
+                ],
+              ),
             ),
           ),
           NumberInputPad(numPadKey, _onNumberInput, null, null, showNumPad: true,)
