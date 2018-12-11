@@ -2,5 +2,7 @@
 .flutter-plugins
 .gitignore
 .packages
-lib/database/firebase_config.dart
+lib/data/firebase_config.dart
 build
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
