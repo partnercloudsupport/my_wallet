@@ -19,6 +19,8 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _displayNameController = TextEditingController();
 
+  final GlobalKey<RoundedButtonState> _registerKey = GlobalKey();
+
   bool _obscureText = true;
 
   @override
@@ -193,11 +195,18 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
               child: Row(
                 children: <Widget>[
                   Expanded(
-                      child: FlatButton(
-                        padding: EdgeInsets.all(15.0),
-                        onPressed: _registerEmail,
-                        child: Text("Register"),
-                        color: AppTheme.darkBlue,))
+                    child: RoundedButton(
+                      key: _registerKey,
+                      onPressed: _registerEmail,
+                      child: Text("Register", style: TextStyle(color: AppTheme.white),),
+                      color: AppTheme.blue,
+                    ),
+//                      child: FlatButton(
+//                        padding: EdgeInsets.all(15.0),
+//                        onPressed: _registerEmail,
+//                        child: Text("Register"),
+//                        color: AppTheme.darkBlue,))
+                  )
                 ],
               ),
             )
@@ -216,17 +225,20 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
   }
 
   void _registerEmail() {
+    _registerKey.currentState.process();
     presenter.registerEmail(_displayNameController.text, _emailController.text, _passwordController.text);
   }
 
   @override
   void onRegisterSuccess(bool result) {
+    _registerKey.currentState.stop();
     Navigator.pop(context);
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MyWalletHome()));
   }
 
   @override
   void onRegisterFailed(Exception e) {
+    _registerKey.currentState.stop();
     showDialog(context: context, builder: (context) => AlertDialog(
       title: Text("Registration failed"),
       content: Text("Registration failed with error ${e.toString()}"),

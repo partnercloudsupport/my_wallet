@@ -17,6 +17,8 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  final GlobalKey<RoundedButtonState> _loginKey = GlobalKey();
   bool _obscureText = true;
 
   bool _signingIn = false;
@@ -62,14 +64,9 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               RoundedButton(
+                key: _loginKey,
                 onPressed: _signIn,
-                child: Padding(padding: EdgeInsets.all(12.0), child: _signingIn ? SizedBox(
-                  width: 15.0,
-                  height: 15.0,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.0,
-                  ),
-                ) : Text("Sign In", style: TextStyle(color: AppTheme.white),),),
+                child: Padding(padding: EdgeInsets.all(12.0), child: Text("Sign In", style: TextStyle(color: AppTheme.white),),),
                 color: AppTheme.blue,
               ),
               RoundedButton(
@@ -86,19 +83,23 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   void _signIn() {
     if (_signingIn) return;
 
+    _signingIn = true;
+    _loginKey.currentState.process();
+
     setState(() => _signingIn = true);
     presenter.signIn(_emailController.text, _passwordController.text);
   }
 
   @override
   void onSignInSuccess(bool result) {
-    setState(() => _signingIn = false);
+    _loginKey.currentState.stop();
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => MyWalletHome()));
   }
 
   @override
   void onSignInFailed(Exception e) {
-    setState(() => _signingIn = false);
+    _loginKey.currentState.stop();
+
     showDialog(context: context, builder: (_) => AlertDialog(
       title: Text("Sign in failed"),
       content: Text("Sign in to email ${_emailController.text} failed with error ${e.toString()}"),
