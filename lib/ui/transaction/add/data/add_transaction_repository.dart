@@ -3,7 +3,7 @@ import 'package:my_wallet/data/database_manager.dart' as _db;
 import 'package:my_wallet/data/firebase_manager.dart' as _fm;
 import 'package:my_wallet/ui/transaction/add/domain/add_transaction_exception.dart';
 import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
-
+import 'package:my_wallet/shared_pref/shared_preference.dart';
 class AddTransactionRepository extends CleanArchitectureRepository {
 
   final _AddTransactionDatabaseRepository _dbRepo = _AddTransactionDatabaseRepository();
@@ -135,8 +135,12 @@ class _AddTransactionFirebaseRepository {
       AppCategory _category,
       double _amount,
       DateTime _date,
-      String _desc) {
-    return _fm.addTransaction(AppTransaction(id, _date, _account.id, _category.id, _amount, _desc, _type));
+      String _desc) async {
+    SharedPreferences sharedPref = await SharedPreferences.getInstance();
+
+    var uuid = sharedPref.getString(UserUUID);
+
+    return await _fm.addTransaction(AppTransaction(id, _date, _account.id, _category.id, _amount, _desc, _type, uuid));
   }
 
   Future<bool> updateAccount(

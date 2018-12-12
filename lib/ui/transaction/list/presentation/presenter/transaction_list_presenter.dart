@@ -1,4 +1,3 @@
-import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/ui/transaction/list/domain/transaction_list_use_case.dart';
 import 'package:my_wallet/ca/presentation/presenter/ca_presenter.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_data_view.dart';

@@ -1,5 +1,5 @@
 import 'package:my_wallet/ui/transaction/list/presentation/presenter/transaction_list_presenter.dart';
-import 'package:my_wallet/data/data.dart';
+import 'package:my_wallet/ui/transaction/list/data/transaction_list_entity.dart';
 import 'package:intl/intl.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_data_view.dart';
@@ -25,7 +25,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
 
   final tables = [observer.tableTransactions];
 
-  List<AppTransaction> entities = [];
+  List<TransactionEntity> entities = [];
 
   NumberFormat nf = NumberFormat("#,##0.00");
   DateFormat df = DateFormat("dd MMM, yyyy");
@@ -61,7 +61,11 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
           itemCount: entities.length,
           itemBuilder: (context, index) => Container(
             child: ListTile(
-              title: Text(entities[index].desc, style: Theme.of(context).textTheme.body2.apply(color: AppTheme.darkBlue),),
+              title: Text(entities[index].transactionDesc, style: Theme.of(context).textTheme.body2.apply(color: AppTheme.darkBlue),),
+              leading: CircleAvatar(
+                child: Text(entities[index].userInitial, style: Theme.of(context).textTheme.title.apply(color: AppTheme.white),),
+                backgroundColor: AppTheme.darkBlue,
+              ),
               subtitle: Text(df.format(entities[index].dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
               trailing: Text("\$${nf.format(entities[index].amount)}", style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AddTransaction(transactionId: entities[index].id,))),
@@ -73,7 +77,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
   }
 
   @override
-  void onTransactionListLoaded(List<AppTransaction> value) {
+  void onTransactionListLoaded(List<TransactionEntity> value) {
     setState(() {
       this.entities = value;
     });

@@ -102,11 +102,11 @@ AppCategory _snapshotToCategory(DataSnapshot snapshot) {
 }
 
 Map<String, dynamic> _TransactionToMap(AppTransaction trans) {
-  return {_dateTime: trans.dateTime.millisecondsSinceEpoch, _accountId: trans.accountId, _categoryId: trans.categoryId, _amount: trans.amount, _desc: trans.desc, _type: trans.type.id};
+  return {_dateTime: trans.dateTime.millisecondsSinceEpoch, _accountId: trans.accountId, _categoryId: trans.categoryId, _amount: trans.amount, _desc: trans.desc, _type: trans.type.id, _uuid: trans.userUid};
 }
 
 AppTransaction _snapshotToTransaction(DataSnapshot snapshot) {
-  return AppTransaction(_toId(snapshot), DateTime.fromMillisecondsSinceEpoch(snapshot.value[_dateTime]), snapshot.value[_accountId], snapshot.value[_categoryId], double.parse("${snapshot.value[_amount]}"), snapshot.value[_desc], TransactionType.all[snapshot.value[_type]]);
+  return AppTransaction(_toId(snapshot), DateTime.fromMillisecondsSinceEpoch(snapshot.value[_dateTime]), snapshot.value[_accountId], snapshot.value[_categoryId], double.parse("${snapshot.value[_amount]}"), snapshot.value[_desc], TransactionType.all[snapshot.value[_type]], snapshot.value[_uuid]);
 }
 
 User _snapshotToUser(DataSnapshot snapshot) {

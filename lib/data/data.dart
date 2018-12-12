@@ -88,6 +88,7 @@ class AppTransaction {
   final double amount;
   final String desc;
   final TransactionType type;
+  final String userUid;
 
   AppTransaction(
       this.id,
@@ -96,7 +97,8 @@ class AppTransaction {
       this.categoryId,
       this.amount,
       this.desc,
-      this.type
+      this.type,
+      this.userUid
       );
 }
 

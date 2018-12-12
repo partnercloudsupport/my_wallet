@@ -25,8 +25,9 @@ final _transDateTime = "_dateTime";
 final _transAcc = "_accountId";
 final _transCategory = "_categoryId";
 final _transAmount = "_amount";
-final _transDesc = "transactionDescription";
-final _transType = "transactionType";
+final _transDesc = "_transactionDescription";
+final _transType = "_transactionType";
+final _transUid = "_transactionUserUid";
 
 // table category
 final _tableCategory = tableCategory;
@@ -346,7 +347,7 @@ Future<int> updateUser(User user) {
 // private helper
 // ################################################################################################################
 AppTransaction _toTransaction(Map<String, dynamic> map) {
-  return AppTransaction(map[_transID], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], map[_transAmount], map[_transDesc], TransactionType.all[map[_transType]]);
+  return AppTransaction(map[_transID], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], map[_transAmount], map[_transDesc], TransactionType.all[map[_transType]], map[_transUid]);
 }
 
 Account _toAccount(Map<String, dynamic> map) {
@@ -376,7 +377,7 @@ User _toUser(Map<String, dynamic> map) {
 }
 
 Map<String, dynamic> _transactionToMap(AppTransaction transaction) {
-  return {_transID: transaction.id, _transDateTime: transaction.dateTime.millisecondsSinceEpoch, _transAcc: transaction.accountId, _transCategory: transaction.categoryId, _transAmount: transaction.amount, _transDesc: transaction.desc, _transType: transaction.type.id};
+  return {_transID: transaction.id, _transDateTime: transaction.dateTime.millisecondsSinceEpoch, _transAcc: transaction.accountId, _transCategory: transaction.categoryId, _transAmount: transaction.amount, _transDesc: transaction.desc, _transType: transaction.type.id, _transUid: transaction.userUid};
 }
 
 Map<String, dynamic> _accountToMap(Account acc) {
@@ -434,7 +435,8 @@ class _Database {
           $_transCategory INTEGER NOT NULL,
           $_transAmount DOUBLE NOT NULL,
           $_transDesc TEXT,
-          $_transType INTEGER NOT NULL
+          $_transType INTEGER NOT NULL,
+          $_transUid TEXT NOT NULL
           )""");
 
       await db.execute("""
