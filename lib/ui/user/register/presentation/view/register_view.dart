@@ -55,75 +55,75 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
                 ),
               ),
             ),
-            Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: EdgeInsets.only(top: 00.0, bottom: 10.0),
-                  child: Text(
-                    "Signup with Social Network or Email",
-                    style: Theme.of(context).textTheme.title.apply(color: AppTheme.blueGrey),
-                  ),
-                )
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 20.0, right: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Expanded(
-                    child: RoundedButton(
-                      onPressed: _onFacebookButtonPressed,
-                      padding: EdgeInsets.all(10.0),
-                      child: Icon(
-                        MyFlutterApp.facebook_rect,
-                        color: AppTheme.white,
-                      ),
-                      radius: 5.0,
-                      color: AppTheme.facebookColor,
-                    ),
-                  ),
-                  Expanded(
-                    child: RoundedButton(
-                      onPressed: _onGoogleButtonPressed,
-                      padding: EdgeInsets.all(10.0),
-                      child: Icon(
-                        MyFlutterApp.googleplus_rect,
-                        color: AppTheme.white,
-                      ),
-                      radius: 5.0,
-                      color: AppTheme.googleColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20.0, right: 20.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      height: 1.0,
-                      color: AppTheme.blueGrey,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(5.0),
-                    child: Text(
-                      "OR",
-                      style: Theme.of(context).textTheme.title.apply(color: AppTheme.blueGrey),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      height: 1.0,
-                      color: AppTheme.blueGrey,
-                    ),
-                  )
-                ],
-              ),
-            ),
+//            Align(
+//                alignment: Alignment.center,
+//                child: Padding(
+//                  padding: EdgeInsets.only(top: 00.0, bottom: 10.0),
+//                  child: Text(
+//                    "Signup with Social Network or Email",
+//                    style: Theme.of(context).textTheme.title.apply(color: AppTheme.blueGrey),
+//                  ),
+//                )
+//            ),
+//            Padding(
+//              padding: EdgeInsets.only(left: 20.0, right: 20.0),
+//              child: Row(
+//                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                mainAxisSize: MainAxisSize.max,
+//                children: <Widget>[
+//                  Expanded(
+//                    child: RoundedButton(
+//                      onPressed: _onFacebookButtonPressed,
+//                      padding: EdgeInsets.all(10.0),
+//                      child: Icon(
+//                        MyFlutterApp.facebook_rect,
+//                        color: AppTheme.white,
+//                      ),
+//                      radius: 5.0,
+//                      color: AppTheme.facebookColor,
+//                    ),
+//                  ),
+//                  Expanded(
+//                    child: RoundedButton(
+//                      onPressed: _onGoogleButtonPressed,
+//                      padding: EdgeInsets.all(10.0),
+//                      child: Icon(
+//                        MyFlutterApp.googleplus_rect,
+//                        color: AppTheme.white,
+//                      ),
+//                      radius: 5.0,
+//                      color: AppTheme.googleColor,
+//                    ),
+//                  ),
+//                ],
+//              ),
+//            ),
+//            Padding(
+//              padding: EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20.0, right: 20.0),
+//              child: Row(
+//                children: <Widget>[
+//                  Expanded(
+//                    child: Container(
+//                      height: 1.0,
+//                      color: AppTheme.blueGrey,
+//                    ),
+//                  ),
+//                  Padding(
+//                    padding: EdgeInsets.all(5.0),
+//                    child: Text(
+//                      "OR",
+//                      style: Theme.of(context).textTheme.title.apply(color: AppTheme.blueGrey),
+//                    ),
+//                  ),
+//                  Expanded(
+//                    child: Container(
+//                      height: 1.0,
+//                      color: AppTheme.blueGrey,
+//                    ),
+//                  )
+//                ],
+//              ),
+//            ),
             Container(
               height: 0.5,
               color: AppTheme.blueGrey,
