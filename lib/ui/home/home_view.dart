@@ -6,6 +6,7 @@ import 'package:my_wallet/ui/home/overview/presentation/view/overview_view.dart'
 import 'package:my_wallet/ui/home/chart/chart_row_view.dart';
 import 'package:my_wallet/ui/home/expenseslist/data/expense_list_entity.dart';
 import 'package:my_wallet/ui/home/expenseslist/presentation/view/expense_list_view.dart';
+import 'package:my_wallet/ui/home/drawer/presentation/view/drawer_view.dart';
 
 class MyWalletHome extends StatefulWidget {
   @override
@@ -30,7 +31,7 @@ class _MyWalletState extends State<MyWalletHome> {
 
     return GradientScaffold(
       body: _generateMainBody(),
-      drawer: _LeftDrawer(),
+      drawer: LeftDrawer(),
       floatingActionButton: Padding(
         padding: EdgeInsets.all(platform == TargetPlatform.iOS ? 10.0 : 0.0),
         child: RoundedButton(
@@ -88,31 +89,5 @@ class _MyWalletState extends State<MyWalletHome> {
     );
 
     return CustomScrollView(slivers: list);
-  }
-}
-
-class _LeftDrawer extends StatelessWidget {
-  final drawerListItems = {"Categories": routes.ListCategories, "Accounts": routes.ListAccounts};
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(color: Theme.of(context).primaryColorDark),
-      width: MediaQuery.of(context).size.width * 0.85,
-      alignment: Alignment.center,
-      child: ListView(
-        padding: EdgeInsets.all(10.0),
-        shrinkWrap: true,
-        children: drawerListItems.keys
-            .map((f) => ListTile(
-                  title: Text(
-                    f,
-                    style: Theme.of(context).textTheme.title.apply(color: Colors.white),
-                  ),
-                  onTap: () => Navigator.popAndPushNamed(context, drawerListItems[f]),
-                ))
-            .toList(),
-      ),
-    );
   }
 }
