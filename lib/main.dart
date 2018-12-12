@@ -12,13 +12,24 @@ import 'package:my_wallet/ui/category/list/presentation/view/list_category.dart'
 import 'package:my_wallet/ui/category/create/presentation/view/create_category_view.dart';
 
 import 'package:my_wallet/data/firebase_manager.dart' as fm;
+import 'package:my_wallet/data/database_manager.dart' as db;
+
 import 'package:my_wallet/ui/user/login/presentation/view/login_view.dart';
 
+import 'package:my_wallet/ui/user/detail/presentation/view/detail_view.dart';
+import 'package:flutter/services.dart';
+
 void main() async {
+//  await SystemChrome.setPreferredOrientations([
+//    DeviceOrientation.portraitDown,
+//    DeviceOrientation.portraitUp
+//  ]);
+
   await fm.init();
 
-  var user = await fm.checkCurrentUser();
-  runApp(MyApp(user));
+  var user = await db.getCurrentUser();
+
+  runApp(MyApp(user != null));
 }
 
 
@@ -30,7 +41,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'My Wallet',
       theme: AppTheme.appTheme,
       home: hasUser ? MyWalletHome() : Login(),
       debugShowCheckedModeBanner: false,
@@ -60,6 +71,10 @@ class MyApp extends StatelessWidget {
               return CategoryList("Categories");
             case routes.CreateCategory:
               return CreateCategory();
+            case routes.UserProfile:
+              return UserDetail();
+            case routes.Login:
+              return Login();
             default:
               return PlainScaffold(
                 appBar: MyWalletAppBar(

@@ -134,6 +134,7 @@ class User {
   final String uuid;
   final String email;
   final String displayName;
+  final String photoUrl;
 
-  User(this.uuid, this.email, this.displayName);
+  User(this.uuid, this.email, this.displayName, this.photoUrl);
 }

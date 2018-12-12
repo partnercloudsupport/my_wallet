@@ -9,4 +9,6 @@ class routes {
   static const ListAccounts = "ListAccounts";
   static const AddAccount = "AddAccount";
 
+  static const UserProfile = "UserProfile";
+  static const Login = "Login";
 }

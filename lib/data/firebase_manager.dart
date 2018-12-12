@@ -251,26 +251,33 @@ Future<bool> deleteCategory(AppCategory cat) async {
   });
 }
 
-Future<bool> getCurrentUser() async {
+Future<User> getCurrentUser() async {
+  User _user;
   try {
-    FirebaseUser user = await _auth.signInWithEmailAndPassword(email: "susu@mama.com", password: "mamama");
+    FirebaseUser user = await _auth.currentUser();
 
     if (user != null) {
       print("User has display name as ${user.displayName}");
+
+      _user = User(
+        user.uid,
+        user.email,
+        user.displayName,
+        ""
+      );
     }
   } catch (e) {
     print("Error: ${e.toString()}");
   }
 
-  return true;
+  return _user;
 }
 
-Future<User> login(String email, String password, {bool createIfNeeded}) async {
+Future<User> login(String email, String password) async {
   FirebaseUser user = await _auth.signInWithEmailAndPassword(email: email, password: password);
 
   if (user != null) {
-    UserUpdateInfo info = UserUpdateInfo();
-    return User(user.uid, user.email, user.displayName);
+    return User(user.uid, user.email, user.displayName, user.photoUrl);
   }
 
   throw Exception("Failed to signin to firebase");
@@ -294,6 +301,12 @@ Future<bool> updateDisplayName(String displayName) async {
   UserUpdateInfo userUpdateInfo = UserUpdateInfo();
   userUpdateInfo.displayName = displayName;
   await user.updateProfile(userUpdateInfo);
+
+  return true;
+}
+
+Future<bool> signOut() async {
+  await _auth.signOut();
 
   return true;
 }

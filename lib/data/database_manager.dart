@@ -42,6 +42,12 @@ final _budgetPerMonth = "_budgetPerMonth";
 final _budgetStart = "_budgetStart";
 final _budgetEnd = "_budgetEnd";
 
+final _tableUser = tableUser;
+final _userUid = _id;
+final _userDisplayName = "_displayName";
+final _userEmail = "_email";
+final _userPhotoUrl = "_photoUrl";
+
 _Database db = _Database();
 Lock _lock = Lock();
 
@@ -312,6 +318,27 @@ Future<int> updateCategory(AppCategory cat) {
   return _lock.synchronized(() => db._update(_tableCategory, _categoryToMap(cat), "$_catId = ?", [cat.id]));
 }
 
+Future<int> saveUser(User user) {
+  return _lock.synchronized(() => db._insert(_tableUser, item: {
+    _userUid: user.uuid,
+    _userDisplayName: user.displayName,
+    _userEmail: user.email,
+    _userPhotoUrl: user.photoUrl
+  }));
+}
+
+Future<User> getCurrentUser() async {
+  List<Map<String, dynamic>> _users = await _lock.synchronized(() => db._query(_tableUser));
+
+  User user;
+
+  if (_users != null && _users.isNotEmpty) {
+    Map<String, dynamic> _user = _users[0];
+    user = User(_user[_userUid], _user[_userEmail], _user[_userDisplayName], _user[_userPhotoUrl]);
+  }
+
+  return user;
+}
 // private helper
 AppTransaction _toTransaction(Map<String, dynamic> map) {
   return AppTransaction(map[_transID], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], map[_transAmount], map[_transDesc], TransactionType.all[map[_transType]]);
@@ -406,6 +433,15 @@ class _Database {
         $_budgetEnd INTEGER
         )
         """);
+
+      await db.execute("""
+        CREATE TABLE $_tableUser (
+        $_userUid TEXT NOT NULL,
+        $_userDisplayName TEXT NOT NULL,
+        $_userEmail TEXT NOT NULL,
+        $_userPhotoUrl TEXT
+      )
+      """);
     });
 
     return db;

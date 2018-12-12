@@ -4,6 +4,7 @@ const tableAccount = "table_accounts";
 const tableTransactions = "table_transactions";
 const tableCategory = "table_categories";
 const tableBudget = "table_budget";
+const tableUser = "table_user";
 
 abstract class DatabaseObservable {
   void onDatabaseUpdate(String table);
