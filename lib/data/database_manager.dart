@@ -48,6 +48,7 @@ final _userUid = _id;
 final _userDisplayName = "_displayName";
 final _userEmail = "_email";
 final _userPhotoUrl = "_photoUrl";
+final _userColor = "_userColor";
 
 _Database db = _Database();
 Lock _lock = Lock();
@@ -368,11 +369,13 @@ Budget _toBudget(Map<String, dynamic> map) {
 }
 
 User _toUser(Map<String, dynamic> map) {
+  print("${map[_userColor]} for user email ${map[_userEmail]}");
   return User(
-      map[_userUid],
-      map[_userEmail],
-      map[_userDisplayName],
-      map[_userPhotoUrl]
+    map[_userUid],
+    map[_userEmail],
+    map[_userDisplayName],
+    map[_userPhotoUrl],
+    map[_userColor],
   );
 }
 
@@ -401,7 +404,8 @@ Map<String, dynamic> _userToMap(User user) {
     _userUid: user.uuid,
     _userEmail: user.email,
     _userDisplayName: user.displayName,
-    _userPhotoUrl: user.photoUrl
+    _userPhotoUrl: user.photoUrl,
+  _userColor: user.color,
   };
 }
 // #############################################################################################################################
@@ -409,11 +413,11 @@ Map<String, dynamic> _userToMap(User user) {
 // #############################################################################################################################
 class _Database {
   Database db;
-//  Map<String, List<DatabaseObservable>> _watchers = {};
-  List<DatabaseObservable> _accountWatchers = [];
-  List<DatabaseObservable> _categoryWatchers = [];
-  List<DatabaseObservable> _transactionWatchers = [];
-  List<DatabaseObservable> _budgetWatchers  = [];
+  Map<String, List<DatabaseObservable>> _watchers = {};
+//  List<DatabaseObservable> _accountWatchers = [];
+//  List<DatabaseObservable> _categoryWatchers = [];
+//  List<DatabaseObservable> _transactionWatchers = [];
+//  List<DatabaseObservable> _budgetWatchers  = [];
 
   Future<Database> _openDatabase() async {
     String dbPath = join((await getApplicationDocumentsDirectory()).path, "MyWalletDb");
@@ -462,7 +466,8 @@ class _Database {
         $_userUid TEXT NOT NULL,
         $_userDisplayName TEXT NOT NULL,
         $_userEmail TEXT NOT NULL,
-        $_userPhotoUrl TEXT
+        $_userPhotoUrl TEXT,
+        $_userColor INTEGER
       )
       """);
     });
@@ -567,23 +572,20 @@ class _Database {
   }
 
   void _notifyObservers(String table) {
-    switch(table) {
-      case tableAccount: _accountWatchers.forEach((w) => w.onDatabaseUpdate(table)); break;
-      case tableCategory: _categoryWatchers.forEach((w) => w.onDatabaseUpdate(table)); break;
-      case tableTransactions: _transactionWatchers.forEach((w) => w.onDatabaseUpdate(table)); break;
-      case tableBudget: _budgetWatchers.forEach((w) => w.onDatabaseUpdate(table)); break;
-      }
+    if(_watchers[table] != null) _watchers[table].forEach((f) => f.onDatabaseUpdate(table));
   }
 
   void registerDatabaseObservable(List<String> tables, DatabaseObservable observable) {
     if (tables != null) {
     tables.forEach((f) {
-      switch(f) {
-        case tableAccount: _accountWatchers.add(observable); break;
-        case tableCategory: _categoryWatchers.add(observable); break;
-        case tableTransactions: _transactionWatchers.add(observable); break;
-        case tableBudget: _budgetWatchers.add(observable); break;
-      }
+      List<DatabaseObservable> list = _watchers[f];
+
+      if(list == null) list = [];
+
+      list.add(observable);
+
+      _watchers.remove(f);
+      _watchers.putIfAbsent(f, () => list);
     });
     }
 
@@ -593,12 +595,19 @@ class _Database {
 
     if(tables != null) {
       tables.forEach((f) {
-        switch(f) {
-          case tableAccount: _accountWatchers.remove(observable); break;
-          case tableCategory: _categoryWatchers.remove(observable); break;
-          case tableTransactions: _transactionWatchers.remove(observable); break;
-          case tableBudget: _budgetWatchers.remove(observable); break;
-        }
+        List<DatabaseObservable> list = _watchers[f];
+
+        if(list != null) list.remove(observable);
+
+        _watchers.remove(f);
+        _watchers.putIfAbsent(f, () => list);
+//        switch(f) {
+//          case tableAccount: _accountWatchers.remove(observable); break;
+//          case tableCategory: _categoryWatchers.remove(observable); break;
+//          case tableTransactions: _transactionWatchers.remove(observable); break;
+//          case tableBudget: _budgetWatchers.remove(observable); break;
+//          case tableUser: _budgetWatchers.remove(obser)
+//        }
       });
     }
   }

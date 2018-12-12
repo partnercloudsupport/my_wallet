@@ -23,7 +23,7 @@ class TransactionList extends StatefulWidget {
 class _TransactionListState extends CleanArchitectureView<TransactionList, TransactionListPresenter> implements TransactionListDataView, observer.DatabaseObservable {
   _TransactionListState() : super(TransactionListPresenter());
 
-  final tables = [observer.tableTransactions];
+  final tables = [observer.tableTransactions, observer.tableUser];
 
   List<TransactionEntity> entities = [];
 
@@ -64,7 +64,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
               title: Text(entities[index].transactionDesc, style: Theme.of(context).textTheme.body2.apply(color: AppTheme.darkBlue),),
               leading: CircleAvatar(
                 child: Text(entities[index].userInitial, style: Theme.of(context).textTheme.title.apply(color: AppTheme.white),),
-                backgroundColor: AppTheme.darkBlue,
+                backgroundColor: Color(entities[index].color),
               ),
               subtitle: Text(df.format(entities[index].dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
               trailing: Text("\$${nf.format(entities[index].amount)}", style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),),
@@ -85,6 +85,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
 
   @override
   void onDatabaseUpdate(String table) {
+    print("transaction list view on database updated $table}");
     _loadData();
   }
 

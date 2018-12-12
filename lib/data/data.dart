@@ -137,6 +137,7 @@ class User {
   final String email;
   final String displayName;
   final String photoUrl;
+  final int color;
 
-  User(this.uuid, this.email, this.displayName, this.photoUrl);
+  User(this.uuid, this.email, this.displayName, this.photoUrl, this.color);
 }

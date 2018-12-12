@@ -87,7 +87,8 @@ class _TransactionListDatabaseRepository {
           var splits = users[0].displayName.split(" ");
           var initial = splits.map((f) => f.substring(0, 1).toUpperCase()).join();
           initial = initial.substring(0, initial.length < 2 ? initial.length : 2);
-          entities.add(TransactionEntity(trans.id, initial, trans.desc, trans.amount, trans.dateTime));
+          print("user color ${users[0].color}");
+          entities.add(TransactionEntity(trans.id, initial, trans.desc, trans.amount, trans.dateTime, users[0].color));
         }
       }
     }

@@ -23,7 +23,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   var _numberFormat = NumberFormat("\$#,##0.00");
 
-  final tables = [observer.tableAccount, observer.tableCategory];
+  final tables = [observer.tableAccount, observer.tableCategory, observer.tableUser];
 
   GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
 
@@ -55,6 +55,15 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
     if(table == observer.tableAccount) presenter.loadAccounts();
 
     if (table == observer.tableCategory) presenter.loadCategory();
+
+    if(table == observer.tableTransactions || table == observer.tableUser) {
+      if(widget.transactionId == null) {
+        presenter.loadCurrentUserName();
+      } else {
+        presenter.loadTransactionDetail(widget.transactionId);
+      }
+    }
+
   }
 
   @override

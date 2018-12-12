@@ -7,6 +7,7 @@ import 'package:my_wallet/data/firebase_config.dart' as fbConfig;
 import 'package:synchronized/synchronized.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_wallet/data/data.dart';
+import 'dart:math';
 
 FirebaseDatabase _database;
 FirebaseAuth _auth;
@@ -32,6 +33,7 @@ const _email = "email";
 const _displayName = "displayName";
 const _photoUrl = "photoUrl";
 const _uuid = "uuid";
+const _color = "color";
 
 Future<void> init() async {
   if (_isInit) return;
@@ -94,7 +96,8 @@ Map<String, dynamic> _CategoryToMap(AppCategory cat) {
 }
 
 Map<String, dynamic> _UserToMap(User user) {
-  return {_uuid: user.uuid, _email: user.email, _displayName: user.displayName, _photoUrl: user.photoUrl};
+  var random = Random();
+  return {_uuid: user.uuid, _email: user.email, _displayName: user.displayName, _photoUrl: user.photoUrl, _color: random.nextInt(0xFFEEEEEE)};
 }
 
 AppCategory _snapshotToCategory(DataSnapshot snapshot) {
@@ -110,7 +113,7 @@ AppTransaction _snapshotToTransaction(DataSnapshot snapshot) {
 }
 
 User _snapshotToUser(DataSnapshot snapshot) {
-  return User(snapshot.value[_uuid], snapshot.value[_email], snapshot.value[_displayName], snapshot.value[_photoUrl]);
+  return User(snapshot.value[_uuid], snapshot.value[_email], snapshot.value[_displayName], snapshot.value[_photoUrl], snapshot.value[_color]);
 }
 
 int _toId(DataSnapshot snapshot) {
@@ -160,18 +163,21 @@ void _onTransactionRemoved(Event event) {
 }
 
 void _onUserAdded(Event event) {
+  print("on user added");
   db.insertUser(_snapshotToUser(event.snapshot)).catchError((e) => _onUserChanged(event));
 }
 
 void _onUserChanged(Event event) {
+  print("on user changed");
   db.updateUser(_snapshotToUser(event.snapshot));
 }
 
 void _onUserMoved(Event event) {
-
+  print("on user moved");
 }
 
 void _onUserRemoved(Event event) {
+  print("on user removed");
   db.deleteUser(event.snapshot.value[_uuid]);
 }
 
@@ -324,6 +330,7 @@ Future<bool> deleteUser(User user) async {
 
 Future<User> getCurrentUser() async {
   User _user;
+
   try {
     FirebaseUser user = await _auth.currentUser();
 
@@ -332,14 +339,19 @@ Future<User> getCurrentUser() async {
           ? user.providerData.where((f) => f.photoUrl != null && f.photoUrl.isNotEmpty).map((f) => f.photoUrl).toList()
           : [];
 
+      DatabaseReference _ref = _database.reference().child(_User);
+      var colorSnapshot = await _ref.child(_User).child(user.uid).child(_color).once();
+
+      print("color snapshot ${colorSnapshot.value}");
       _user = User(
         user.uid,
         user.email,
         user.displayName,
-        photoUrlList != null && photoUrlList.isNotEmpty ? photoUrlList[0] : null
+        photoUrlList != null && photoUrlList.isNotEmpty ? photoUrlList[0] : null,
+        int.parse(colorSnapshot.value)
       );
     }
-  } catch (e) {
+  } on Platform catch (e) {
     print("Error: ${e.toString()}");
   }
 
@@ -350,7 +362,7 @@ Future<User> login(String email, String password) async {
   FirebaseUser user = await _auth.signInWithEmailAndPassword(email: email, password: password);
 
   if (user != null) {
-    return User(user.uid, user.email, user.displayName, user.photoUrl);
+    return User(user.uid, user.email, user.displayName, user.photoUrl, 0);
   }
 
   throw Exception("Failed to signin to firebase");
