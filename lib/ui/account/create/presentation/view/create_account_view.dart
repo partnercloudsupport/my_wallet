@@ -61,18 +61,11 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
       ],
     );
 
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height - width - appBar.preferredSize.height;
-
     return GradientScaffold(
       appBar: appBar,
       body: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          SizedBox(
-            width: width,
-            height: height,
+          Expanded(
             child: Container(
               alignment: Alignment.center,
               color: AppTheme.white,
@@ -99,7 +92,10 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
               ),
             ),
           ),
-          NumberInputPad(numPadKey, _onNumberInput, null, null, showNumPad: true,)
+          Align(
+            child: NumberInputPad(numPadKey, _onNumberInput, null, null, showNumPad: true,),
+            alignment: Alignment.bottomCenter,
+          )
         ],
       )
     );

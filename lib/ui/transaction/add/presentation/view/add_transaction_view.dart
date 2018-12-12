@@ -101,39 +101,29 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
       ],
     );
 
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height - width - appBar.preferredSize.height;
-
     return GradientScaffold(
       appBar: appBar,
-      body: Stack(
+      body: Column(
           children: <Widget>[
-            SizedBox(
-              width: width,
-              height: height,
-              child: Container(
-                color: AppTheme.white,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Expanded(
-                      child: ConversationRow(
+              Expanded(
+                child: Container(
+                  color: AppTheme.white,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      ConversationRow(
                           widget.transactionId == null ? "Create new" : "An",
                           _type.name,
                           AppTheme.darkBlue,
                           onPressed: _showTransactionTypeSelection),
-                    ),
-                    Expanded(
-                      child: ConversationRow(
+                      ConversationRow(
                         widget.transactionId == null ? "of" : "valued of",
                         _numberFormat.format(_toNumber(_number, _decimal)),
                         TransactionType.isIncome(_type) ? AppTheme.tealAccent : TransactionType.isExpense(_type) ? AppTheme.pinkAccent : AppTheme.blueGrey,
                         style: Theme.of(context).textTheme.display2,
                         onPressed: () => numPadKey.currentState.show(),),
-                    ),
-                    Expanded(
-                      child: Row(
+                      Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: <Widget>[
@@ -148,24 +138,21 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                             AppTheme.darkGreen,)
                         ],
                       ),
-                    ),
-                    Expanded(
-                      child: ConversationRow(
+                      ConversationRow(
                           "for",
                           _category == null ? "Select Category" : _category.name,
                           AppTheme.brightPink,
                           onPressed: _showSelectCategory
                       ),
-                    ),
-                    Expanded(
-                      child: DateTimeRow(_date, _showDatePicker, _showTimePicker),
-                    ),
-                  ],
+                      DateTimeRow(_date, _showDatePicker, _showTimePicker),
+                    ],
+                  ),
                 ),
               ),
-            ),
-//            ),
-            NumberInputPad(numPadKey, _onNumberInput, _number, _decimal, showNumPad: true,)
+            Align(
+              child: NumberInputPad(numPadKey, _onNumberInput, _number, _decimal, showNumPad: true,),
+              alignment: Alignment.bottomCenter,
+            )
           ],
         ),
     );

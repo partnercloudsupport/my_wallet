@@ -48,7 +48,6 @@ class PlainScaffold extends Scaffold {
     Widget endDrawer,
     Widget bottomNavigationBar,
     Widget bottomSheet,
-    bool resizeToAvoidBottomPadding = true,
     bool primary = true,
   }) : super(
       key: key,
@@ -65,6 +64,6 @@ class PlainScaffold extends Scaffold {
       endDrawer: endDrawer,
       bottomNavigationBar: bottomNavigationBar,
       bottomSheet: bottomSheet,
-      resizeToAvoidBottomPadding: resizeToAvoidBottomPadding,
+      resizeToAvoidBottomPadding: true,
       primary: primary);
 }
