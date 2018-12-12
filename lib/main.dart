@@ -21,10 +21,10 @@ import 'package:my_wallet/ui/user/detail/presentation/view/detail_view.dart';
 import 'package:flutter/services.dart';
 
 void main() async {
-//  await SystemChrome.setPreferredOrientations([
-//    DeviceOrientation.portraitDown,
-//    DeviceOrientation.portraitUp
-//  ]);
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.portraitUp
+  ]);
 
   await fm.init();
 

@@ -221,6 +221,7 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
 
   @override
   void onRegisterSuccess(bool result) {
+    Navigator.pop(context);
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MyWalletHome()));
   }
 
