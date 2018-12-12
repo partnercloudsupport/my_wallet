@@ -463,7 +463,7 @@ class _Database {
 
       await db.execute("""
         CREATE TABLE $_tableUser (
-        $_userUid TEXT NOT NULL,
+        $_userUid TEXT NOT NULL PRIMARY KEY,
         $_userDisplayName TEXT NOT NULL,
         $_userEmail TEXT NOT NULL,
         $_userPhotoUrl TEXT,

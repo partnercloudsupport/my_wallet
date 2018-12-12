@@ -85,7 +85,6 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
 
   @override
   void onDatabaseUpdate(String table) {
-    print("transaction list view on database updated $table}");
     _loadData();
   }
 

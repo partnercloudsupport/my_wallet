@@ -11,6 +11,7 @@ import 'package:my_wallet/utils.dart' as Utils;
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_wallet/shared_pref/shared_preference.dart';
+import 'dart:math';
 
 class RegisterRepository extends CleanArchitectureRepository {
   _RegisterFirebaseRepository _fbRepo = _RegisterFirebaseRepository();
@@ -97,7 +98,8 @@ class _RegisterFirebaseRepository {
   }
 
   Future<bool> saveUser(User user) async {
-    return await fm.addUser(user);
+    var random = Random();
+    return await fm.addUser(user, color: random.nextInt(0xFFEEEEEE));
   }
 
   Future<void> saveUserReference(String uuid) async {

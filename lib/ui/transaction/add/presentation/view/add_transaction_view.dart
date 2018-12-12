@@ -143,10 +143,9 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                             AppTheme.darkGreen,
                             onPressed: _showSelectAccount,),
                           ConversationRow(
-                            "${widget.transactionId == null ? "" : "by "}",
-                            _user == null ? "Unknown" : _user.fistName,
-                            AppTheme.darkGreen,
-                            onPressed: _showSelectAccount,)
+                            "by ",
+                            _user == null ? "Unknown" : _user.firstName,
+                            AppTheme.darkGreen,)
                         ],
                       ),
                     ),

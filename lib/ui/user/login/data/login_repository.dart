@@ -24,10 +24,6 @@ class LoginRepository extends CleanArchitectureRepository{
     return _fbRepo.signInToFirebase(email, password);
   }
 
-  Future<void> saveUserToDatabase(User user) {
-    return _fbRepo._saveUserToDatabase(user);
-  }
-
   Future<void> saveUserReference(String uuid) async {
     var sharePref = await SharedPreferences.getInstance();
 
@@ -38,9 +34,5 @@ class LoginRepository extends CleanArchitectureRepository{
 class _LoginFirebaseRepository {
   Future<void> signInToFirebase(email, password) {
     return fm.login(email, password);
-  }
-
-  Future<void> _saveUserToDatabase(User user) {
-    return fm.addUser(user);
   }
 }

@@ -45,7 +45,6 @@ class _CreateCategoryDatabaseRepository {
       color += String.fromCharCode(hex.codeUnitAt(rnd.nextInt(hex.length)));
     }
 
-    print("color is $color");
     return color;
   }
 }

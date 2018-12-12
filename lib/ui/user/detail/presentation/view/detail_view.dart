@@ -47,7 +47,7 @@ class _UserDetailState extends CleanArchitectureView<UserDetail, UserDetailPrese
                 height: iconSize,
                 width: iconSize,
                 child: CircleAvatar(
-                  backgroundColor: AppTheme.white,
+                  backgroundColor: _user == null || _user.color == null ? AppTheme.white : Color(_user.color),
                   child: _user != null
                       ? _user.photoUrl == null || _user.photoUrl.isEmpty ? IconButton(icon: Icon(Icons.camera_alt, color: AppTheme.blueGrey,), onPressed: _openCameraOptionSelection,) : Icon(Icons.face, color: AppTheme.darkBlue,)
                       : Text(""),
@@ -63,20 +63,16 @@ class _UserDetailState extends CleanArchitectureView<UserDetail, UserDetailPrese
   }
 
   void _openCameraOptionSelection() {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) => BottomSheet(
-            onClosing: _onBottomSheetClosing,
-            builder: (context) => SizedBox(
-              height: 150,
-              child: Center(child: Text("hahaha", style: TextStyle(color: AppTheme.darkBlue),),),
-            )
-        )
-    );
-  }
-
-  void _onBottomSheetClosing() {
-    print("bottom sheet is closed");
+//    showModalBottomSheet(
+//        context: context,
+//        builder: (context) => BottomSheet(
+//            onClosing: _onBottomSheetClosing,
+//            builder: (context) => SizedBox(
+//              height: 150,
+//              child: Center(child: Text("hahaha", style: TextStyle(color: AppTheme.darkBlue),),),
+//            )
+//        )
+//    );
   }
 
   @override

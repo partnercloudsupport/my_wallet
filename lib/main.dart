@@ -32,8 +32,6 @@ void main() async {
 
   var user = sharedPref.getString(UserUUID);
 
-  print("dark blue ${AppTheme.darkBlue.value}");
-
   runApp(MyApp(user != null && user.isNotEmpty));
 }
 

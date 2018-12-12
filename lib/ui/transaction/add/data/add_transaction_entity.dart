@@ -16,7 +16,7 @@ class TransactionDetail {
 
 class UserDetail {
   final String uid;
-  final String fistName;
+  final String firstName;
 
-  UserDetail(this.uid, this.fistName);
+  UserDetail(this.uid, this.firstName);
 }
