@@ -18,8 +18,8 @@ class RegisterRepository extends CleanArchitectureRepository {
   }
 
   Future<bool> validatePassword(String password) async {
-    if(password == null || password.isEmpty) throw Exception("Password is empty");
-    if(password.length < 6) throw Exception("Password is too short");
+    if(password == null || password.isEmpty) throw RegisterException("Password is empty");
+    if(password.length < 6) throw RegisterException("Password is too short");
 
     return true;
   }
@@ -28,7 +28,8 @@ class RegisterRepository extends CleanArchitectureRepository {
     try {
       await fm.registerEmail(email, password);
     } on PlatformException catch (e) {
-      throw RegisterException("${e.code} :: ${e.message} :: ${e.toString()}");
+      print("${e.code} :: ${e.message} :: ${e.toString()}");
+      throw RegisterException(e.message);
     } catch (e) {
       throw RegisterException(e.toString());
     }

@@ -18,7 +18,7 @@ void main() async {
   await fm.init();
 
   var user = await fm.checkCurrentUser();
-  runApp(MyApp(true));
+  runApp(MyApp(user));
 }
 
 

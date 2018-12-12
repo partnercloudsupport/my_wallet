@@ -1,6 +1,7 @@
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/user/register/presentation/presenter/register_presenter.dart';
 import 'package:my_wallet/ui/user/register/presentation/view/register_data_view.dart';
+import 'package:my_wallet/ui/home/home_view.dart';
 
 import 'package:my_wallet/font/my_flutter_app_icons.dart';
 
@@ -222,11 +223,20 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
 
   @override
   void onRegisterSuccess(bool result) {
-    print("register success");
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MyWalletHome()));
   }
 
   @override
   void onRegisterFailed(Exception e) {
-    print("register failed ${e.toString()}");
+    showDialog(context: context, builder: (context) => AlertDialog(
+      title: Text("Registration failed"),
+      content: Text("Registration failed with error ${e.toString()}"),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text("Try Again"),
+        )
+      ],
+    ));
   }
 }
