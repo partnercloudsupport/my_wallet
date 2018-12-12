@@ -10,4 +10,6 @@ abstract class AddTransactionDataView extends DataView {
 
   void onLoadTransactionDetail(TransactionDetail detail);
   void onLoadTransactionFailed(Exception e);
+
+  void onUserDetailLoaded(UserDetail user);
 }

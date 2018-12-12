@@ -8,7 +8,15 @@ class TransactionDetail {
   final AppCategory category;
   final double amount;
   final TransactionType type;
+  final UserDetail user;
 
-  TransactionDetail(this.id, this.dateTime, this.account, this.category, this.amount, this.type);
+  TransactionDetail(this.id, this.dateTime, this.account, this.category, this.amount, this.type, this.user);
 
+}
+
+class UserDetail {
+  final String uid;
+  final String fistName;
+
+  UserDetail(this.uid, this.fistName);
 }

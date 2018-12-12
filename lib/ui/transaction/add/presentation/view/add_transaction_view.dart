@@ -36,6 +36,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   Account _account;
   AppCategory _category;
 
+  UserDetail _user;
+
   List<Account> _accountList = [];
   List<AppCategory> _categoryList = [];
 
@@ -66,6 +68,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
     if(widget.transactionId != null) {
       presenter.loadTransactionDetail(widget.transactionId);
+    } else {
+      presenter.loadCurrentUserName();
     }
   }
 
@@ -120,11 +124,22 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                         onPressed: () => numPadKey.currentState.show(),),
                     ),
                     Expanded(
-                      child: ConversationRow(
-                        "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
-                        _account == null ? "Select Account" : _account.name,
-                        AppTheme.darkGreen,
-                        onPressed: _showSelectAccount,),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          ConversationRow(
+                            "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
+                            _account == null ? "Select Account" : _account.name,
+                            AppTheme.darkGreen,
+                            onPressed: _showSelectAccount,),
+                          ConversationRow(
+                            "${widget.transactionId == null ? "" : "by "}",
+                            _user == null ? "Unknown" : _user.fistName,
+                            AppTheme.darkGreen,
+                            onPressed: _showSelectAccount,)
+                        ],
+                      ),
                     ),
                     Expanded(
                       child: ConversationRow(
@@ -287,6 +302,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
       _date = detail.dateTime;
       _account = detail.account;
       _category = detail.category;
+      _user = detail.user;
 
       _number = "${_nf.format(detail.amount)}";
       _decimal = "${_nf.format((detail.amount - detail.amount.floor()) * 100)}";
@@ -295,5 +311,10 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   @override
   void onLoadTransactionFailed(Exception e) {
+  }
+
+  @override
+  void onUserDetailLoaded(UserDetail user) {
+    setState(() => _user = user);
   }
 }

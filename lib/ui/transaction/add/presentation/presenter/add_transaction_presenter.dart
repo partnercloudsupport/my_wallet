@@ -18,6 +18,10 @@ class AddTransactionPresenter extends CleanArchitecturePresenter<AddTransactionU
     useCase.loadTransactionDetail(id, dataView.onLoadTransactionDetail, dataView.onLoadTransactionFailed);
   }
 
+  void loadCurrentUserName() {
+    useCase.loadCurrentUserName(dataView.onUserDetailLoaded);
+  }
+
   void saveTransaction(
       int id,
       TransactionType _type,

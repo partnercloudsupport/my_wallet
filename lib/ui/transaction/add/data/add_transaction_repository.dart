@@ -4,6 +4,8 @@ import 'package:my_wallet/data/firebase_manager.dart' as _fm;
 import 'package:my_wallet/ui/transaction/add/domain/add_transaction_exception.dart';
 import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
 import 'package:my_wallet/shared_pref/shared_preference.dart';
+import 'package:my_wallet/shared_pref/shared_preference.dart';
+
 class AddTransactionRepository extends CleanArchitectureRepository {
 
   final _AddTransactionDatabaseRepository _dbRepo = _AddTransactionDatabaseRepository();
@@ -63,6 +65,10 @@ class AddTransactionRepository extends CleanArchitectureRepository {
   Future<bool> checkDescription(String desc) {
     return _dbRepo.checkDescription(desc);
   }
+
+  Future<UserDetail> loadCurrentUserName() {
+    return _dbRepo.loadCurrentUserName();
+  }
 }
 
 class _AddTransactionDatabaseRepository {
@@ -92,14 +98,25 @@ class _AddTransactionDatabaseRepository {
     AppCategory category;
     if(categories != null && categories.isNotEmpty) category = categories[0];
 
+
+    UserDetail user = await _getUserWithUid(transaction.userUid);
+
     return TransactionDetail(
-      transaction.id,
-      transaction.dateTime,
-      account,
-      category,
-      transaction.amount,
-      transaction.type
+        transaction.id,
+        transaction.dateTime,
+        account,
+        category,
+        transaction.amount,
+        transaction.type,
+        user
     );
+  }
+
+  Future<UserDetail> loadCurrentUserName() async {
+    SharedPreferences sharedPref = await SharedPreferences.getInstance();
+    String uid = sharedPref.getString(UserUUID);
+
+    return await _getUserWithUid(uid);
   }
 
   Future<bool> checkTransactionType(TransactionType type) async {
@@ -124,6 +141,18 @@ class _AddTransactionDatabaseRepository {
 
   Future<int> generateId() {
     return _db.generateTransactionId();
+  }
+
+  // private helper
+  Future<UserDetail> _getUserWithUid(String uid) async {
+    List<User> users = await _db.queryUserWithUuid(uid);
+
+    User user = users != null && users.isNotEmpty ? users[0] : null;
+
+    var firstName = user.displayName.contains(" ") ? user.displayName.substring(0, user.displayName.indexOf(" ")) : user.displayName;
+    firstName = "${firstName.substring(0, 1).toUpperCase()}${firstName.substring(1, firstName.length)}";
+
+    return user == null ? null : UserDetail(user.uuid, firstName);
   }
 }
 
