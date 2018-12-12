@@ -21,6 +21,8 @@ class RegisterUseCase extends CleanArchitectureUseCase<RegisterRepository> {
         User user = await repo.getCurrentUser();
         await repo.saveUser(user);
 
+        await repo.saveUserReference(user.uuid);
+
         next(true);
       } while (false);
     } catch(e) {

@@ -5,7 +5,9 @@ import 'package:my_wallet/data/data.dart';
 export 'package:my_wallet/data/data.dart';
 
 class UserDetailRepository extends CleanArchitectureRepository {
-  Future<User> loadCurrentUser() {
-    return db.getCurrentUser();
+  Future<User> loadUserWithUuid(String uuid) async {
+    List<User> users =  await db.queryUserWithUuid(uuid);
+
+    return users == null || users.isEmpty ? null : users[0];
   }
 }

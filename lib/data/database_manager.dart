@@ -224,9 +224,13 @@ Future<List<AppTransaction>> queryForDate(DateTime day) async {
 
   List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: "$_transDateTime BETWEEN ? AND ?", whereArgs: [startOfDay.millisecondsSinceEpoch, startOfDay.add(Duration(hours: 23, minutes: 59, seconds: 59, milliseconds: 999)).millisecondsSinceEpoch]));
 
-  if (map != null) return map.map((f) => _toTransaction(f)).toList();
+  return map != null ? map.map((f) => _toTransaction(f)).toList() : null;
+}
 
-  return null;
+Future<List<User>> queryUserWithUuid(String uuid) async {
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableUser, where: "$_userUid = ?", whereArgs: [ uuid ]));
+
+  return map == null ? null : map.map((f) => _toUser(f)).toList();
 }
 
 Future<int> generateAccountId() {
@@ -277,6 +281,14 @@ Future<int> insertCategories(List<AppCategory> cats) {
   return _lock.synchronized(() => db._insert(_tableCategory, items: cats.map((f) => _categoryToMap(f)).toList()));
 }
 
+Future<int> insertUser(User user) {
+  return _lock.synchronized(() => db._insert(tableUser, item: _userToMap(user)));
+}
+
+Future<int> insertUsers(List<User> users) {
+  return _lock.synchronized(() => db._insert(tableUser, items: users.map((f) => _userToMap(f)).toList()));
+}
+
 // ------------------------------------------------------------------------------------------------------------------------
 // delete
 Future<int> deleteAccount(int id) {
@@ -303,6 +315,14 @@ Future<int> deleteCategories(List<int> ids) {
   return _lock.synchronized(() => db._delete(_tableTransactions, "$_catId = ?", ids));
 }
 
+Future<int> deleteUser(String uid) {
+  return _lock.synchronized(() => db._delete(tableUser, "$_userUid = ?", [uid]));
+}
+
+Future<int> deleteUsers(List<String> uids) {
+  return _lock.synchronized(() => db._delete(tableUser, "$_userUid = ?", uids));
+}
+
 // ------------------------------------------------------------------------------------------------------------------------
 // update
 Future<int> updateAccount(Account acc) {
@@ -318,28 +338,13 @@ Future<int> updateCategory(AppCategory cat) {
   return _lock.synchronized(() => db._update(_tableCategory, _categoryToMap(cat), "$_catId = ?", [cat.id]));
 }
 
-Future<int> saveUser(User user) {
-  return _lock.synchronized(() => db._insert(_tableUser, item: {
-    _userUid: user.uuid,
-    _userDisplayName: user.displayName,
-    _userEmail: user.email,
-    _userPhotoUrl: user.photoUrl
-  }));
+Future<int> updateUser(User user) {
+  return _lock.synchronized(() => db._update(tableUser, _userToMap(user), "$_userUid = ?", [user.uuid]));
 }
 
-Future<User> getCurrentUser() async {
-  List<Map<String, dynamic>> _users = await _lock.synchronized(() => db._query(_tableUser));
-
-  User user;
-
-  if (_users != null && _users.isNotEmpty) {
-    Map<String, dynamic> _user = _users[0];
-    user = User(_user[_userUid], _user[_userEmail], _user[_userDisplayName], _user[_userPhotoUrl]);
-  }
-
-  return user;
-}
+// ################################################################################################################
 // private helper
+// ################################################################################################################
 AppTransaction _toTransaction(Map<String, dynamic> map) {
   return AppTransaction(map[_transID], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], map[_transAmount], map[_transDesc], TransactionType.all[map[_transType]]);
 }
@@ -361,6 +366,15 @@ Budget _toBudget(Map<String, dynamic> map) {
   return Budget(map[_budgetId], map[_budgetCategoryId], map[_budgetPerMonth], map[_budgetStart], map[_budgetEnd]);
 }
 
+User _toUser(Map<String, dynamic> map) {
+  return User(
+      map[_userUid],
+      map[_userEmail],
+      map[_userDisplayName],
+      map[_userPhotoUrl]
+  );
+}
+
 Map<String, dynamic> _transactionToMap(AppTransaction transaction) {
   return {_transID: transaction.id, _transDateTime: transaction.dateTime.millisecondsSinceEpoch, _transAcc: transaction.accountId, _transCategory: transaction.categoryId, _transAmount: transaction.amount, _transDesc: transaction.desc, _transType: transaction.type.id};
 }
@@ -380,8 +394,15 @@ Map<String, dynamic> _categoryToMap(AppCategory cat) {
 Map<String, dynamic> _bugetToMap(Budget budget) {
   return {_budgetId: budget.id, _budgetCategoryId: budget.categoryId, _budgetPerMonth: budget.budgetPerMonth, _budgetStart: budget.budgetStart, _budgetEnd: budget.budgetEnd};
 }
-//}
 
+Map<String, dynamic> _userToMap(User user) {
+  return {
+    _userUid: user.uuid,
+    _userEmail: user.email,
+    _userDisplayName: user.displayName,
+    _userPhotoUrl: user.photoUrl
+  };
+}
 // #############################################################################################################################
 // private database handler
 // #############################################################################################################################

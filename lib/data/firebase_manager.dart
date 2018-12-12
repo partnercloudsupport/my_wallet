@@ -15,6 +15,7 @@ bool _isInit = false;
 const _Account = "Account";
 const _Transaction = "Transaction";
 const _Category = "Category";
+const _User = "User";
 
 const _name = "name";
 const _type = "type";
@@ -27,6 +28,10 @@ const _accountId = "accountId";
 const _categoryId = "categoryId";
 const _amount = "amount";
 const _desc = "desc";
+const _email = "email";
+const _displayName = "displayName";
+const _photoUrl = "photoUrl";
+const _uuid = "uuid";
 
 Future<void> init() async {
   if (_isInit) return;
@@ -67,6 +72,11 @@ Future<void> init() async {
   _database.reference().child(_Transaction).onChildChanged.listen(_onTransactionChanged);
   _database.reference().child(_Transaction).onChildMoved.listen(_onTransactionMoved);
   _database.reference().child(_Transaction).onChildRemoved.listen(_onTransactionRemoved);
+
+  _database.reference().child(_User).onChildAdded.listen(_onUserAdded);
+  _database.reference().child(_User).onChildChanged.listen(_onUserChanged);
+  _database.reference().child(_User).onChildMoved.listen(_onUserMoved);
+  _database.reference().child(_User).onChildRemoved.listen(_onUserRemoved);
 }
 
 // ####################################################################################################
@@ -83,6 +93,10 @@ Map<String, dynamic> _CategoryToMap(AppCategory cat) {
   return {_name: cat.name, _colorHex: cat.colorHex, _balance: cat.balance};
 }
 
+Map<String, dynamic> _UserToMap(User user) {
+  return {_uuid: user.uuid, _email: user.email, _displayName: user.displayName, _photoUrl: user.photoUrl};
+}
+
 AppCategory _snapshotToCategory(DataSnapshot snapshot) {
   return AppCategory(_toId(snapshot), snapshot.value[_name], snapshot.value[_colorHex], double.parse("${snapshot.value[_balance]}"));
 }
@@ -93,6 +107,10 @@ Map<String, dynamic> _TransactionToMap(AppTransaction trans) {
 
 AppTransaction _snapshotToTransaction(DataSnapshot snapshot) {
   return AppTransaction(_toId(snapshot), DateTime.fromMillisecondsSinceEpoch(snapshot.value[_dateTime]), snapshot.value[_accountId], snapshot.value[_categoryId], double.parse("${snapshot.value[_amount]}"), snapshot.value[_desc], TransactionType.all[snapshot.value[_type]]);
+}
+
+User _snapshotToUser(DataSnapshot snapshot) {
+  return User(snapshot.value[_uuid], snapshot.value[_email], snapshot.value[_displayName], snapshot.value[_photoUrl]);
 }
 
 int _toId(DataSnapshot snapshot) {
@@ -140,6 +158,23 @@ void _onTransactionMoved(Event event) {}
 void _onTransactionRemoved(Event event) {
   db.deleteTransaction(_toId(event.snapshot));
 }
+
+void _onUserAdded(Event event) {
+  db.insertUser(_snapshotToUser(event.snapshot)).catchError((e) => _onUserChanged(event));
+}
+
+void _onUserChanged(Event event) {
+  db.updateUser(_snapshotToUser(event.snapshot));
+}
+
+void _onUserMoved(Event event) {
+
+}
+
+void _onUserRemoved(Event event) {
+  db.deleteUser(event.snapshot.value[_uuid]);
+}
+
 
 // ####################################################################################################
 // Account
@@ -251,19 +286,57 @@ Future<bool> deleteCategory(AppCategory cat) async {
   });
 }
 
+// ####################################################################################################
+// User
+Future<bool> addUser(User user) async {
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_User);
+
+    var result = await _ref.child("${user.uuid}").runTransaction((data) async {
+      data.value = _UserToMap(user);
+
+      return data;
+    });
+
+    return result.committed;
+  });
+}
+
+Future<bool> updateUser(User user) async {
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_User);
+
+    await _ref.child("${user.uuid}").update(_UserToMap(user));
+
+    return true;
+  });
+}
+
+Future<bool> deleteUser(User user) async {
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_User);
+
+    await _ref.child("${user.uuid}").remove();
+
+    return true;
+  });
+}
+
 Future<User> getCurrentUser() async {
   User _user;
   try {
     FirebaseUser user = await _auth.currentUser();
 
     if (user != null) {
-      print("User has display name as ${user.displayName}");
+      var photoUrlList = user.providerData != null && user.providerData.isNotEmpty
+          ? user.providerData.where((f) => f.photoUrl != null && f.photoUrl.isNotEmpty).map((f) => f.photoUrl).toList()
+          : [];
 
       _user = User(
         user.uid,
         user.email,
         user.displayName,
-        ""
+        photoUrlList != null && photoUrlList.isNotEmpty ? photoUrlList[0] : null
       );
     }
   } catch (e) {

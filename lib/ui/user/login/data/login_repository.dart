@@ -1,6 +1,5 @@
 import 'package:my_wallet/ca/data/ca_repository.dart';
 import 'package:my_wallet/data/firebase_manager.dart' as fm;
-import 'package:my_wallet/data/database_manager.dart' as db;
 import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/utils.dart' as Utils;
 
@@ -8,7 +7,6 @@ export 'package:my_wallet/data/data.dart';
 
 class LoginRepository extends CleanArchitectureRepository{
   final _LoginFirebaseRepository _fbRepo = _LoginFirebaseRepository();
-  final _LoginDatabaseRepository _dbRepo = _LoginDatabaseRepository();
 
   Future<void> validateEmail(String email) async {
     if (email == null || email.isEmpty) throw Exception("Email is empty");
@@ -25,7 +23,7 @@ class LoginRepository extends CleanArchitectureRepository{
   }
 
   Future<void> saveUserToDatabase(User user) {
-    return _dbRepo._saveUserToDatabase(user);
+    return _fbRepo._saveUserToDatabase(user);
   }
 }
 
@@ -33,10 +31,8 @@ class _LoginFirebaseRepository {
   Future<void> signInToFirebase(email, password) {
     return fm.login(email, password);
   }
-}
 
-class _LoginDatabaseRepository {
   Future<void> _saveUserToDatabase(User user) {
-    return db.saveUser(user);
+    return fm.addUser(user);
   }
 }

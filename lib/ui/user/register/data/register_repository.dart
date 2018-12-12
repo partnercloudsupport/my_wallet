@@ -5,14 +5,15 @@ import 'package:my_wallet/ui/user/register/domain/register_exception.dart';
 import 'package:my_wallet/data/data.dart';
 export 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/data/firebase_manager.dart' as fm;
-import 'package:my_wallet/data/database_manager.dart' as db;
 
 import 'package:flutter/services.dart';
 import 'package:my_wallet/utils.dart' as Utils;
 
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_wallet/shared_pref/shared_preference.dart';
+
 class RegisterRepository extends CleanArchitectureRepository {
   _RegisterFirebaseRepository _fbRepo = _RegisterFirebaseRepository();
-  _RegisterDatabaseRepository _dbRepo = _RegisterDatabaseRepository();
 
   Future<bool> validateDisplayName(String name) {
     return _fbRepo.validateDisplayName(name);
@@ -39,7 +40,11 @@ class RegisterRepository extends CleanArchitectureRepository {
   }
 
   Future<bool> saveUser(User user) {
-    return _dbRepo.saveUser(user);
+    return _fbRepo.saveUser(user);
+  }
+
+  Future<void> saveUserReference(String uuid) async {
+    return _fbRepo.saveUserReference(uuid);
   }
 }
 
@@ -90,10 +95,14 @@ class _RegisterFirebaseRepository {
   Future<User> getCurrentUser() {
     return fm.getCurrentUser();
   }
-}
 
-class _RegisterDatabaseRepository {
   Future<bool> saveUser(User user) async {
-    return await db.saveUser(user) > 0;
+    return await fm.addUser(user);
+  }
+
+  Future<void> saveUserReference(String uuid) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    await pref.setString(UserUUID, uuid);
   }
 }

@@ -12,7 +12,8 @@ import 'package:my_wallet/ui/category/list/presentation/view/list_category.dart'
 import 'package:my_wallet/ui/category/create/presentation/view/create_category_view.dart';
 
 import 'package:my_wallet/data/firebase_manager.dart' as fm;
-import 'package:my_wallet/data/database_manager.dart' as db;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_wallet/shared_pref/shared_preference.dart';
 
 import 'package:my_wallet/ui/user/login/presentation/view/login_view.dart';
 
@@ -27,9 +28,11 @@ void main() async {
 
   await fm.init();
 
-  var user = await db.getCurrentUser();
+  var sharedPref = await SharedPreferences.getInstance();
 
-  runApp(MyApp(user != null));
+  var user = sharedPref.getString(UserUUID);
+
+  runApp(MyApp(user != null && user.isNotEmpty));
 }
 
 
