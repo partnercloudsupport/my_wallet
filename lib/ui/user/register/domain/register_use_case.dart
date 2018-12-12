@@ -18,6 +18,9 @@ class RegisterUseCase extends CleanArchitectureUseCase<RegisterRepository> {
 
         await repo.updateDisplayName(displayName);
 
+        User user = await repo.getCurrentUser();
+        await repo.saveUser(user);
+
         next(true);
       } while (false);
     } catch(e) {

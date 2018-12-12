@@ -1,11 +1,49 @@
 import 'package:my_wallet/ca/data/ca_repository.dart';
 
 import 'package:my_wallet/ui/user/register/domain/register_exception.dart';
+
+import 'package:my_wallet/data/data.dart';
+export 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/data/firebase_manager.dart' as fm;
+import 'package:my_wallet/data/database_manager.dart' as db;
+
 import 'package:flutter/services.dart';
 import 'package:my_wallet/utils.dart' as Utils;
 
 class RegisterRepository extends CleanArchitectureRepository {
+  _RegisterFirebaseRepository _fbRepo = _RegisterFirebaseRepository();
+  _RegisterDatabaseRepository _dbRepo = _RegisterDatabaseRepository();
+
+  Future<bool> validateDisplayName(String name) {
+    return _fbRepo.validateDisplayName(name);
+  }
+
+  Future<bool> validateEmail(String email) {
+    return _fbRepo.validateEmail(email);
+  }
+
+  Future<bool> validatePassword(String password) {
+    return _fbRepo.validatePassword(password);
+  }
+
+  Future<bool> registerEmail(String email, String password) {
+    return _fbRepo.registerEmail(email, password);
+  }
+
+  Future<bool> updateDisplayName(String displayName)  {
+    return _fbRepo.updateDisplayName(displayName);
+  }
+
+  Future<User> getCurrentUser() {
+    return _fbRepo.getCurrentUser();
+  }
+
+  Future<bool> saveUser(User user) {
+    return _dbRepo.saveUser(user);
+  }
+}
+
+class _RegisterFirebaseRepository {
   Future<bool> validateDisplayName(String name) async {
     return name == null || name.isEmpty ? throw RegisterException("Name must not be empty") : true;
   }
@@ -47,5 +85,15 @@ class RegisterRepository extends CleanArchitectureRepository {
     }
 
     return true;
+  }
+
+  Future<User> getCurrentUser() {
+    return fm.getCurrentUser();
+  }
+}
+
+class _RegisterDatabaseRepository {
+  Future<bool> saveUser(User user) async {
+    return await db.saveUser(user) > 0;
   }
 }

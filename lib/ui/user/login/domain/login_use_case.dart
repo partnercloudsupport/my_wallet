@@ -17,6 +17,8 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         if(user == null) break;
 
+        await repo.saveUserToDatabase(user);
+
         onNext(true);
       } while(false);
     } on PlatformException catch(e) {

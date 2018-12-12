@@ -24,9 +24,9 @@ class LoginRepository extends CleanArchitectureRepository{
     return _fbRepo.signInToFirebase(email, password);
   }
 
-//  Future<void> saveUserToDatabase(User user) {
-//    _dbRepo._saveUserToDatabase(user);
-//  }
+  Future<void> saveUserToDatabase(User user) {
+    return _dbRepo._saveUserToDatabase(user);
+  }
 }
 
 class _LoginFirebaseRepository {
@@ -36,7 +36,7 @@ class _LoginFirebaseRepository {
 }
 
 class _LoginDatabaseRepository {
-//  Future<void> _saveUserToDatabase(User user) {
-//    db.saveUser(user)
-//  }
+  Future<void> _saveUserToDatabase(User user) {
+    return db.saveUser(user);
+  }
 }

@@ -216,8 +216,6 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
   }
 
   void _registerEmail() {
-    print("Register email with ${_displayNameController.text} and ${_emailController.text}");
-
     presenter.registerEmail(_displayNameController.text, _emailController.text, _passwordController.text);
   }
 
