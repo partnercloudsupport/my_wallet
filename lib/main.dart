@@ -25,6 +25,7 @@ void main() async {
     DeviceOrientation.portraitDown,
     DeviceOrientation.portraitUp
   ]);
+  await SystemChrome.setEnabledSystemUIOverlays([]);
 
   await fm.init();
 

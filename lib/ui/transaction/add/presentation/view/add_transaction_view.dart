@@ -102,7 +102,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
     );
 
     var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height - width - appBar.preferredSize.height - 23;
+    var height = MediaQuery.of(context).size.height - width - appBar.preferredSize.height;
 
     return GradientScaffold(
       appBar: appBar,

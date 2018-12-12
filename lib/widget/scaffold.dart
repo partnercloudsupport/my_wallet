@@ -15,7 +15,6 @@ class GradientScaffold extends Scaffold {
     Widget endDrawer,
     Widget bottomNavigationBar,
     Widget bottomSheet,
-    bool resizeToAvoidBottomPadding = true,
     bool primary = true,
   }) : super(
       key: key,
@@ -32,8 +31,8 @@ class GradientScaffold extends Scaffold {
       endDrawer: endDrawer,
       bottomNavigationBar: bottomNavigationBar,
       bottomSheet: bottomSheet,
-      resizeToAvoidBottomPadding: resizeToAvoidBottomPadding,
-      primary: primary);
+      resizeToAvoidBottomPadding: true,
+      primary: primary,);
 }
 
 class PlainScaffold extends Scaffold {
