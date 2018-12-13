@@ -93,7 +93,8 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   @override
   void onSignInSuccess(bool result) {
     _loginKey.currentState.stop();
-    Navigator.pushReplacementNamed(context, routes.HomeProfile);
+
+    presenter.checkUserHome();
   }
 
   @override
@@ -113,6 +114,10 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
       ],
     )
     );
+  }
+
+  void onUserHomeResult(bool exist) {
+    Navigator.pushReplacementNamed(context, exist ? routes.MyHome : routes.HomeProfile);
   }
 
   void _register() {

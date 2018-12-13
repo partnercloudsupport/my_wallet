@@ -34,6 +34,7 @@ const _photoUrl = "photoUrl";
 const _uuid = "uuid";
 const _color = "color";
 const _host = "host";
+const _key = "key";
 
 Future<void> init() async {
   if (_isInit) return;
@@ -399,7 +400,7 @@ Future<void> createHome(
     String hostEmail,
     String homeKey,
     String homeName,
-) async {
+) {
   return _lock.synchronized(() async {
     DatabaseReference _ref = _database.reference();
 
@@ -413,5 +414,15 @@ Future<void> createHome(
     });
 
     return result.committed;
+  });
+}
+
+Future<bool> isHost(User user) {
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference();
+
+    DataSnapshot snapshot = await _ref.child(user.uuid).once();
+
+    return snapshot != null && snapshot.value != null;
   });
 }

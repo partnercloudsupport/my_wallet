@@ -8,4 +8,8 @@ class LoginPresenter extends CleanArchitecturePresenter<LoginUseCase, LoginDataV
   void signIn(String email, String password) {
     useCase.signIn(email, password, dataView.onSignInSuccess, dataView.onSignInFailed);
   }
+
+  void checkUserHome() {
+    useCase.checkUserHome(dataView.onUserHomeResult);
+  }
 }

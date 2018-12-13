@@ -26,15 +26,37 @@ class LoginRepository extends CleanArchitectureRepository{
     return _fbRepo.signInToFirebase(email, password);
   }
 
+  Future<bool> checkHost(User user) {
+    return _fbRepo.checkHost(user);
+  }
+
+  Future<void> saveHome(String homeKey) async {
+    var sharePref = await SharedPreferences.getInstance();
+
+    await sharePref.setString(prefHomeProfile, homeKey);
+  }
+
   Future<void> saveUserReference(String uuid) async {
     var sharePref = await SharedPreferences.getInstance();
 
     await sharePref.setString(UserUUID, uuid);
+  }
+
+  Future<bool> checkUserHome() async {
+    var sharePref = await SharedPreferences.getInstance();
+
+    var key = sharePref.getString(prefHomeProfile);
+
+    return key != null && key.isNotEmpty;
   }
 }
 
 class _LoginFirebaseRepository {
   Future<void> signInToFirebase(email, password) {
     return fm.login(email, password);
+  }
+
+  Future<bool> checkHost(User user) {
+    return fm.isHost(user);
   }
 }

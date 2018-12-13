@@ -17,10 +17,21 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         await repo.saveUserReference(user.uuid);
 
+        // if this user is a host, allow him to go directly into his home. 1 host cannot host more than 1 home
+        bool isHost = await repo.checkHost(user);
+
+        if(isHost) {
+          // save his home to shared pref
+          await repo.saveHome(user.uuid);
+        }
         onNext(true);
       } while(false);
     } catch (e) {
       onError(e);
     }
+  }
+
+  void checkUserHome(onNext<bool> next) {
+    repo.checkUserHome().then((result) => next(result));
   }
 }
