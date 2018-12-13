@@ -23,6 +23,9 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
         if(isHost) {
           // save his home to shared pref
           await repo.saveHome(user.uuid);
+
+          // switch database reference
+          await repo.switchReference();
         }
         onNext(true);
       } while(false);

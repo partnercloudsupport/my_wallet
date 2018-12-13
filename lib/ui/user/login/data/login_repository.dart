@@ -42,6 +42,10 @@ class LoginRepository extends CleanArchitectureRepository{
     await sharePref.setString(UserUUID, uuid);
   }
 
+  Future<void> switchReference() {
+    return _fbRepo.switchReference();
+  }
+
   Future<bool> checkUserHome() async {
     var sharePref = await SharedPreferences.getInstance();
 
@@ -58,5 +62,9 @@ class _LoginFirebaseRepository {
 
   Future<bool> checkHost(User user) {
     return fm.isHost(user);
+  }
+
+  Future<void> switchReference() {
+    return fm.setupDatabase();
   }
 }
