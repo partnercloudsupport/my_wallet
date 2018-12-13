@@ -110,7 +110,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                   color: AppTheme.white,
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       ConversationRow(
                           widget.transactionId == null ? "Create new" : "An",
@@ -121,8 +121,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                         widget.transactionId == null ? "of" : "valued of",
                         _numberFormat.format(_toNumber(_number, _decimal)),
                         TransactionType.isIncome(_type) ? AppTheme.tealAccent : TransactionType.isExpense(_type) ? AppTheme.pinkAccent : AppTheme.blueGrey,
-                        style: Theme.of(context).textTheme.display2,
-                        onPressed: () => numPadKey.currentState.show(),),
+                        style: Theme.of(context).textTheme.display2,),
                       Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -159,8 +158,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   }
 
   void _showTransactionTypeSelection() {
-    numPadKey.currentState.hide();
-
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(TransactionType.all, (f) =>
             Align(
@@ -173,8 +170,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                   setState(() => _type = f);
 
                   Navigator.pop(context);
-
-                  numPadKey.currentState.show();
                 },
               ),
               alignment: Alignment.center,
@@ -184,7 +179,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   }
 
   void _showSelectAccount() {
-    numPadKey.currentState.hide();
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(_accountList, (f) => Align(
           child: InkWell(
@@ -193,8 +187,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
             ),
             onTap: () {
               setState(() => _account = f);
-
-              numPadKey.currentState.show();
 
               Navigator.pop(context);
             },
@@ -205,7 +197,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   }
 
   void _showSelectCategory() {
-    numPadKey.currentState.hide();
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(_categoryList, (f) => Align(
           child: InkWell(
@@ -214,8 +205,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
             ),
             onTap: () {
               setState(() => _category = f);
-
-              numPadKey.currentState.show();
 
               Navigator.pop(context);
             },
