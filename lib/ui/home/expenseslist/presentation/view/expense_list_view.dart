@@ -61,7 +61,7 @@ class _ExpensesListViewState extends CleanArchitectureView<ExpensesListView, Exp
           title: Text(f.name, style: TextStyle(color: AppTheme.darkBlue),),
           leading: Icon(Icons.map, color: AppTheme.darkBlue,),
           trailing: Text(_nf.format(f.amount), style: TextStyle(color: AppTheme.tealAccent),),
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionList(f.name, categoryId: f.categoryId,))),
+          onTap: () => Navigator.pushNamed(context, routes.TransactionList(f.name, categoryId: f.categoryId)),
         )).toList(),
       ),
     );

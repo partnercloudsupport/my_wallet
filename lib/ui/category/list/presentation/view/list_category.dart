@@ -61,14 +61,9 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
                   title: _categories[index].name,
                   onTap: () => widget.returnValue
                       ? Navigator.pop(context, _categories[index])
-                      : Navigator.push(
+                      : Navigator.pushNamed(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => TransactionList(
-                                  _categories[index].name,
-                                  categoryId: _categories[index].id,
-                                ),
-                          ),
+                          routes.TransactionList(_categories[index].name, categoryId: _categories[index].id)
                         ),
                 ),
           )),

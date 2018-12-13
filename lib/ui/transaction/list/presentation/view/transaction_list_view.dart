@@ -3,7 +3,6 @@ import 'package:my_wallet/ui/transaction/list/data/transaction_list_entity.dart'
 import 'package:intl/intl.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_data_view.dart';
-import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_view.dart';
 import 'package:my_wallet/data/data_observer.dart' as observer;
 
 class TransactionList extends StatefulWidget {
@@ -68,7 +67,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
               ),
               subtitle: Text(df.format(entities[index].dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
               trailing: Text("\$${nf.format(entities[index].amount)}", style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),),
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AddTransaction(transactionId: entities[index].id,))),
+            onTap: () => Navigator.pushNamed(context, routes.EditTransaction(entities[index].id)),
             ),
             color: index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.2),
           )

@@ -60,7 +60,8 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
             itemCount: _accounts.length,
             itemBuilder: (context, index) => CardListTile(
               title: _accounts[index].name,
-                onTap: () => widget.selectionMode ? Navigator.pop(context, _accounts[index]) : Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionList(_accounts[index].name, accountId: _accounts[index].id,))),
+                onTap: () => widget.selectionMode ? Navigator.pop(context, _accounts[index]) : Navigator.pushNamed(context,
+                    routes.TransactionList(_accounts[index].name, accountId: _accounts[index].id)),
               subTitle: "${_nf.format(_accounts[index].balance)}",
               trailing: isEditMode ? IconButton(
                 onPressed: () {

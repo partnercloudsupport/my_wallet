@@ -84,13 +84,11 @@ class _TransactionListDatabaseRepository {
         List<User> users = await db.queryUserWithUuid(trans.userUid);
 
         if(users != null && users.isNotEmpty) {
-          print("users ${users.length}");
           User user = users[0];
           var splits = user.displayName.split(" ");
           var initial = splits.map((f) => f.substring(0, 1).toUpperCase()).join();
           initial = initial.substring(0, initial.length < 2 ? initial.length : 2);
 
-          print("user ${user.email} has color ${user.color}");
           entities.add(TransactionEntity(trans.id, initial, trans.desc, trans.amount, trans.dateTime, user.color));
         }
       }

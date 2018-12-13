@@ -93,7 +93,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   @override
   void onSignInSuccess(bool result) {
     _loginKey.currentState.stop();
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => MyWalletHome()));
+    Navigator.pushReplacementNamed(context, routes.MyHome);
   }
 
   @override
@@ -116,6 +116,6 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   }
 
   void _register() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => Register()));
+    Navigator.pushNamed(context, routes.Register);
   }
 }

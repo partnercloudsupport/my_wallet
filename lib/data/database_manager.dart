@@ -369,7 +369,6 @@ Budget _toBudget(Map<String, dynamic> map) {
 }
 
 User _toUser(Map<String, dynamic> map) {
-  print("${map[_userColor]} for user email ${map[_userEmail]}");
   return User(
     map[_userUid],
     map[_userEmail],
