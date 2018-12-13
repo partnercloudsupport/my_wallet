@@ -4,6 +4,7 @@ import 'package:my_wallet/ui/user/homeprofile/main/presentation/presenter/homepr
 import 'package:my_wallet/ui/user/homeprofile/main/presentation/view/homeprofile_data_view.dart';
 
 import 'package:my_wallet/ui/user/homeprofile/newhome/presentation/view/newhome_view.dart';
+import 'package:my_wallet/ui/user/homeprofile/gohome/presentation/view/gohome_view.dart';
 
 class HomeProfile extends StatefulWidget {
   @override
@@ -45,13 +46,9 @@ class _HomeProfileState extends CleanArchitectureView<HomeProfile, HomeProfilePr
         padding: EdgeInsets.all(10.0),
       margin: EdgeInsets.all(20.0),
           child: _checking ? Center(child: CircularProgressIndicator(),)
-              : _homeEntity == null ? NewHome() : _confirmHome()
+              : _homeEntity == null ? NewHome() : GoHome(_homeEntity.homeKey, _homeEntity.homeName, _homeEntity.hostEmail)
       ),
     );
-  }
-
-  Widget _confirmHome() {
-    return Center(child:  Text("Nothing yet", style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),),);
   }
 
   void onHomeResult(HomeEntity entity) {
