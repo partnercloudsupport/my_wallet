@@ -10,6 +10,6 @@ class LoginPresenter extends CleanArchitecturePresenter<LoginUseCase, LoginDataV
   }
 
   void checkUserHome() {
-    useCase.checkUserHome(dataView.onUserHomeResult);
+    useCase.checkUserHome(dataView.onUserHomeResult, (e) {});
   }
 }

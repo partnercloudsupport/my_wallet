@@ -325,6 +325,10 @@ Future<int> deleteUsers(List<String> uids) {
   return _lock.synchronized(() => db._delete(tableUser, "$_userUid = ?", uids));
 }
 
+Future<void> deleteDatabase() {
+  return _lock.synchronized(() => db._deleteDb());
+}
+
 // ------------------------------------------------------------------------------------------------------------------------
 // update
 Future<int> updateAccount(Account acc) {
@@ -568,6 +572,15 @@ class _Database {
     _notifyObservers(table);
 
     return result;
+  }
+
+  Future<void> _deleteDb() async {
+    Database db = await _openDatabase();
+    await db.delete(_tableUser);
+    await db.delete(_tableTransactions);
+    await db.delete(_tableAccounts);
+    await db.delete(_tableBudget);
+    await db.delete(_tableTransactions);
   }
 
   void _notifyObservers(String table) {

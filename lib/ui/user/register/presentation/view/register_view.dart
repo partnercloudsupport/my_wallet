@@ -233,7 +233,7 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
   void onRegisterSuccess(bool result) {
     _registerKey.currentState.stop();
     Navigator.pop(context);
-    Navigator.of(context).pushReplacementNamed(routes.MyHome);
+    Navigator.of(context).pushReplacementNamed(routes.HomeProfile);
   }
 
   @override

@@ -3,7 +3,7 @@ import 'dart:io' show Platform;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/data/database_manager.dart' as db;
-import 'package:my_wallet/data/firebase_config.dart' as fbConfig;
+import 'package:my_wallet/firebase_config.dart' as fbConfig;
 import 'package:synchronized/synchronized.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_wallet/shared_pref/shared_preference.dart';
@@ -39,8 +39,10 @@ const _members = "members";
 const _homes = "homes";
 const _data = "data";
 
+FirebaseApp _app;
 Future<FirebaseApp> createFirebaseApp() async {
-  return await FirebaseApp.configure(
+  if(_app == null )
+  _app = await FirebaseApp.configure(
       name: Platform.isIOS ? "MyWallet" : "My Wallet",
       options: Platform.isIOS
           ? const FirebaseOptions(
@@ -55,6 +57,8 @@ Future<FirebaseApp> createFirebaseApp() async {
         projectID: fbConfig.firebase_project_id,
         databaseURL: fbConfig.firebase_database_url,
       ));
+
+  return _app;
 }
 Future<void> init() async {
   if (_isInit) return;
@@ -537,5 +541,15 @@ Future<bool> joinHome(Home home, User user) async  {
       return data;
     });
     return result.committed;
+  });
+}
+
+Future<User> getUserDetail(String homeKey, User user) {
+  return _lock.synchronized(() async {
+    DataSnapshot snapshot = await _database.reference().child(_User).child(user.uuid).once();
+
+    if(snapshot == null) throw Exception("User not found");
+
+    return _snapshotToUser(snapshot);
   });
 }
