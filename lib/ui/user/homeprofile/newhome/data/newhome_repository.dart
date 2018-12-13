@@ -3,13 +3,14 @@ import 'package:flutter/services.dart';
 
 import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/data/firebase_manager.dart' as _fm;
-import 'package:my_wallet/data/database_manager.dart' as _db;
 
 import 'package:my_wallet/shared_pref/shared_preference.dart';
 import 'package:my_wallet/ui/user/homeprofile/newhome/data/newhome_exception.dart';
 
 export 'package:my_wallet/data/data.dart';
 export 'package:my_wallet/ui/user/homeprofile/newhome/data/newhome_exception.dart';
+
+import 'dart:math';
 
 class NewHomeRepository extends CleanArchitectureRepository {
   final _NewHomeFirebaseRepository _fbRepo = _NewHomeFirebaseRepository();
@@ -18,14 +19,32 @@ class NewHomeRepository extends CleanArchitectureRepository {
     return _fbRepo.getCurrentUser();
   }
 
+  /// create new home
   Future<String> createHome(User host, String name) {
     return _fbRepo.createHome(host, name);
+  }
+
+  /// join a home
+  Future<Home> findHomeOfHost(String host) {
+    return _fbRepo.findHomeOfHost(host);
+  }
+
+  Future<bool> joinHome(Home home, User user) {
+    return _fbRepo.joinHome(home, user);
   }
 
   Future<void> saveKey(String homeKey) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
 
     pref.setString(prefHomeProfile, homeKey);
+  }
+
+  Future<void> updateDatabaseReference() {
+    return _fbRepo.updateDatabaseReference();
+  }
+
+  Future<void> saveUserToHome(User user) {
+    return _fbRepo.saveUserToHome(user);
   }
 }
 
@@ -48,5 +67,34 @@ class _NewHomeFirebaseRepository {
     }
 
     return host.uuid;
+  }
+
+  Future<Home> findHomeOfHost(String host) async {
+    try {
+      return await _fm.findHomeOfHost(host);
+    } on PlatformException catch (e) {
+      throw NewHomeException(e.message);
+    } catch (e) {
+      throw NewHomeException(e.toString());
+    }
+  }
+
+  Future<bool> joinHome(Home home, User user) async {
+    try {
+      return await _fm.joinHome(home, user);
+    } on PlatformException catch(e) {
+      throw NewHomeException(e.message);
+    } catch (e) {
+      throw NewHomeException(e.toString());
+    }
+  }
+
+  Future<void> updateDatabaseReference() {
+    return _fm.setupDatabase();
+  }
+
+  Future<void> saveUserToHome(User user) {
+    Random random = Random();
+    return _fm.addUser(user, color: random.nextInt(0xFFEEEEEE));
   }
 }

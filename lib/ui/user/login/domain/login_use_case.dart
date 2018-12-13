@@ -20,8 +20,6 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
         // if this user is a host, allow him to go directly into his home. 1 host cannot host more than 1 home
         bool isHost = await repo.checkHost(user);
 
-        print("check host $isHost");
-        
         if(isHost) {
           // save his home to shared pref
           await repo.saveHome(user.uuid);

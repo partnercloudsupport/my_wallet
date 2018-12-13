@@ -489,3 +489,53 @@ Future<Home> searchUserHome(User user) {
     return home;
   });
 }
+
+Future<Home> findHomeOfHost(String host) async {
+  return _lock.synchronized(() async {
+    DataSnapshot _allHomes = await _database.reference().child(_homes).once();
+
+    Home home;
+    do {
+      if (_allHomes == null) break;
+
+      if (_allHomes.value == null) break;
+
+      if (!(_allHomes.value is Map<dynamic, dynamic>)) break;
+
+      Map map = _allHomes.value as Map<dynamic, dynamic>;
+
+      for (dynamic key in map.keys) {
+        dynamic value = map[key];
+
+        if(value[_host] != null && value[_host]== host) {
+          home = Home(key, value[_host], value[_name]);
+
+          break;
+        }
+      }
+
+    } while (false);
+
+    return home;
+
+  });
+}
+
+Future<bool> joinHome(Home home, User user) async  {
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(_homes).child(home.key).child(_members);
+
+    DataSnapshot members = await _ref.once();
+
+    int id = members == null || members.value == null ? 0 : members.value.length;
+
+    var result = await _ref.child("$id").runTransaction((data) async {
+      data.value = {
+        _email : user.email
+      };
+
+      return data;
+    });
+    return result.committed;
+  });
+}

@@ -18,9 +18,39 @@ class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
       // save this key to shared preference
       await repo.saveKey(homeKey);
 
+      await repo.updateDatabaseReference();
+
+      await repo.saveUserToHome(host);
+
       next(true);
     } catch (e) {
       err(e);
+    }
+  }
+
+  void joinHomeWithHost(String host, onNext<bool> onJoinSuccess, onError onJoinFailed) async {
+    try {
+      Home home = await repo.findHomeOfHost(host);
+
+      if(home == null) throw NewHomeException("This host $host does not have any home right now");
+
+      User myProfile = await repo.getCurrentUser();
+
+      bool result = await repo.joinHome(home, myProfile);
+
+      if(!result) throw NewHomeException("Failed to join home with $host");
+
+      // save this home key
+      await repo.saveKey(home.key);
+
+      // and finally update database reference
+      await repo.updateDatabaseReference();
+
+      await repo.saveUserToHome(myProfile);
+
+      onJoinSuccess(true);
+    } catch(e) {
+      onJoinFailed(e);
     }
   }
 }

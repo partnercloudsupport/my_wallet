@@ -9,4 +9,8 @@ class NewHomePresenter extends CleanArchitecturePresenter<NewHomeUseCase, NewHom
   void createHomeProfile(String name) {
     useCase.createHomeProfile(name, dataView.onHomeCreated, dataView.onHomeCreateFailed);
   }
+
+  void joinHomeWithHost(String host) {
+    useCase.joinHomeWithHost(host, dataView.onJoinSuccess, dataView.onJoinFailed);
+  }
 }

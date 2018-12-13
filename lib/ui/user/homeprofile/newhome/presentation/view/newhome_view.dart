@@ -19,6 +19,7 @@ class _NewHomeState extends CleanArchitectureView<NewHome, NewHomePresenter> imp
   final GlobalKey<RoundedButtonState> _createHomeState = GlobalKey();
 
   bool _creatingHome = false;
+  bool _joiningHome = false;
 
   @override
   void init() {
@@ -27,84 +28,87 @@ class _NewHomeState extends CleanArchitectureView<NewHome, NewHomePresenter> imp
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        Container(
-          alignment: Alignment.center,
-          child: Text("Join a home", style: Theme.of(context).textTheme.headline.apply(color: AppTheme.darkBlue)),
-          margin: EdgeInsets.all(30.0),
-        ),
-        Container(
-          padding: EdgeInsets.only(top: 10.0, bottom: 10.0, left: 10.0, right: 10.0),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(40.0),
-              color: AppTheme.darkBlue.withOpacity(0.2)
+    return Center(
+      child: ListView(
+        shrinkWrap: true,
+        children: <Widget>[
+          Container(
+            alignment: Alignment.center,
+            child: Text("Join a home", style: Theme.of(context).textTheme.headline.apply(color: AppTheme.darkBlue)),
+            margin: EdgeInsets.all(30.0),
           ),
-          child: TextField(
-            controller: _hostEmailController,
-            decoration: InputDecoration.collapsed(
-              hintText: "Enter host's email address",
-              hintStyle: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey),
+          Container(
+            padding: EdgeInsets.only(top: 10.0, bottom: 10.0, left: 10.0, right: 10.0),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(40.0),
+                color: AppTheme.darkBlue.withOpacity(0.2)
             ),
-            style: Theme.of(context).textTheme.subtitle.apply(color: AppTheme.black),
-          ),
-        ),
-        RoundedButton(
-          key: _joinHomeState,
-          onPressed: () {},
-          child: Text("Request to join this home"),
-          color: AppTheme.darkBlue,
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: 30.0,),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  height: 1.0,
-                  color: AppTheme.blueGrey,
-                ),
+            child: TextField(
+              controller: _hostEmailController,
+              decoration: InputDecoration.collapsed(
+                hintText: "Enter host's email address",
+                hintStyle: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey),
               ),
-              Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text("OR", style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),),
-              ),
-              Expanded(
-                child: Container(
-                  height: 1.0,
-                  color: AppTheme.blueGrey,
-                ),
-              )
-            ],
-          ),
-        ),
-        Container(
-          alignment: Alignment.center,
-          child: Text("Create a new home", style: Theme.of(context).textTheme.headline.apply(color: AppTheme.darkBlue)),
-          margin: EdgeInsets.all(30.0),
-        ),
-        Container(
-          padding: EdgeInsets.only(top: 10.0, bottom: 10.0, left: 10.0, right: 10.0),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(40.0),
-              color: AppTheme.darkBlue.withOpacity(0.2)
-          ),
-          child: TextField(
-            controller: _homeNameController,
-            decoration: InputDecoration.collapsed(
-              hintText: "Enter your home name",
-              hintStyle: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey),
+              style: Theme.of(context).textTheme.subtitle.apply(color: AppTheme.black),
             ),
-            style: Theme.of(context).textTheme.subtitle.apply(color: AppTheme.black),
           ),
-        ),
-        RoundedButton(
-          key: _createHomeState,
-          onPressed: _createProfile,
-          child: Text("Create home"),
-          color: AppTheme.darkBlue,
-        ),
-      ],
+          RoundedButton(
+            key: _joinHomeState,
+            onPressed: _joinAHome,
+            child: Text("Request to join this home"),
+            color: AppTheme.darkBlue,
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 30.0,),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                    height: 1.0,
+                    color: AppTheme.blueGrey,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text("OR", style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),),
+                ),
+                Expanded(
+                  child: Container(
+                    height: 1.0,
+                    color: AppTheme.blueGrey,
+                  ),
+                )
+              ],
+            ),
+          ),
+          Container(
+            alignment: Alignment.center,
+            child: Text("Create a new home", style: Theme.of(context).textTheme.headline.apply(color: AppTheme.darkBlue)),
+            margin: EdgeInsets.all(30.0),
+          ),
+          Container(
+            padding: EdgeInsets.only(top: 10.0, bottom: 10.0, left: 10.0, right: 10.0),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(40.0),
+                color: AppTheme.darkBlue.withOpacity(0.2)
+            ),
+            child: TextField(
+              controller: _homeNameController,
+              decoration: InputDecoration.collapsed(
+                hintText: "Enter your home name",
+                hintStyle: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey),
+              ),
+              style: Theme.of(context).textTheme.subtitle.apply(color: AppTheme.black),
+            ),
+          ),
+          RoundedButton(
+            key: _createHomeState,
+            onPressed: _createProfile,
+            child: Text("Create home"),
+            color: AppTheme.darkBlue,
+          ),
+        ],
+      ),
     );
   }
 
@@ -141,5 +145,28 @@ class _NewHomeState extends CleanArchitectureView<NewHome, NewHomePresenter> imp
               ],
             )
     );
+  }
+
+  void _joinAHome() {
+    if(_joiningHome) return;
+
+    _joiningHome = true;
+    _joinHomeState.currentState.process();
+    presenter.joinHomeWithHost(_hostEmailController.text);
+  }
+
+  @override
+  void onJoinSuccess(bool result) {
+    _joiningHome = false;
+    _joinHomeState.currentState.stop();
+
+    Navigator.pushReplacementNamed(context, routes.MyHome);
+  }
+
+  @override
+  void onJoinFailed(Exception e) {
+    print(e.toString());
+    _joiningHome = false;
+    _joinHomeState.currentState.stop();
   }
 }

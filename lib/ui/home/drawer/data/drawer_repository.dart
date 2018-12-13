@@ -9,6 +9,7 @@ class LeftDrawerRepository extends CleanArchitectureRepository {
     if(result) {
       SharedPreferences pref = await SharedPreferences.getInstance();
       pref.remove(UserUUID);
+      pref.remove(prefHomeProfile);
     }
 
     return result;
