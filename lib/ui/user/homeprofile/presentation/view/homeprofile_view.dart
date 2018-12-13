@@ -19,6 +19,8 @@ class _HomeProfileState extends CleanArchitectureView<HomeProfile, HomeProfilePr
   final GlobalKey<RoundedButtonState> _joinHomeState = GlobalKey();
   final GlobalKey<RoundedButtonState> _createHomeState = GlobalKey();
 
+  bool creatingHome = false;
+
   @override
   void init() {
     presenter.dataView = this;
@@ -110,13 +112,48 @@ class _HomeProfileState extends CleanArchitectureView<HomeProfile, HomeProfilePr
           ),
           RoundedButton(
             key: _createHomeState,
-            onPressed: () {},
+            onPressed: _createProfile,
             child: Text("Create home"),
             color: AppTheme.darkBlue,
           ),
         ],
       ),
       ),
+    );
+  }
+
+  void _createProfile() {
+    if (creatingHome) return;
+
+    creatingHome = true;
+    _createHomeState.currentState.process();
+
+    presenter.createHomeProfile(_homeNameController.text);
+  }
+
+  @override
+  void onHomeCreated(bool result) {
+    creatingHome = false;
+    _createHomeState.currentState.stop();
+
+    Navigator.pushReplacementNamed(context, routes.MyHome);
+  }
+
+  @override
+  void onHomeCreateFailed(Exception e) {
+    showDialog(
+        context: context,
+        builder: (context) =>
+            AlertDialog(
+              title: Text("Failed to create home}"),
+              content: Text("Your home ${_homeNameController.text} is not created because ${e.toString()}"),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Try Again"),
+                )
+              ],
+            )
     );
   }
 }

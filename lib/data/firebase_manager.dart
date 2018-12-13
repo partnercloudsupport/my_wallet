@@ -33,6 +33,7 @@ const _displayName = "displayName";
 const _photoUrl = "photoUrl";
 const _uuid = "uuid";
 const _color = "color";
+const _host = "host";
 
 Future<void> init() async {
   if (_isInit) return;
@@ -392,4 +393,25 @@ Future<bool> signOut() async {
   await _auth.signOut();
 
   return true;
+}
+
+Future<void> createHome(
+    String hostEmail,
+    String homeKey,
+    String homeName,
+) async {
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference();
+
+    var result = await _ref.child("$homeKey").runTransaction((data) async {
+      data.value = {
+        _host : hostEmail,
+        _name: homeName,
+      };
+
+      return data;
+    });
+
+    return result.committed;
+  });
 }

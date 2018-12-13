@@ -18,6 +18,7 @@ import 'package:my_wallet/shared_pref/shared_preference.dart';
 
 import 'package:my_wallet/ui/user/login/presentation/view/login_view.dart';
 import 'package:my_wallet/ui/user/register/presentation/view/register_view.dart';
+import 'package:my_wallet/ui/user/homeprofile/presentation/view/homeprofile_view.dart';
 
 import 'package:my_wallet/ui/user/detail/presentation/view/detail_view.dart';
 import 'package:flutter/services.dart';
@@ -34,8 +35,9 @@ void main() async {
   var sharedPref = await SharedPreferences.getInstance();
 
   var user = sharedPref.getString(UserUUID);
+  var profile = sharedPref.getString(prefHomeProfile);
 
-  runApp(MyApp(user != null && user.isNotEmpty));
+  runApp(MyApp(user != null && user.isNotEmpty, profile != null && profile.isNotEmpty));
 }
 
 class _MaterialPageRoute<T> extends MaterialPageRoute<T> {
@@ -56,14 +58,16 @@ class _MaterialPageRoute<T> extends MaterialPageRoute<T> {
 class MyApp extends StatelessWidget {
 
   final bool hasUser;
-  MyApp(this.hasUser) : super();
+  final bool hasProfile;
+
+  MyApp(this.hasUser, this.hasProfile) : super();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My Wallet',
       theme: AppTheme.appTheme,
-      home: hasUser ? MyWalletHome() : Login(),
+      home: hasUser && hasProfile ? MyWalletHome() : hasUser && !hasProfile ? HomeProfile() : Login(),
       debugShowCheckedModeBanner: false,
       showPerformanceOverlay: false,
       showSemanticsDebugger: false,
@@ -99,6 +103,8 @@ class MyApp extends StatelessWidget {
               return MyWalletHome();
             case routes.Register:
               return Register();
+            case routes.HomeProfile:
+              return HomeProfile();
             default:
               Widget paramRoute = _getParamRoute(settings.name);
 

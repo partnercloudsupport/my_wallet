@@ -1,8 +1,6 @@
 import 'package:my_wallet/ui/user/login/data/login_repository.dart';
 import 'package:my_wallet/ca/domain/ca_use_case.dart';
 
-import 'package:flutter/services.dart';
-
 class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
   LoginUseCase() : super(LoginRepository());
 
@@ -21,7 +19,7 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         onNext(true);
       } while(false);
-    } on PlatformException catch(e) {
+    } catch (e) {
       onError(e);
     }
   }
