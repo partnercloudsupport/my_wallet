@@ -18,7 +18,7 @@ import 'package:my_wallet/shared_pref/shared_preference.dart';
 
 import 'package:my_wallet/ui/user/login/presentation/view/login_view.dart';
 import 'package:my_wallet/ui/user/register/presentation/view/register_view.dart';
-import 'package:my_wallet/ui/user/homeprofile/presentation/view/homeprofile_view.dart';
+import 'package:my_wallet/ui/user/homeprofile/main/presentation/view/homeprofile_view.dart';
 
 import 'package:my_wallet/ui/user/detail/presentation/view/detail_view.dart';
 import 'package:flutter/services.dart';

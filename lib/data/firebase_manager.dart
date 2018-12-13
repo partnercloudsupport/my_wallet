@@ -6,9 +6,9 @@ import 'package:my_wallet/data/database_manager.dart' as db;
 import 'package:my_wallet/data/firebase_config.dart' as fbConfig;
 import 'package:synchronized/synchronized.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:my_wallet/data/data.dart';
+import 'package:my_wallet/shared_pref/shared_preference.dart';
 
-FirebaseDatabase _database;
+DatabaseReference _database;
 FirebaseAuth _auth;
 bool _isInit = false;
 
@@ -35,51 +35,72 @@ const _uuid = "uuid";
 const _color = "color";
 const _host = "host";
 const _key = "key";
+const _members = "members";
+const _homes = "homes";
+const _data = "data";
 
-Future<void> init() async {
-  if (_isInit) return;
-
-  _isInit = true;
-  FirebaseApp _app = await FirebaseApp.configure(
+Future<FirebaseApp> createFirebaseApp() async {
+  return await FirebaseApp.configure(
       name: Platform.isIOS ? "MyWallet" : "My Wallet",
       options: Platform.isIOS
           ? const FirebaseOptions(
-              googleAppID: fbConfig.firebase_ios_app_id,
-              gcmSenderID: fbConfig.firebase_gcm_sender_id,
-              projectID: fbConfig.firebase_project_id,
-              databaseURL: fbConfig.firebase_database_url,
-            )
+        googleAppID: fbConfig.firebase_ios_app_id,
+        gcmSenderID: fbConfig.firebase_gcm_sender_id,
+        projectID: fbConfig.firebase_project_id,
+        databaseURL: fbConfig.firebase_database_url,
+      )
           : const FirebaseOptions(
-              googleAppID: fbConfig.firebase_android_app_id,
-              apiKey: fbConfig.firebase_api_key,
-              projectID: fbConfig.firebase_project_id,
-              databaseURL: fbConfig.firebase_database_url,
-            ));
-  _database = FirebaseDatabase(app: _app);
-  _auth = FirebaseAuth.fromApp(_app);
+        googleAppID: fbConfig.firebase_android_app_id,
+        apiKey: fbConfig.firebase_api_key,
+        projectID: fbConfig.firebase_project_id,
+        databaseURL: fbConfig.firebase_database_url,
+      ));
+}
+Future<void> init() async {
+  if (_isInit) return;
 
-  // register listener to Account
-  _database.reference().child(_Account).onChildAdded.listen(_onAccountAdded);
-  _database.reference().child(_Account).onChildChanged.listen(_onAccountChanged);
-  _database.reference().child(_Account).onChildMoved.listen(_onAccountMoved);
-  _database.reference().child(_Account).onChildRemoved.listen(_onAccountRemoved);
+  _lock.synchronized(() async {
+    _auth = FirebaseAuth.fromApp(await createFirebaseApp());
+  });
 
-  // register listener to Category
-  _database.reference().child(_Category).onChildAdded.listen(_onCategoryAdded);
-  _database.reference().child(_Category).onChildChanged.listen(_onCategoryChanged);
-  _database.reference().child(_Category).onChildMoved.listen(_onCategoryMoved);
-  _database.reference().child(_Category).onChildRemoved.listen(_onCategoryRemoved);
+  setupDatabase();
 
-  // register listener to Transactions
-  _database.reference().child(_Transaction).onChildAdded.listen(_onTransactionAdded);
-  _database.reference().child(_Transaction).onChildChanged.listen(_onTransactionChanged);
-  _database.reference().child(_Transaction).onChildMoved.listen(_onTransactionMoved);
-  _database.reference().child(_Transaction).onChildRemoved.listen(_onTransactionRemoved);
+  _isInit = true;
+}
+Future<void> setupDatabase() async {
+  _lock.synchronized(() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String homeKey = pref.getString(prefHomeProfile);
 
-  _database.reference().child(_User).onChildAdded.listen(_onUserAdded);
-  _database.reference().child(_User).onChildChanged.listen(_onUserChanged);
-  _database.reference().child(_User).onChildMoved.listen(_onUserMoved);
-  _database.reference().child(_User).onChildRemoved.listen(_onUserRemoved);
+    if(homeKey == null) {
+      _database = FirebaseDatabase(app: await createFirebaseApp()).reference();
+    } else {
+      _database = FirebaseDatabase(app: await createFirebaseApp()).reference().child(_data).child(homeKey);
+    }
+
+    // register listener to Account
+    _database.reference().child(_Account).onChildAdded.listen(_onAccountAdded);
+    _database.reference().child(_Account).onChildChanged.listen(_onAccountChanged);
+    _database.reference().child(_Account).onChildMoved.listen(_onAccountMoved);
+    _database.reference().child(_Account).onChildRemoved.listen(_onAccountRemoved);
+
+    // register listener to Category
+    _database.reference().child(_Category).onChildAdded.listen(_onCategoryAdded);
+    _database.reference().child(_Category).onChildChanged.listen(_onCategoryChanged);
+    _database.reference().child(_Category).onChildMoved.listen(_onCategoryMoved);
+    _database.reference().child(_Category).onChildRemoved.listen(_onCategoryRemoved);
+
+    // register listener to Transactions
+    _database.reference().child(_Transaction).onChildAdded.listen(_onTransactionAdded);
+    _database.reference().child(_Transaction).onChildChanged.listen(_onTransactionChanged);
+    _database.reference().child(_Transaction).onChildMoved.listen(_onTransactionMoved);
+    _database.reference().child(_Transaction).onChildRemoved.listen(_onTransactionRemoved);
+
+    _database.reference().child(_User).onChildAdded.listen(_onUserAdded);
+    _database.reference().child(_User).onChildChanged.listen(_onUserChanged);
+    _database.reference().child(_User).onChildMoved.listen(_onUserMoved);
+    _database.reference().child(_User).onChildRemoved.listen(_onUserRemoved);
+  });
 }
 
 // ####################################################################################################
@@ -325,75 +346,81 @@ Future<bool> deleteUser(User user) async {
 }
 
 Future<User> getCurrentUser() async {
-  User _user;
+  return _lock.synchronized(() async {
+    User _user;
 
-  try {
-    FirebaseUser user = await _auth.currentUser();
+    try {
+      FirebaseUser user = await _auth.currentUser();
 
-    if (user != null) {
-      var photoUrlList = user.providerData != null && user.providerData.isNotEmpty
-          ? user.providerData.where((f) => f.photoUrl != null && f.photoUrl.isNotEmpty).map((f) => f.photoUrl).toList()
-          : [];
+      if (user != null) {
+        var photoUrlList = user.providerData != null && user.providerData.isNotEmpty
+            ? user.providerData.where((f) => f.photoUrl != null && f.photoUrl.isNotEmpty).map((f) => f.photoUrl).toList()
+            : [];
 
-      DatabaseReference _ref = _database.reference().child(_User);
-      var colorSnapshot = await _ref.child(_User).child(user.uid).child(_color).once();
+        DatabaseReference _ref = _database.reference().child(_User);
+        var colorSnapshot = await _ref.child(_User).child(user.uid).child(_color).once();
 
-      _user = User(
-        user.uid,
-        user.email,
-        user.displayName,
-        photoUrlList != null && photoUrlList.isNotEmpty ? photoUrlList[0] : null,
-          colorSnapshot.value == null ? 0 : colorSnapshot.value
-      );
+        _user = User(
+            user.uid,
+            user.email,
+            user.displayName,
+            photoUrlList != null && photoUrlList.isNotEmpty ? photoUrlList[0] : null,
+            colorSnapshot.value == null ? 0 : colorSnapshot.value
+        );
+      }
+    } on Platform catch (e) {
+      print("Error: ${e.toString()}");
     }
-  } on Platform catch (e) {
-    print("Error: ${e.toString()}");
-  }
 
-  return _user;
+    return _user;
+  });
 }
 
 Future<User> login(String email, String password) async {
-  FirebaseUser user = await _auth.signInWithEmailAndPassword(email: email, password: password);
+  return _lock.synchronized(() async {
+    FirebaseUser user = await _auth.signInWithEmailAndPassword(email: email, password: password);
 
-  if (user != null) {
-    DatabaseReference _ref = _database.reference().child(_User);
+    if (user != null) {
+      DatabaseReference _ref = _database.reference().child(_User);
 
-    var colorSnapshot = await _ref.child(_User).child(user.uid).child(_color).once();
-    var color = colorSnapshot.value;
+      var colorSnapshot = await _ref.child(_User).child(user.uid).child(_color).once();
+      var color = colorSnapshot.value;
 
-    return User(user.uid, user.email, user.displayName, user.photoUrl, color);
-  }
+      return User(user.uid, user.email, user.displayName, user.photoUrl, color);
+    }
 
-  throw Exception("Failed to signin to firebase");
+    throw Exception("Failed to signin to firebase");
+  });
 }
 
 Future<bool> checkCurrentUser() async {
-  return await _auth.currentUser() != null;
+  return _lock.synchronized(() async => await _auth.currentUser() != null);
 }
 
 Future<bool> registerEmail(String email, String password) async {
-  FirebaseUser user = await _auth.createUserWithEmailAndPassword(email: email, password: password);
-
-  return user != null;
+  return _lock.synchronized(() async => await _auth.createUserWithEmailAndPassword(email: email, password: password) != null);
 }
 
 Future<bool> updateDisplayName(String displayName) async {
-  FirebaseUser user = await _auth.currentUser();
+  return _lock.synchronized(() async {
+    FirebaseUser user = await _auth.currentUser();
 
-  if(user == null) throw Exception("No user available");
+    if(user == null) throw Exception("No user available");
 
-  UserUpdateInfo userUpdateInfo = UserUpdateInfo();
-  userUpdateInfo.displayName = displayName;
-  await user.updateProfile(userUpdateInfo);
+    UserUpdateInfo userUpdateInfo = UserUpdateInfo();
+    userUpdateInfo.displayName = displayName;
+    await user.updateProfile(userUpdateInfo);
 
-  return true;
+    return true;
+  });
 }
 
 Future<bool> signOut() async {
-  await _auth.signOut();
+  return _lock.synchronized(() async {
+    await _auth.signOut();
 
-  return true;
+    return true;
+  });
 }
 
 Future<void> createHome(
@@ -402,7 +429,7 @@ Future<void> createHome(
     String homeName,
 ) {
   return _lock.synchronized(() async {
-    DatabaseReference _ref = _database.reference();
+    DatabaseReference _ref = _database.reference().child(_homes);
 
     var result = await _ref.child("$homeKey").runTransaction((data) async {
       data.value = {
@@ -419,10 +446,46 @@ Future<void> createHome(
 
 Future<bool> isHost(User user) {
   return _lock.synchronized(() async {
-    DatabaseReference _ref = _database.reference();
+    DatabaseReference _ref = _database.reference().child(_homes);
 
     DataSnapshot snapshot = await _ref.child(user.uuid).once();
 
     return snapshot != null && snapshot.value != null;
+  });
+}
+
+Future<Home> searchUserHome(User user) {
+  return _lock.synchronized(() async {
+    DataSnapshot _allHomes = await _database.reference().child(_homes).once();
+
+    Home home;
+    do {
+      if (_allHomes == null) break;
+
+      if (_allHomes.value == null) break;
+
+      if (!(_allHomes.value is Map<dynamic, dynamic>)) break;
+
+      Map map = _allHomes.value as Map<dynamic, dynamic>;
+
+      for (dynamic key in map.keys) {
+        dynamic value = map[key];
+
+        if(value[_members] != null && value[_members] is List) {
+          List list = value[_members];
+
+          Iterable found = list.where((f) => f[_email] == user.email);
+
+          if(found.length >= 1) {
+            home = Home(key, value[_host], value[_name]);
+
+            break;
+          }
+        }
+      }
+
+    } while (false);
+
+    return home;
   });
 }

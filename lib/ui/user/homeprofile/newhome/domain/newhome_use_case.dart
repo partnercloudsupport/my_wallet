@@ -1,9 +1,9 @@
 import 'package:my_wallet/ca/domain/ca_use_case.dart';
 
-import 'package:my_wallet/ui/user/homeprofile/data/homeprofile_repository.dart';
+import 'package:my_wallet/ui/user/homeprofile/newhome/data/newhome_repository.dart';
 
-class HomeProfileUseCase extends CleanArchitectureUseCase<HomeProfileRepository> {
-  HomeProfileUseCase() : super(HomeProfileRepository());
+class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
+  NewHomeUseCase() : super(NewHomeRepository());
 
   void createHomeProfile(String name, onNext<bool> next, onError err) async {
     try {
@@ -13,7 +13,7 @@ class HomeProfileUseCase extends CleanArchitectureUseCase<HomeProfileRepository>
       // create this data reference on Firebase database
       String homeKey = await repo.createHome(host, name);
 
-      if(homeKey == null) throw HomeProfileException("Failed to create this new home");
+      if(homeKey == null) throw NewHomeException("Failed to create this new home");
 
       // save this key to shared preference
       await repo.saveKey(homeKey);

@@ -141,3 +141,16 @@ class User {
 
   User(this.uuid, this.email, this.displayName, this.photoUrl, this.color);
 }
+
+class Home {
+  final String host;
+  final String key;
+  final String name;
+
+  Home(this.key, this.host, this.name);
+
+  @override
+  String toString() {
+    return "$key - $host - $name";
+  }
+}
