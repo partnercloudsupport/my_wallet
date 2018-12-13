@@ -29,6 +29,7 @@ dependencies:
   gradient_app_bar: any
   auto_size_text: any
   keyboard_visibility: any
+  image_picker: any
 
 dev_dependencies:
   flutter_test:
@@ -45,6 +46,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/nartus.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

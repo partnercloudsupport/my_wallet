@@ -33,12 +33,9 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
       body: Padding(
         padding: EdgeInsets.all(20.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          FlutterLogo(
-            size: 150.0,
-            curve: Curves.bounceInOut,
-          ),
+          Image.asset("assets/nartus.png"),
           Column(
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
