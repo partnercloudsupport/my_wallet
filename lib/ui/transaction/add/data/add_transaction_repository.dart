@@ -1,6 +1,6 @@
 import 'package:my_wallet/ca/data/ca_repository.dart';
 import 'package:my_wallet/data/database_manager.dart' as _db;
-import 'package:my_wallet/data/firebase_manager.dart' as _fm;
+import 'package:my_wallet/data/firebase/database.dart' as _fm;
 import 'package:my_wallet/ui/transaction/add/domain/add_transaction_exception.dart';
 import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
 import 'package:my_wallet/shared_pref/shared_preference.dart';

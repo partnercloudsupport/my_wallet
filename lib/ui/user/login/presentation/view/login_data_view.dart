@@ -5,4 +5,5 @@ abstract class LoginDataView extends DataView {
   void onSignInFailed(Exception e);
 
   void onUserHomeResult(bool exist);
+  void onUserHomeFailed(Exception e);
 }

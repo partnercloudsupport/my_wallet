@@ -8,7 +8,8 @@ class GoHomeUseCase extends CleanArchitectureUseCase<GoHomeRepository> {
   void goHome(String homeKey, onNext<bool> next) async {
     await repo.updateHomeReference(homeKey);
 
-    await repo.switchReference();
+    await repo.switchReference(homeKey);
+
     next(true);
   }
 }

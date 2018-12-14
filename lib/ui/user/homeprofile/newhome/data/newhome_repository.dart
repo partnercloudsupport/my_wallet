@@ -2,7 +2,8 @@ import 'package:my_wallet/ca/data/ca_repository.dart';
 import 'package:flutter/services.dart';
 
 import 'package:my_wallet/data/data.dart';
-import 'package:my_wallet/data/firebase_manager.dart' as _fm;
+import 'package:my_wallet/data/firebase/authentication.dart' as _fm;
+import 'package:my_wallet/data/firebase/database.dart' as _fdb;
 
 import 'package:my_wallet/shared_pref/shared_preference.dart';
 import 'package:my_wallet/ui/user/homeprofile/newhome/data/newhome_exception.dart';
@@ -39,8 +40,8 @@ class NewHomeRepository extends CleanArchitectureRepository {
     pref.setString(prefHomeProfile, homeKey);
   }
 
-  Future<void> updateDatabaseReference() {
-    return _fbRepo.updateDatabaseReference();
+  Future<void> updateDatabaseReference(String key) {
+    return _fbRepo.updateDatabaseReference(key);
   }
 
   Future<void> saveUserToHome(User user) {
@@ -89,12 +90,12 @@ class _NewHomeFirebaseRepository {
     }
   }
 
-  Future<void> updateDatabaseReference() {
-    return _fm.setupDatabase();
+  Future<void> updateDatabaseReference(String homeKey) {
+    return _fdb.setupDatabase(homeKey);
   }
 
   Future<void> saveUserToHome(User user) {
     Random random = Random();
-    return _fm.addUser(user, color: random.nextInt(0xFFEEEEEE));
+    return _fdb.addUser(user, color: random.nextInt(0xFFEEEEEE));
   }
 }

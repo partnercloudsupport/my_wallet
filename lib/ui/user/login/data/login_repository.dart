@@ -1,5 +1,6 @@
 import 'package:my_wallet/ca/data/ca_repository.dart';
-import 'package:my_wallet/data/firebase_manager.dart' as fm;
+import 'package:my_wallet/data/firebase/authentication.dart' as fm;
+import 'package:my_wallet/data/firebase/database.dart' as fdb;
 import 'package:my_wallet/data/database_manager.dart' as db;
 import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/utils.dart' as Utils;
@@ -50,8 +51,8 @@ class LoginRepository extends CleanArchitectureRepository{
     await sharePref.setString(UserUUID, uuid);
   }
 
-  Future<void> switchReference() {
-    return _fbRepo.switchReference();
+  Future<void> switchReference(String key) {
+    return _fbRepo.switchReference(key);
   }
 
   Future<void> saveUser(User user) {
@@ -77,7 +78,7 @@ class _LoginFirebaseRepository {
     try {
       return await fm.login(email, password);
     } on PlatformException catch (e) {
-      throw LoginException("${e.message} : ${e.details}");
+      throw LoginException("${e.message} ${e.details == null ? "" : e.details}");
     } catch (e) {
       throw e;
     }
@@ -87,12 +88,12 @@ class _LoginFirebaseRepository {
     return fm.isHost(user);
   }
 
-  Future<void> switchReference() {
-    return fm.setupDatabase();
+  Future<void> switchReference(String homeKey) {
+    return fdb.setupDatabase(homeKey);
   }
 
   Future<void> saveUser(User user) {
-    return fm.addUser(user, color: user.color == null ? Random().nextInt(0xEEEEEEEE) : user.color);
+    return fdb.addUser(user, color: user.color == null ? Random().nextInt(0xEEEEEEEE) : user.color);
   }
 
   Future<User> getUserDetailFromFbDatabase(String homeKey, User user) {

@@ -12,7 +12,8 @@ import 'package:my_wallet/ui/account/create/presentation/view/create_account_vie
 import 'package:my_wallet/ui/category/list/presentation/view/list_category.dart';
 import 'package:my_wallet/ui/category/create/presentation/view/create_category_view.dart';
 
-import 'package:my_wallet/data/firebase_manager.dart' as fm;
+import 'package:my_wallet/data/firebase/database.dart' as fdb;
+import 'package:my_wallet/data/firebase/authentication.dart' as auth;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_wallet/shared_pref/shared_preference.dart';
 
@@ -23,6 +24,10 @@ import 'package:my_wallet/ui/user/homeprofile/main/presentation/view/homeprofile
 import 'package:my_wallet/ui/user/detail/presentation/view/detail_view.dart';
 import 'package:flutter/services.dart';
 
+import 'package:my_wallet/firebase_config.dart' as fbConfig;
+import 'package:firebase_core/firebase_core.dart';
+import 'dart:io' show Platform;
+
 void main() async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitDown,
@@ -30,12 +35,30 @@ void main() async {
   ]);
   await SystemChrome.setEnabledSystemUIOverlays([]);
 
-  await fm.init();
+  FirebaseApp _app = await FirebaseApp.configure(
+      name: Platform.isIOS ? "MyWallet" : "My Wallet",
+      options: Platform.isIOS
+          ? const FirebaseOptions(
+        googleAppID: fbConfig.firebase_ios_app_id,
+        gcmSenderID: fbConfig.firebase_gcm_sender_id,
+        projectID: fbConfig.firebase_project_id,
+        databaseURL: fbConfig.firebase_database_url,
+      )
+          : const FirebaseOptions(
+        googleAppID: fbConfig.firebase_android_app_id,
+        apiKey: fbConfig.firebase_api_key,
+        projectID: fbConfig.firebase_project_id,
+        databaseURL: fbConfig.firebase_database_url,
+      ));
+
+  await auth.init(_app);
 
   var sharedPref = await SharedPreferences.getInstance();
 
   var user = sharedPref.getString(UserUUID);
   var profile = sharedPref.getString(prefHomeProfile);
+
+  fdb.init(_app, homeProfile: profile);
 
   runApp(MyApp(user != null && user.isNotEmpty, profile != null && profile.isNotEmpty));
 }
@@ -200,4 +223,43 @@ class MyApp extends StatelessWidget {
 
     return null;
   }
+}
+
+class LifecycleEventHandler extends WidgetsBindingObserver {
+  LifecycleEventHandler({this.resumeCallBack, this.suspendingCallBack});
+
+  final Future<void> resumeCallBack;
+  final Future<void> suspendingCallBack;
+
+//  @override
+//  Future<bool> didPopRoute()
+
+//  @override
+//  void didHaveMemoryPressure()
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.suspending:
+//        fm.dispose();
+        break;
+      case AppLifecycleState.resumed:
+//        fm.resume();
+        break;
+    }
+  }
+
+//  @override
+//  void didChangeLocale(Locale locale)
+
+//  @override
+//  void didChangeTextScaleFactor()
+
+//  @override
+//  void didChangeMetrics();
+
+//  @override
+//  Future<bool> didPushRoute(String route)
 }

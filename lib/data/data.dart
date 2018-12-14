@@ -140,6 +140,11 @@ class User {
   final int color;
 
   User(this.uuid, this.email, this.displayName, this.photoUrl, this.color);
+
+  @override
+  String toString() {
+    return "$email - $displayName - $color";
+  }
 }
 
 class Home {

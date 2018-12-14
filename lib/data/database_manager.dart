@@ -499,7 +499,7 @@ class _Database {
 
     var result = await db.rawQuery(sql);
 
-    db.close();
+    await db.close();
 
     return result;
   }
@@ -555,7 +555,7 @@ class _Database {
 
     var result = await db.delete(table, where: where, whereArgs: whereArgs);
 
-    db.close();
+    await db.close();
 
     _notifyObservers(table);
 
@@ -567,7 +567,7 @@ class _Database {
 
     var result = await db.update(table, item, where: where, whereArgs: whereArgs);
 
-    db.close();
+    await db.close();
 
     _notifyObservers(table);
 
@@ -576,11 +576,13 @@ class _Database {
 
   Future<void> _deleteDb() async {
     Database db = await _openDatabase();
-    await db.delete(_tableUser);
-    await db.delete(_tableTransactions);
-    await db.delete(_tableAccounts);
-    await db.delete(_tableBudget);
-    await db.delete(_tableTransactions);
+    await db.execute("DELETE FROM $_tableUser");
+    await db.execute("DELETE FROM $_tableTransactions");
+    await db.execute("DELETE FROM $_tableAccounts");
+    await db.execute("DELETE FROM $_tableBudget");
+    await db.execute("DELETE FROM $_tableTransactions");
+
+    await db.close();
   }
 
   void _notifyObservers(String table) {

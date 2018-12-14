@@ -18,7 +18,7 @@ class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
       // save this key to shared preference
       await repo.saveKey(homeKey);
 
-      await repo.updateDatabaseReference();
+      await repo.updateDatabaseReference(homeKey);
 
       await repo.saveUserToHome(host);
 
@@ -44,7 +44,7 @@ class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
       await repo.saveKey(home.key);
 
       // and finally update database reference
-      await repo.updateDatabaseReference();
+      await repo.updateDatabaseReference(home.key);
 
       await repo.saveUserToHome(myProfile);
 

@@ -4,7 +4,7 @@ import 'package:my_wallet/ui/user/register/domain/register_exception.dart';
 
 import 'package:my_wallet/data/data.dart';
 export 'package:my_wallet/data/data.dart';
-import 'package:my_wallet/data/firebase_manager.dart' as fm;
+import 'package:my_wallet/data/firebase/authentication.dart' as fm;
 
 import 'package:flutter/services.dart';
 import 'package:my_wallet/utils.dart' as Utils;

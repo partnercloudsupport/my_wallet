@@ -1,6 +1,6 @@
 import 'package:my_wallet/ca/data/ca_repository.dart';
 
-import 'package:my_wallet/data/firebase_manager.dart' as _fm;
+import 'package:my_wallet/data/firebase/authentication.dart' as _fm;
 import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/ui/user/homeprofile/main/data/homeprofile_entity.dart';
 

@@ -116,6 +116,12 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
     Navigator.pushReplacementNamed(context, exist ? routes.MyHome : routes.HomeProfile);
   }
 
+  void onUserHomeFailed(Exception e) {
+    print(e.toString());
+
+    onUserHomeResult(true);
+  }
+
   void _register() {
     Navigator.pushNamed(context, routes.Register);
   }
