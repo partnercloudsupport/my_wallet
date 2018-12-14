@@ -1,6 +1,6 @@
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter/material.dart';
-import 'package:my_wallet/style/app_theme.dart';
+import 'package:flutter/scheduler.dart';
 
 class NumberInputPad extends StatefulWidget {
   final Function(String, String) _onValueChanged;
@@ -22,6 +22,8 @@ class NumberInputPadState extends State<NumberInputPad> {
   bool isDecimal = false;
 
   bool _showNumPad = true;
+
+  GlobalKey stickyKey = new GlobalKey();
 
   @override
   void initState() {
@@ -48,8 +50,10 @@ class NumberInputPadState extends State<NumberInputPad> {
       "8", "9", "0", "."];
 
     return Align(
+//      key: fullScreenKey,
       alignment: Alignment.bottomCenter,
       child: _showNumPad ? StaggeredGridView.countBuilder(
+        key: stickyKey,
         shrinkWrap: true,
         primary: false,
         crossAxisCount: 4,
@@ -130,5 +134,17 @@ class NumberInputPadState extends State<NumberInputPad> {
     setState(() {
       _showNumPad = true;
     });
+  }
+
+  double calculateHeight() {
+    var height = 0.0;
+    final keyContext = stickyKey.currentContext;
+
+    if(keyContext != null) {
+      final RenderBox numPadBox = keyContext.findRenderObject();
+      height = numPadBox.size.height;
+    }
+
+    return height;
   }
 }

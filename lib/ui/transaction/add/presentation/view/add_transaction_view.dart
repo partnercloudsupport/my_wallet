@@ -7,6 +7,8 @@ import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
 import 'package:intl/intl.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 
+import 'package:flutter/scheduler.dart';
+
 class AddTransaction extends StatefulWidget {
   final int transactionId;
 
@@ -26,6 +28,16 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   final tables = [observer.tableAccount, observer.tableCategory, observer.tableUser];
 
   GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
+  /// to adjust the detail column/list base on screen height
+  final minTextFactor = 0.9;
+  final textFactorStep = 0.05;
+  GlobalKey columnKey = GlobalKey();
+  var itemCount = 0;
+  var textFactor = 1.0;
+  bool needList = false;
+  var maxRowHeight = 0.0;
+  /// END adjusting flexible column/list
+
 
   var _number = "";
   var _decimal = "";
@@ -68,6 +80,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   @override
   void initState() {
+    SchedulerBinding.instance.addPostFrameCallback((_) => _calculateColumnHeight());
     super.initState();
 
     observer.registerDatabaseObservable(tables, this);
@@ -101,50 +114,27 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
       ],
     );
 
+    List<Widget> content = _detailContent();
+    itemCount = content.length;
+
     return GradientScaffold(
       appBar: appBar,
       body: Column(
           children: <Widget>[
               Expanded(
                 child: Container(
+                  alignment: Alignment.center,
                   color: AppTheme.white,
-                  child: Column(
+                  child: needList ?
+                      ListView(
+                        shrinkWrap: true,
+                        children: content,
+                      )
+                  :Column(
+                    key: columnKey,
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      ConversationRow(
-                          widget.transactionId == null ? "Create new" : "An",
-                          _type.name,
-                          AppTheme.darkBlue,
-                          onPressed: _showTransactionTypeSelection),
-                      ConversationRow(
-                        widget.transactionId == null ? "of" : "valued of",
-                        _numberFormat.format(_toNumber(_number, _decimal)),
-                        TransactionType.isIncome(_type) ? AppTheme.tealAccent : TransactionType.isExpense(_type) ? AppTheme.pinkAccent : AppTheme.blueGrey,
-                        style: Theme.of(context).textTheme.display2,),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <Widget>[
-                          ConversationRow(
-                            "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
-                            _account == null ? "Select Account" : _account.name,
-                            AppTheme.darkGreen,
-                            onPressed: _showSelectAccount,),
-                          ConversationRow(
-                            "by ",
-                            _user == null ? "Unknown" : _user.firstName,
-                            AppTheme.darkGreen,)
-                        ],
-                      ),
-                      ConversationRow(
-                          "for",
-                          _category == null ? "Select Category" : _category.name,
-                          AppTheme.brightPink,
-                          onPressed: _showSelectCategory
-                      ),
-                      DateTimeRow(_date, _showDatePicker, _showTimePicker),
-                    ],
+                    children: content,
                   ),
                 ),
               ),
@@ -155,6 +145,78 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
           ],
         ),
     );
+  }
+
+  List<Widget> _detailContent() {
+    return <Widget> [
+      ConversationRow(
+        widget.transactionId == null ? "Create new" : "An",
+        _type.name,
+        AppTheme.darkBlue,
+        onPressed: _showTransactionTypeSelection,
+        onSizeChanged: _recalculateSize,
+          textSizeFactor: textFactor),
+      ConversationRow(
+        widget.transactionId == null ? "of" : "valued of",
+        _numberFormat.format(_toNumber(_number, _decimal)),
+        TransactionType.isIncome(_type) ? AppTheme.tealAccent : TransactionType.isExpense(_type) ? AppTheme.pinkAccent : AppTheme.blueGrey,
+        style: Theme.of(context).textTheme.display2,
+        onSizeChanged: _recalculateSize,
+          textSizeFactor: textFactor),
+      Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          ConversationRow(
+            "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
+            _account == null ? "Select Account" : _account.name,
+            AppTheme.darkGreen,
+            onPressed: _showSelectAccount,
+            onSizeChanged: _recalculateSize,
+              textSizeFactor: textFactor),
+          ConversationRow(
+            "by ",
+            _user == null ? "Unknown" : _user.firstName,
+            AppTheme.darkGreen,
+            onSizeChanged: _recalculateSize,
+              textSizeFactor: textFactor)
+        ],
+      ),
+      ConversationRow(
+        "for",
+        _category == null ? "Select Category" : _category.name,
+        AppTheme.brightPink,
+        onPressed: _showSelectCategory,
+        onSizeChanged: _recalculateSize,
+          textSizeFactor: textFactor
+      ),
+      DateTimeRow(_date, _showDatePicker, _showTimePicker, onSizeChanged: _recalculateSize,
+          textSizeFactor: textFactor),
+    ];
+  }
+
+  void _recalculateSize(Size size) {
+    if(size.height > maxRowHeight) {
+      maxRowHeight = size.height;
+
+      _calculateColumnHeight();
+    }
+  }
+
+  void _calculateColumnHeight() {
+    final columnContext = columnKey.currentContext;
+
+    if(columnContext != null) {
+      if(maxRowHeight*itemCount > columnContext.size.height) {
+        if(textFactor <= minTextFactor) {
+          needList = true;
+          textFactor = 1.0;
+        }
+        else textFactor-= textFactorStep;
+
+        setState(() {});
+      }
+    }
   }
 
   void _showTransactionTypeSelection() {
