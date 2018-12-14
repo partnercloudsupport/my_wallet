@@ -8,6 +8,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.8"
+  auto_size_text:
+    dependency: "direct main"
+    description:
+      name: auto_size_text
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -50,6 +57,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.2"
+  firebase_auth:
+    dependency: "direct main"
+    description:
+      name: firebase_auth
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.6"
   firebase_core:
     dependency: "direct main"
     description:
@@ -81,6 +95,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  gradient_app_bar:
+    dependency: "direct main"
+    description:
+      name: gradient_app_bar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1"
+  image_picker:
+    dependency: "direct main"
+    description:
+      name: image_picker
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.10"
   intl:
     dependency: transitive
     description:
@@ -88,6 +116,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.15.7"
+  keyboard_visibility:
+    dependency: "direct main"
+    description:
+      name: keyboard_visibility
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.0"
   logging:
     dependency: transitive
     description:
@@ -130,6 +165,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  shared_preferences:
+    dependency: "direct main"
+    description:
+      name: shared_preferences
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.3"
   sky_engine:
     dependency: transitive
     description: flutter
