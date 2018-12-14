@@ -22,6 +22,9 @@ import 'package:my_wallet/ui/user/register/presentation/view/register_view.dart'
 import 'package:my_wallet/ui/user/homeprofile/main/presentation/view/homeprofile_view.dart';
 
 import 'package:my_wallet/ui/user/detail/presentation/view/detail_view.dart';
+import 'package:my_wallet/ui/budget/list/presentation/view/list_view.dart';
+import 'package:my_wallet/ui/budget/detail/presentation/view/detail_view.dart';
+
 import 'package:flutter/services.dart';
 
 import 'package:my_wallet/firebase_config.dart' as fbConfig;
@@ -128,6 +131,10 @@ class MyApp extends StatelessWidget {
               return Register();
             case routes.HomeProfile:
               return HomeProfile();
+            case routes.ListBudgets:
+              return ListBudgets();
+            case routes.AddBudget:
+              return BudgetDetail("Create budget");
             default:
               Widget paramRoute = _getParamRoute(settings.name);
 

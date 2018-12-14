@@ -19,6 +19,9 @@ class routes {
   static const MyHome = "MyHome";
   static const Register = "Register";
 
+  static const ListBudgets = "ListBudgets";
+  static const AddBudget = "AddBudget";
+
   static String EditTransaction(int id) {
     return "$AddTransaction/$id";
   }

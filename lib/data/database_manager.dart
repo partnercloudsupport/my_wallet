@@ -5,6 +5,8 @@ import 'package:my_wallet/data/data.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:my_wallet/data/data_observer.dart';
 
+import 'package:flutter/foundation.dart';
+
 // #############################################################################################################################
 // database manager
 // #############################################################################################################################
@@ -90,6 +92,17 @@ Future<double> sumTransactionsByDay(DateTime day, TransactionType type) async {
     var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startOfDay AND $endOfDay) AND $_transType = ${type.id}"));
 
     return sum[0].values.first ?? 0.0;
+}
+
+Future<double> sumTransactionsByCategory({@required int catId, @required DateTime start, @required DateTime end}) async {
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN ${start.millisecondsSinceEpoch} AND ${end.millisecondsSinceEpoch}) AND $_transCategory = $catId"));
+
+  return sum[0].values.first ?? 0.0;
+}
+
+Future<double> sumAllBudget(DateTime start, DateTime end) async {
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE ($_budgetStart >= ${start.millisecondsSinceEpoch} and $_budgetEnd <= ${end.millisecondsSinceEpoch})"));
+  return sum[0].values.first ?? 0.0;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------
@@ -233,6 +246,12 @@ Future<List<User>> queryUserWithUuid(String uuid) async {
   List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableUser, where: "$_userUid = ?", whereArgs: [ uuid ]));
 
   return map == null ? null : map.map((f) => _toUser(f)).toList();
+}
+
+Future<double> queryBudgetAmount({@required int catId, @required DateTime start, @required DateTime end}) async {
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT $_budgetPerMonth FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart > ${start.millisecondsSinceEpoch} AND $_budgetEnd < ${end.millisecondsSinceEpoch}"));
+
+  return sum == null || sum.isEmpty ? 0.0 : sum[0].values.first ?? 0.0;
 }
 
 Future<int> generateAccountId() {

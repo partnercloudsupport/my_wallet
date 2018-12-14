@@ -18,6 +18,7 @@ class _LeftDrawerState extends CleanArchitectureView<LeftDrawer, LeftDrawerPrese
     _DrawerTitle("Finance"),
     _DrawerItem("Categories", routes.ListCategories),
     _DrawerItem("Accounts", routes.ListAccounts),
+    _DrawerItem("Budgets", routes.ListBudgets),
     _DrawerTitle("Profile"),
     _DrawerItem("Your profile", routes.UserProfile)
   ];
