@@ -53,13 +53,10 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   List<Account> _accountList = [];
   List<AppCategory> _categoryList = [];
 
-  var keyboardSubscriptionId;
 
   @override
   void init() {
     presenter.dataView = this;
-
-    keyboardSubscriptionId = KeyboardVisibilityNotification().addNewListener(onShow: () => setState(() => numPadKey.currentState.hide()));
   }
 
   @override
@@ -75,7 +72,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
         presenter.loadTransactionDetail(widget.transactionId);
       }
     }
-
   }
 
   @override
