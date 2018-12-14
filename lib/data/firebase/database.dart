@@ -2,7 +2,7 @@ import 'package:my_wallet/data/firebase/common.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:my_wallet/data/database_manager.dart' as db;
-import 'package:my_wallet/shared_pref/shared_preference.dart';
+import 'dart:async';
 
 const _data = "data";
 
@@ -12,6 +12,8 @@ bool _isInit = false;
 bool _isDbSetup = false;
 
 FirebaseApp _app;
+
+List<StreamSubscription> subs = [];
 
 Future<void> init(FirebaseApp app, {String homeProfile}) async {
   if (_isInit) return;
@@ -31,27 +33,27 @@ Future<void> setupDatabase(final String homeKey) async {
     _database = FirebaseDatabase(app: _app).reference().child(_data).child(homeKey);
 
     // register listener to Account
-    _database.reference().child(tblAccount).onChildAdded.listen(_onAccountAdded);
-    _database.reference().child(tblAccount).onChildChanged.listen(_onAccountChanged);
-    _database.reference().child(tblAccount).onChildMoved.listen(_onAccountMoved);
-    _database.reference().child(tblAccount).onChildRemoved.listen(_onAccountRemoved);
+    subs.add(_database.reference().child(tblAccount).onChildAdded.listen(_onAccountAdded));
+    subs.add(_database.reference().child(tblAccount).onChildChanged.listen(_onAccountChanged));
+    subs.add(_database.reference().child(tblAccount).onChildMoved.listen(_onAccountMoved));
+    subs.add(_database.reference().child(tblAccount).onChildRemoved.listen(_onAccountRemoved));
 
     // register listener to Category
-    _database.reference().child(tblCategory).onChildAdded.listen(_onCategoryAdded);
-    _database.reference().child(tblCategory).onChildChanged.listen(_onCategoryChanged);
-    _database.reference().child(tblCategory).onChildMoved.listen(_onCategoryMoved);
-    _database.reference().child(tblCategory).onChildRemoved.listen(_onCategoryRemoved);
+    subs.add(_database.reference().child(tblCategory).onChildAdded.listen(_onCategoryAdded));
+    subs.add(_database.reference().child(tblCategory).onChildChanged.listen(_onCategoryChanged));
+    subs.add(_database.reference().child(tblCategory).onChildMoved.listen(_onCategoryMoved));
+    subs.add(_database.reference().child(tblCategory).onChildRemoved.listen(_onCategoryRemoved));
 
     // register listener to Transactions
-    _database.reference().child(tblTransaction).onChildAdded.listen(_onTransactionAdded);
-    _database.reference().child(tblTransaction).onChildChanged.listen(_onTransactionChanged);
-    _database.reference().child(tblTransaction).onChildMoved.listen(_onTransactionMoved);
-    _database.reference().child(tblTransaction).onChildRemoved.listen(_onTransactionRemoved);
+    subs.add(_database.reference().child(tblTransaction).onChildAdded.listen(_onTransactionAdded));
+    subs.add(_database.reference().child(tblTransaction).onChildChanged.listen(_onTransactionChanged));
+    subs.add(_database.reference().child(tblTransaction).onChildMoved.listen(_onTransactionMoved));
+    subs.add(_database.reference().child(tblTransaction).onChildRemoved.listen(_onTransactionRemoved));
 
-    _database.reference().child(tblUser).onChildAdded.listen(_onUserAdded);
-    _database.reference().child(tblUser).onChildChanged.listen(_onUserChanged);
-    _database.reference().child(tblUser).onChildMoved.listen(_onUserMoved);
-    _database.reference().child(tblUser).onChildRemoved.listen(_onUserRemoved);
+    subs.add(_database.reference().child(tblUser).onChildAdded.listen(_onUserAdded));
+    subs.add(_database.reference().child(tblUser).onChildChanged.listen(_onUserChanged));
+    subs.add(_database.reference().child(tblUser).onChildMoved.listen(_onUserMoved));
+    subs.add(_database.reference().child(tblUser).onChildRemoved.listen(_onUserRemoved));
   });
 }
 
@@ -294,29 +296,10 @@ Future<bool> deleteUser(User user) async {
 }
 
 Future<bool> removeRefenrence() async {
-  return _lock.synchronized(() {
-//    // register listener to Account
-//    _database.reference().child(tblAccount).onChildAdded.listen(_onAccountAdded);
-//    _database.reference().child(tblAccount).onChildChanged.listen(_onAccountChanged);
-//    _database.reference().child(tblAccount).onChildMoved.listen(_onAccountMoved);
-//    _database.reference().child(tblAccount).onChildRemoved.listen(_onAccountRemoved);
-//
-//    // register listener to Category
-//    _database.reference().child(tblCategory).onChildAdded.listen(_onCategoryAdded);
-//    _database.reference().child(tblCategory).onChildChanged.listen(_onCategoryChanged);
-//    _database.reference().child(tblCategory).onChildMoved.listen(_onCategoryMoved);
-//    _database.reference().child(tblCategory).onChildRemoved.listen(_onCategoryRemoved);
-//
-//    // register listener to Transactions
-//    _database.reference().child(tblTransaction).onChildAdded.listen(_onTransactionAdded);
-//    _database.reference().child(tblTransaction).onChildChanged.listen(_onTransactionChanged);
-//    _database.reference().child(tblTransaction).onChildMoved.listen(_onTransactionMoved);
-//    _database.reference().child(tblTransaction).onChildRemoved.listen(_onTransactionRemoved);
-//
-//    _database.reference().child(tblUser).onChildAdded.listen(_onUserAdded);
-//    _database.reference().child(tblUser).onChildChanged.listen(_onUserChanged);
-//    _database.reference().child(tblUser).onChildMoved.listen(_onUserMoved);
-//    _database.reference().child(tblUser).onChildRemoved.listen(_onUserRemoved);
+  return _lock.synchronized(() async {
+    if(subs != null) subs.forEach((f) async => await f.cancel());
+
+    _isDbSetup = false;
   });
 }
 

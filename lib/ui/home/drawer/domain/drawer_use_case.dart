@@ -12,6 +12,7 @@ class LeftDrawerUseCase extends CleanArchitectureUseCase<LeftDrawerRepository> {
     if (signOut) {
       await repo.clearAllPreference();
       await repo.deleteDatabase();
+      await repo.unlinkFbDatabase();
     }
 
     repo.signOut().then((_) => next(true)).catchError((e) => err(e));

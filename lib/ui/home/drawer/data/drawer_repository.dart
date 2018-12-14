@@ -21,11 +21,19 @@ class LeftDrawerRepository extends CleanArchitectureRepository {
   Future<void> deleteDatabase() async {
     return _dbRepo.deleteDatabase();
   }
+
+  Future<void> unlinkFbDatabase() async {
+    return _fbRepo.unlinkFbDatabase();
+  }
 }
 
 class _LeftDrawerFirebaseRepository {
   Future<bool> signOut() {
     return fm.signOut();
+  }
+
+  Future<void> unlinkFbDatabase() async {
+    return fdb.removeRefenrence();
   }
 }
 

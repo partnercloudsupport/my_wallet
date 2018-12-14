@@ -578,14 +578,12 @@ class _Database {
 
     Database db = await _openDatabase();
 
-    deleteDatabase(db.path);
-//    await db.execute("DELETE FROM $_tableUser");
-//    await db.execute("DELETE FROM $_tableTransactions");
-//    await db.execute("DELETE FROM $_tableAccounts");
-//    await db.execute("DELETE FROM $_tableBudget");
-//    await db.execute("DELETE FROM $_tableTransactions");
+    String path = db.path;
 
+    // close database before deleting it
     await db.close();
+
+    await deleteDatabase(path);
   }
 
   void _notifyObservers(String table) {
