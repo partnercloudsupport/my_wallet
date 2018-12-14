@@ -325,7 +325,7 @@ Future<int> deleteUsers(List<String> uids) {
   return _lock.synchronized(() => db._delete(tableUser, "$_userUid = ?", uids));
 }
 
-Future<void> deleteDatabase() {
+Future<void> dropAllTables() {
   return _lock.synchronized(() => db._deleteDb());
 }
 
@@ -575,12 +575,15 @@ class _Database {
   }
 
   Future<void> _deleteDb() async {
+
     Database db = await _openDatabase();
-    await db.execute("DELETE FROM $_tableUser");
-    await db.execute("DELETE FROM $_tableTransactions");
-    await db.execute("DELETE FROM $_tableAccounts");
-    await db.execute("DELETE FROM $_tableBudget");
-    await db.execute("DELETE FROM $_tableTransactions");
+
+    deleteDatabase(db.path);
+//    await db.execute("DELETE FROM $_tableUser");
+//    await db.execute("DELETE FROM $_tableTransactions");
+//    await db.execute("DELETE FROM $_tableAccounts");
+//    await db.execute("DELETE FROM $_tableBudget");
+//    await db.execute("DELETE FROM $_tableTransactions");
 
     await db.close();
   }

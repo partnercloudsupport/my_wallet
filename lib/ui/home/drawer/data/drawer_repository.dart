@@ -15,7 +15,7 @@ class LeftDrawerRepository extends CleanArchitectureRepository {
       pref.remove(prefHomeProfile);
 
       // delete database
-      db.deleteDatabase();
+      db.dropAllTables();
       fdb.removeRefenrence();
     }
 
