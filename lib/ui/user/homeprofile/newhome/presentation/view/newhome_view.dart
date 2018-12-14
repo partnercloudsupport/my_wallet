@@ -168,5 +168,17 @@ class _NewHomeState extends CleanArchitectureView<NewHome, NewHomePresenter> imp
     print(e.toString());
     _joiningHome = false;
     _joinHomeState.currentState.stop();
+
+    showDialog(context: context,
+    builder: (context) => AlertDialog(
+      title: Text("Failed to join Home"),
+      content: Text("Failed to join home of ${_hostEmailController.text} because ${e.toString()}"),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text("Try Again"),
+        )
+      ],
+    ));
   }
 }

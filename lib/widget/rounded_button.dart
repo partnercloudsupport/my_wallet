@@ -53,7 +53,11 @@ class RoundedButtonState extends State<RoundedButton> {
   @override
   Widget build(BuildContext context) {
     return FlatButton(
-      onPressed: widget.onPressed,
+      onPressed: () {
+        if(_processing) return;
+
+        if(widget.onPressed != null) widget.onPressed();
+      },
       onHighlightChanged: widget.onHighlightChanged,
       textTheme: widget.textTheme,
       textColor: widget.textColor,

@@ -1,9 +1,6 @@
 import 'package:my_wallet/ui/user/login/presentation/view/login_data_view.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/user/login/presentation/presenter/login_presenter.dart';
-import 'package:my_wallet/ui/home/home_view.dart';
-
-import 'package:my_wallet/ui/user/register/presentation/view/register_view.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -83,12 +80,13 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
     _signingIn = true;
     _loginKey.currentState.process();
 
-    setState(() => _signingIn = true);
     presenter.signIn(_emailController.text, _passwordController.text);
   }
 
   @override
   void onSignInSuccess(bool result) {
+    _signingIn = false;
+
     _loginKey.currentState.stop();
 
     presenter.checkUserHome();
@@ -96,6 +94,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
 
   @override
   void onSignInFailed(Exception e) {
+    _signingIn = false;
     _loginKey.currentState.stop();
 
     showDialog(context: context, builder: (_) => AlertDialog(
@@ -106,7 +105,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
           onPressed: () {
             Navigator.pop(context);
           },
-          child: Text("Retry"),
+          child: Text("Try Again"),
         )
       ],
     )
