@@ -30,28 +30,22 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
         User user = await repo.getCurrentUser();
         bool isHost = await repo.checkHost(user);
 
-        print("isHost $isHost");
         if (isHost) {
           // save his home to shared pref
           await repo.saveHome(user.uuid);
 
-          print("save home done ${user.uuid} and $user");
           user = await repo.getUserDetailFromFbDatabase(user.uuid, user);
-          print("user detail from Firebase database $user");
 
           // switch database reference
           await repo.switchReference(user.uuid);
-          print("switched reference database");
 
           await repo.saveUser(user);
-          print("save user, and return");
 
           next(true);
 
           break;
         }
 
-        print("not host, check user home");
         repo.checkUserHome().then((result) => next(result));
       } while (false);
     } catch (e) {

@@ -5,20 +5,32 @@ import 'package:my_wallet/data/database_manager.dart' as db;
 import 'package:my_wallet/shared_pref/shared_preference.dart';
 
 class LeftDrawerRepository extends CleanArchitectureRepository {
-  Future<bool> signOut() async {
-    bool result = await fm.signOut();
+  final _LeftDrawerFirebaseRepository _fbRepo = _LeftDrawerFirebaseRepository();
+  final _LeftDrawerDatabaseRepository _dbRepo = _LeftDrawerDatabaseRepository();
+  Future<bool> signOut() {
+    return fm.signOut();
+  }
 
-    if(result) {
-      // clear preference
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      pref.remove(UserUUID);
-      pref.remove(prefHomeProfile);
+  Future<void> clearAllPreference() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
 
-      // delete database
-      db.dropAllTables();
-      fdb.removeRefenrence();
-    }
+    await pref.remove(UserUUID);
+    await pref.remove(prefHomeProfile);
+  }
 
-    return result;
+  Future<void> deleteDatabase() async {
+    return _dbRepo.deleteDatabase();
+  }
+}
+
+class _LeftDrawerFirebaseRepository {
+  Future<bool> signOut() {
+    return fm.signOut();
+  }
+}
+
+class _LeftDrawerDatabaseRepository {
+  Future<void> deleteDatabase() {
+    return db.dropAllTables();
   }
 }

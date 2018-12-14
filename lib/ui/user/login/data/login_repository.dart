@@ -93,7 +93,7 @@ class _LoginFirebaseRepository {
   }
 
   Future<void> saveUser(User user) {
-    return fdb.addUser(user, color: user.color == null ? Random().nextInt(0xEEEEEEEE) : user.color);
+    return fdb.addUser(user, color: user.color == null ? Random().nextInt(0xFFEEEEEE) : user.color);
   }
 
   Future<User> getUserDetailFromFbDatabase(String homeKey, User user) {

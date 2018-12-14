@@ -31,18 +31,13 @@ Future<void> init(FirebaseApp app) async {
   });
 }
 
+/// after login, this user does not contain color
 Future<User> login(String email, String password) async {
   return _lock.synchronized(() async {
     FirebaseUser user = await _auth.signInWithEmailAndPassword(email: email, password: password);
 
     if (user != null) {
-      print("user display name ${user.displayName}");
-      DatabaseReference _ref = _database.reference().child(tblUser);
-
-      var colorSnapshot = await _ref.child(tblUser).child(user.uid).child(fldColor).once();
-      var color = colorSnapshot.value;
-
-      return User(user.uid, user.email, user.displayName, user.photoUrl, color);
+      return User(user.uid, user.email, user.displayName, user.photoUrl, null);
     }
 
     throw Exception("Failed to signin to firebase");

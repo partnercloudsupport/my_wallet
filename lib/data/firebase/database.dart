@@ -28,12 +28,6 @@ Future<void> setupDatabase(final String homeKey) async {
 
     _isDbSetup = true;
 
-    print("Home key $homeKey");
-
-    print("FirebaseDatabase(app: _app).reference() ${FirebaseDatabase(app: _app).reference()}");
-    print("FirebaseDatabase(app: _app).reference().child(_data) ${FirebaseDatabase(app: _app).reference().child(_data)}");
-    print("data $_data");
-
     _database = FirebaseDatabase(app: _app).reference().child(_data).child(homeKey);
 
     // register listener to Account
