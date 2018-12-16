@@ -9,6 +9,7 @@ const tblAccount = "Account";
 const tblTransaction = "Transaction";
 const tblCategory = "Category";
 const tblUser = "User";
+const tblBudget = "Budget";
 
 const fldName = "name";
 const fldType = "type";
@@ -26,6 +27,8 @@ const fldDisplayName = "displayName";
 const fldPhotoUrl = "photoUrl";
 const fldUuid = "uuid";
 const fldColor = "color";
+const fldStart = "start";
+const fldEnd = "end";
 
 User snapshotToUser(DataSnapshot snapshot) {
   return User(snapshot.value[fldUuid], snapshot.value[fldEmail], snapshot.value[fldDisplayName], snapshot.value[fldPhotoUrl], snapshot.value[fldColor]);

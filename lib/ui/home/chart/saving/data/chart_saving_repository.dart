@@ -2,8 +2,6 @@ import 'package:my_wallet/ui/home/chart/saving/data/chart_saving_entity.dart';
 import 'package:my_wallet/data/database_manager.dart' as _db;
 import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/utils.dart' as Utils;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:my_wallet/shared_pref/shared_preference.dart';
 import 'package:my_wallet/ca/data/ca_repository.dart';
 
 class SavingChartRepository extends CleanArchitectureRepository {
@@ -17,9 +15,8 @@ class SavingChartRepository extends CleanArchitectureRepository {
 
     var monthlySaving = incomeThisMonth - expenseThisMonth;
 
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    var targetSaving = sharedPreferences.get(keyTargetSaving) ?? 0.0;
+    var monthlyBudget = await _db.sumAllBudget(start, Utils.lastDayOfMonth(start));
 
-    return SavingEntity(monthlySaving, monthlySaving > 0 ? targetSaving > 0 ? monthlySaving/targetSaving : 1.0 : 0.0);
+    return SavingEntity(monthlySaving, monthlySaving > 0 ? monthlyBudget > 0 ? monthlySaving/monthlyBudget : 1.0 : 0.0);
   }
 }

@@ -120,8 +120,8 @@ class Budget {
   final int id;
   final int categoryId;
   final double budgetPerMonth;
-  final int budgetStart;
-  final int budgetEnd;
+  final DateTime budgetStart;
+  final DateTime budgetEnd;
 
   const Budget(
       this.id,

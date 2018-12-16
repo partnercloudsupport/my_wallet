@@ -2,6 +2,7 @@ import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 
 import 'package:my_wallet/ui/budget/list/presentation/presenter/list_presenter.dart';
 import 'package:my_wallet/ui/budget/list/presentation/view/list_data_view.dart';
+import 'package:my_wallet/data/data_observer.dart' as observer;
 
 import 'package:intl/intl.dart';
 
@@ -12,9 +13,11 @@ class ListBudgets extends StatefulWidget {
   }
 }
 
-class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPresenter> implements ListBudgetsDataView {
+class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPresenter> implements ListBudgetsDataView, observer.DatabaseObservable {
 
   _ListBudgetsState() : super(ListBudgetsPresenter());
+
+  var tables = [observer.tableBudget, observer.tableCategory];
 
   var budgetList = <BudgetEntity>[];
   var _nf = NumberFormat("\$##0.00");
@@ -25,10 +28,24 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
   }
 
   @override
+  void onDatabaseUpdate(String table) {
+    presenter.loadThisMonthBudgetList();
+  }
+
+  @override
   void initState() {
     super.initState();
 
+    observer.registerDatabaseObservable(tables, this);
+
     presenter.loadThisMonthBudgetList();
+  }
+
+  @override
+  void dispose() {
+    observer.unregisterDatabaseObservable(tables, this);
+
+    super.dispose();
   }
 
   @override

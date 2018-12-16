@@ -50,10 +50,17 @@ Future<void> setupDatabase(final String homeKey) async {
     subs.add(_database.reference().child(tblTransaction).onChildMoved.listen(_onTransactionMoved));
     subs.add(_database.reference().child(tblTransaction).onChildRemoved.listen(_onTransactionRemoved));
 
+    // register listener to User
     subs.add(_database.reference().child(tblUser).onChildAdded.listen(_onUserAdded));
     subs.add(_database.reference().child(tblUser).onChildChanged.listen(_onUserChanged));
     subs.add(_database.reference().child(tblUser).onChildMoved.listen(_onUserMoved));
     subs.add(_database.reference().child(tblUser).onChildRemoved.listen(_onUserRemoved));
+
+    // register listener to budget
+    subs.add(_database.reference().child(tblBudget).onChildAdded.listen(_onBudgetAdded));
+    subs.add(_database.reference().child(tblBudget).onChildChanged.listen(_onBudgetChanged));
+    subs.add(_database.reference().child(tblBudget).onChildMoved.listen(_onBudgetMoved));
+    subs.add(_database.reference().child(tblBudget).onChildRemoved.listen(_onBudgetRemoved));
   });
 }
 
@@ -74,6 +81,15 @@ Map<String, dynamic> _CategoryToMap(AppCategory cat) {
 Map<String, dynamic> _UserToMap(User user, {int color}) {
   return {fldUuid: user.uuid, fldEmail: user.email, fldDisplayName: user.displayName, fldPhotoUrl: user.photoUrl, fldColor: color != null ? color : user.color};
 }
+
+Map<String, dynamic> _BudgetToMap(Budget budget) {
+  return {fldCategoryId: budget.categoryId, fldAmount: budget.budgetPerMonth, fldStart: budget.budgetStart.millisecondsSinceEpoch, fldEnd: budget.budgetEnd != null ? budget.budgetEnd.millisecondsSinceEpoch : null};
+}
+
+Budget _snapshotToBudget(DataSnapshot snapshot) {
+  return Budget(_toId(snapshot), snapshot.value[fldCategoryId], snapshot.value[fldAmount] * 1.0, DateTime.fromMillisecondsSinceEpoch(snapshot.value[fldStart]), snapshot.value[fldEnd] != null ? DateTime.fromMillisecondsSinceEpoch(snapshot.value[fldEnd]) : null);
+}
+
 
 AppCategory _snapshotToCategory(DataSnapshot snapshot) {
   return AppCategory(_toId(snapshot), snapshot.value[fldName], snapshot.value[fldColorHex], double.parse("${snapshot.value[fldBalance]}"));
@@ -148,7 +164,20 @@ void _onUserRemoved(Event event) {
   db.deleteUser(event.snapshot.value[fldUuid]);
 }
 
+void _onBudgetAdded(Event event) {
+  db.insertBudget(_snapshotToBudget(event.snapshot)).catchError((e) => _onBudgetChanged(event));
+}
 
+void _onBudgetChanged(Event event) {
+  db.updateBudget(_snapshotToBudget(event.snapshot));
+}
+
+void _onBudgetMoved(Event event) {
+}
+
+void _onBudgetRemoved(Event event) {
+  db.deleteBudget(event.snapshot.value[fldUuid]);
+}
 // ####################################################################################################
 // Account
 Lock _lock = Lock();
@@ -294,6 +323,43 @@ Future<bool> deleteUser(User user) async {
     return true;
   });
 }
+
+// ####################################################################################################
+// Budget
+Future<bool> addBudget(Budget budget) async {
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(tblBudget);
+
+    var result = await _ref.child("${budget.id}").runTransaction((data) async {
+      data.value = _BudgetToMap(budget);
+
+      return data;
+    });
+
+    return result.committed;
+  });
+}
+
+Future<bool> updateBudget(Budget budget) async {
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(tblBudget);
+
+    await _ref.child("${budget.id}").update(_BudgetToMap(budget));
+
+    return true;
+  });
+}
+
+Future<bool> deleteBudget(Budget budget) async {
+  return _lock.synchronized(() async {
+    DatabaseReference _ref = _database.reference().child(tblBudget);
+
+    await _ref.child("${budget.id}").remove();
+
+    return true;
+  });
+}
+
 
 Future<bool> removeRefenrence() async {
   return _lock.synchronized(() async {

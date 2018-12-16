@@ -248,8 +248,22 @@ Future<List<User>> queryUserWithUuid(String uuid) async {
   return map == null ? null : map.map((f) => _toUser(f)).toList();
 }
 
+Future<int> queryBudget({@required int catId, @required DateTime start, @required DateTime end}) async {
+  String where ="SELECT $_budgetId FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart = ${start.millisecondsSinceEpoch}";
+
+  if(end != null) {
+    where += "  AND $_budgetEnd = ${end.millisecondsSinceEpoch}";
+  }
+
+  var id = await _lock.synchronized(() => db._executeSql(where));
+
+  return id == null || id.isEmpty ? null : id[0].values.first ?? null;
+}
+
 Future<double> queryBudgetAmount({@required int catId, @required DateTime start, @required DateTime end}) async {
-  var sum = await _lock.synchronized(() => db._executeSql("SELECT $_budgetPerMonth FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart > ${start.millisecondsSinceEpoch} AND $_budgetEnd < ${end.millisecondsSinceEpoch}"));
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart >= ${start.millisecondsSinceEpoch} AND $_budgetEnd <= ${end.millisecondsSinceEpoch}"));
+
+  print("sum $sum");
 
   return sum == null || sum.isEmpty ? 0.0 : sum[0].values.first ?? 0.0;
 }
@@ -310,6 +324,14 @@ Future<int> insertUsers(List<User> users) {
   return _lock.synchronized(() => db._insert(tableUser, items: users.map((f) => _userToMap(f)).toList()));
 }
 
+Future<int> insertBudget(Budget budget) {
+  return _lock.synchronized(() => db._insert(tableBudget, item: _budgetToMap(budget)));
+}
+
+Future<int> insertBudgets(List<Budget> budgets) {
+  return _lock.synchronized(() => db._insert(tableBudget, items: budgets.map((f) => _budgetToMap(f)).toList()));
+}
+
 // ------------------------------------------------------------------------------------------------------------------------
 // delete
 Future<int> deleteAccount(int id) {
@@ -344,6 +366,14 @@ Future<int> deleteUsers(List<String> uids) {
   return _lock.synchronized(() => db._delete(tableUser, "$_userUid = ?", uids));
 }
 
+Future<int> deleteBudget(int id) {
+  return _lock.synchronized(() => db._delete(tableBudget, "$_budgetId = ?", [id]));
+}
+
+Future<int> deleteBudgets(List<int> ids) {
+  return _lock.synchronized(() => db._delete(tableBudget, "$_budgetId = ?", ids));
+}
+
 Future<void> dropAllTables() {
   return _lock.synchronized(() => db._deleteDb());
 }
@@ -367,6 +397,10 @@ Future<int> updateUser(User user) {
   return _lock.synchronized(() => db._update(tableUser, _userToMap(user), "$_userUid = ?", [user.uuid]));
 }
 
+Future<int> updateBudget(Budget budget) {
+  return _lock.synchronized(() => db._update(tableBudget, _budgetToMap(budget), "$_budgetId = ?", [budget.id]));
+}
+
 // ################################################################################################################
 // private helper
 // ################################################################################################################
@@ -388,7 +422,7 @@ AppCategory _toCategory(Map<String, dynamic> map) {
 }
 
 Budget _toBudget(Map<String, dynamic> map) {
-  return Budget(map[_budgetId], map[_budgetCategoryId], map[_budgetPerMonth], map[_budgetStart], map[_budgetEnd]);
+  return Budget(map[_budgetId], map[_budgetCategoryId], map[_budgetPerMonth], DateTime.fromMicrosecondsSinceEpoch(map[_budgetStart]), DateTime.fromMillisecondsSinceEpoch(map[_budgetEnd]));
 }
 
 User _toUser(Map<String, dynamic> map) {
@@ -417,8 +451,8 @@ Map<String, dynamic> _categoryToMap(AppCategory cat) {
   };
 }
 
-Map<String, dynamic> _bugetToMap(Budget budget) {
-  return {_budgetId: budget.id, _budgetCategoryId: budget.categoryId, _budgetPerMonth: budget.budgetPerMonth, _budgetStart: budget.budgetStart, _budgetEnd: budget.budgetEnd};
+Map<String, dynamic> _budgetToMap(Budget budget) {
+  return {_budgetId: budget.id, _budgetCategoryId: budget.categoryId, _budgetPerMonth: budget.budgetPerMonth, _budgetStart: budget.budgetStart.millisecondsSinceEpoch, _budgetEnd: budget.budgetEnd.millisecondsSinceEpoch};
 }
 
 Map<String, dynamic> _userToMap(User user) {
@@ -430,6 +464,8 @@ Map<String, dynamic> _userToMap(User user) {
   _userColor: user.color,
   };
 }
+
+
 // #############################################################################################################################
 // private database handler
 // #############################################################################################################################
@@ -635,13 +671,6 @@ class _Database {
 
         _watchers.remove(f);
         _watchers.putIfAbsent(f, () => list);
-//        switch(f) {
-//          case tableAccount: _accountWatchers.remove(observable); break;
-//          case tableCategory: _categoryWatchers.remove(observable); break;
-//          case tableTransactions: _transactionWatchers.remove(observable); break;
-//          case tableBudget: _budgetWatchers.remove(observable); break;
-//          case tableUser: _budgetWatchers.remove(obser)
-//        }
       });
     }
   }

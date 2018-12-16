@@ -6,4 +6,16 @@ import 'package:my_wallet/ui/budget/detail/presentation/view/detail_data_view.da
 class BudgetDetailPresenter extends CleanArchitecturePresenter<BudgetDetailUseCase, BudgetDetailDataView> {
   BudgetDetailPresenter() : super(BudgetDetailUseCase());
 
+  void loadCategoryList() {
+    useCase.loadCategoryList(dataView.updateCategoryList);
+  }
+
+  void saveBudget(
+      AppCategory _cat,
+      double _amount,
+      DateTime startMonth,
+      DateTime endMonth
+      ) {
+    useCase.saveBudget(_cat, _amount, startMonth, endMonth, dataView.onSaveBudgetSuccess, dataView.onSaveBudgetFailed);
+  }
 }

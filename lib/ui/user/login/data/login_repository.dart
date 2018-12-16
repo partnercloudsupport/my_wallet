@@ -78,6 +78,7 @@ class _LoginFirebaseRepository {
     try {
       return await fm.login(email, password);
     } on PlatformException catch (e) {
+      print(e.toString());
       throw LoginException("${e.message} ${e.details == null ? "" : e.details}");
     } catch (e) {
       throw e;

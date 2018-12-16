@@ -9,3 +9,4 @@ export 'package:flutter/material.dart';
 export 'package:my_wallet/widget/scaffold.dart';
 export 'package:my_wallet/widget/rounded_button.dart';
 export 'package:my_wallet/widget/card_list_title.dart';
+export 'package:my_wallet/widget/page_route.dart';
