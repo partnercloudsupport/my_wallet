@@ -1,9 +1,9 @@
 import 'package:my_wallet/data/data.dart';
 import 'package:intl/intl.dart';
 import 'package:my_wallet/ui/account/list/presentation/presenter/list_accounts_presenter.dart';
-import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/account/list/presentation/view/list_account_dataview.dart';
+import 'package:my_wallet/data/data_observer.dart' as observer;
 
 class ListAccounts extends StatefulWidget {
   final String _title;
@@ -17,8 +17,10 @@ class ListAccounts extends StatefulWidget {
   }
 }
 
-class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccountsPresenter> implements ListAccountDataView {
+class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccountsPresenter> implements ListAccountDataView, observer.DatabaseObservable {
   _ListAccountsState() : super(ListAccountsPresenter());
+
+  var tables = [observer.tableAccount];
 
   var isEditMode = false;
 
@@ -34,7 +36,19 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
   void initState() {
     super.initState();
 
+    observer.registerDatabaseObservable(tables, this);
     _loadAllAccounts();
+  }
+
+  @override
+  void dispose() {
+    observer.unregisterDatabaseObservable(tables, this);
+    super.dispose();
+  }
+
+  @override
+  void onDatabaseUpdate(String table) {
+    presenter.loadAllAccounts();
   }
 
   @override
