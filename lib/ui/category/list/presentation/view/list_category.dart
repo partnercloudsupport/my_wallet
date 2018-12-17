@@ -2,9 +2,10 @@ import 'package:my_wallet/data/data.dart';
 
 import 'package:my_wallet/ui/category/list/presentation/presenter/list_category_presenter.dart';
 
-import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/category/list/presentation/view/list_category_data_view.dart';
+
+import 'package:my_wallet/data/data_observer.dart' as observer;
 
 class CategoryList extends StatefulWidget {
   final String _title;
@@ -18,8 +19,10 @@ class CategoryList extends StatefulWidget {
   }
 }
 
-class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategoryPresenter> implements CategoryListDataView {
+class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategoryPresenter> implements CategoryListDataView, observer.DatabaseObservable {
   _CategoryListState() : super(ListCategoryPresenter());
+
+  var tables = [observer.tableCategory];
 
   List<AppCategory> _categories = [];
 
@@ -34,7 +37,19 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
   void initState() {
     super.initState();
 
+    observer.registerDatabaseObservable(tables, this);
     _loadCategories();
+  }
+
+  @override
+  void dispose() {
+    observer.unregisterDatabaseObservable(tables, this);
+    super.dispose();
+  }
+
+  @override
+  void onDatabaseUpdate(String table) {
+    presenter.loadCategories();
   }
 
   @override
@@ -59,6 +74,9 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
             itemCount: _categories.length,
             itemBuilder: (_, index) => CardListTile(
                   title: _categories[index].name,
+                  trailing: isEditMode ? IconButton(
+                    icon: Icon(Icons.close, color: AppTheme.pinkAccent,),
+                    onPressed: () => presenter.deleteCategory(_categories[index]),) : null,
                   onTap: () => widget.returnValue
                       ? Navigator.pop(context, _categories[index])
                       : Navigator.pushNamed(

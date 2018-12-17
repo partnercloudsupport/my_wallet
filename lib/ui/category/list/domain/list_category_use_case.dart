@@ -8,4 +8,8 @@ class ListCategoryUseCase extends CleanArchitectureUseCase<CategoryListRepositor
   void loadCategories(onNext<List<AppCategory>> next) {
     repo.loadCategories().then((result) => next(result));
   }
+
+  void deleteCategory(AppCategory cat) async {
+    await repo.deleteCategory(cat);
+  }
 }
