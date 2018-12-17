@@ -35,11 +35,13 @@ Future<void> setupDatabase(final String homeKey) async {
     var snapShot;
     try {
       snapShot = await _database.once().timeout(Duration(seconds: 2));
-    } catch (e) {}
+    } catch (e) {
+      print("timeout on homekey data");
+    }
 
     if(snapShot == null || snapShot.value == null) {
       // drop database
-      db.dropAllTables();
+      await db.dropAllTables();
     } else {
       // delete items in local database where it's no longer sync in firebase database
       await _sync(tblAccount, () => db.queryAccounts(), (Account account) => "${account.id}", (Account account) => db.deleteAccount(account.id));
