@@ -242,10 +242,23 @@ Future<List<AppTransaction>> queryForDate(DateTime day) async {
   return map != null ? map.map((f) => _toTransaction(f)).toList() : null;
 }
 
-Future<List<User>> queryUserWithUuid(String uuid) async {
-  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableUser, where: "$_userUid = ?", whereArgs: [ uuid ]));
+Future<List<User>> queryUser({String uuid}) async {
+  String where;
+  List whereArgs;
+
+  if(uuid != null) {
+    where = "$_userUid = ?";
+    whereArgs = [uuid];
+  }
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableUser, where: where, whereArgs: whereArgs));
 
   return map == null ? null : map.map((f) => _toUser(f)).toList();
+}
+
+Future<List<Budget>> queryBudgets() async {
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableBudget));
+
+  return map == null ? null : map.map((f) => _toBudget(f)).toList();
 }
 
 Future<int> queryBudget({@required int catId, @required DateTime start, @required DateTime end}) async {
@@ -351,11 +364,11 @@ Future<int> deleteTransactions(List<int> ids) {
 }
 
 Future<int> deleteCategory(int id) {
-  return _lock.synchronized(() => db._delete(_tableTransactions, "$_catId = ?", [id]));
+  return _lock.synchronized(() => db._delete(_tableCategory, "$_catId = ?", [id]));
 }
 
 Future<int> deleteCategories(List<int> ids) {
-  return _lock.synchronized(() => db._delete(_tableTransactions, "$_catId = ?", ids));
+  return _lock.synchronized(() => db._delete(_tableCategory, "$_catId = ?", ids));
 }
 
 Future<int> deleteUser(String uid) {
@@ -611,6 +624,8 @@ class _Database {
     var result = await db.delete(table, where: where, whereArgs: whereArgs);
 
     await db.close();
+
+    print("Delete from $table where $where with arg $whereArgs");
 
     _notifyObservers(table);
 

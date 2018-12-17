@@ -81,7 +81,7 @@ class _TransactionListDatabaseRepository {
       for(AppTransaction trans in transactions) {
         if(trans.userUid == null || trans.userUid.isEmpty) continue;
 
-        List<User> users = await db.queryUserWithUuid(trans.userUid);
+        List<User> users = await db.queryUser(uuid: trans.userUid);
 
         if(users != null && users.isNotEmpty) {
           User user = users[0];

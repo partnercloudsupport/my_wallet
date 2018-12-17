@@ -145,7 +145,7 @@ class _AddTransactionDatabaseRepository {
 
   // private helper
   Future<UserDetail> _getUserWithUid(String uid) async {
-    List<User> users = await _db.queryUserWithUuid(uid);
+    List<User> users = await _db.queryUser(uuid: uid);
 
     User user = users != null && users.isNotEmpty ? users[0] : null;
 
