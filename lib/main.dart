@@ -61,7 +61,7 @@ void main() async {
   var user = sharedPref.getString(UserUUID);
   var profile = sharedPref.getString(prefHomeProfile);
 
-  fdb.init(_app, homeProfile: profile);
+  await fdb.init(_app, homeProfile: profile);
 
   runApp(MyApp(user != null && user.isNotEmpty, profile != null && profile.isNotEmpty));
 }

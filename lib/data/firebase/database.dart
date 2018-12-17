@@ -21,7 +21,7 @@ Future<void> init(FirebaseApp app, {String homeProfile}) async {
   _isInit = true;
   if(_app != null) _app = app;
 
-  if (homeProfile != null && homeProfile.isNotEmpty) setupDatabase(homeProfile);
+  if (homeProfile != null && homeProfile.isNotEmpty) await setupDatabase(homeProfile);
 }
 
 Future<void> setupDatabase(final String homeKey) async {
@@ -31,6 +31,23 @@ Future<void> setupDatabase(final String homeKey) async {
     _isDbSetup = true;
 
     _database = FirebaseDatabase(app: _app).reference().child(_data).child(homeKey);
+
+    var snapShot;
+    try {
+      snapShot = await _database.once().timeout(Duration(seconds: 2));
+    } catch (e) {}
+
+    if(snapShot == null || snapShot.value == null) {
+      // drop database
+      db.dropAllTables();
+    } else {
+      // delete items in local database where it's no longer sync in firebase database
+      await _sync(tblAccount, () => db.queryAccounts(), (Account account) => "${account.id}", (Account account) => db.deleteAccount(account.id));
+      await _sync(tblBudget, () => db.queryBudgets(), (Budget budget) => "${budget.id}", (Budget budget) => db.deleteBudget(budget.id));
+      await _sync(tblCategory, () => db.queryCategory(), (AppCategory cat) => "${cat.id}", (AppCategory cat) => db.deleteCategory(cat.id));
+      await _sync(tblTransaction, () => db.queryTransactions(), (AppTransaction tran) => "${tran.id}", (AppTransaction tran) => db.deleteTransaction(tran.id));
+      await _sync(tblUser, () => db.queryUser(), (User user) => "${user.uuid}", (User user) => db.deleteUser(user.uuid));
+    }
 
     // register listener to Account
     subs.add(_database.reference().child(tblAccount).onChildAdded.listen(_onAccountAdded));
@@ -62,6 +79,47 @@ Future<void> setupDatabase(final String homeKey) async {
     subs.add(_database.reference().child(tblBudget).onChildMoved.listen(_onBudgetMoved));
     subs.add(_database.reference().child(tblBudget).onChildRemoved.listen(_onBudgetRemoved));
   });
+}
+
+Future<bool> _sync(
+    String tableName,
+    Function _queryList,
+    Function _getChildId,
+    Function _deleteItem,
+    ) async {
+  DataSnapshot tbSnapshot;
+
+  try {
+    tbSnapshot = await _database.reference().child(tableName).once().timeout(Duration(seconds: 2));
+  } catch(e) {}
+
+  if(tbSnapshot == null || tbSnapshot.value == null) {
+    // table is deleted, do not check items in this table, and delete all table content
+    db.deleteTable(tableName);
+    return true;
+  }
+
+  // this table still exits, sync data in this table
+  List<dynamic> list = await _queryList();
+
+  if(list != null && list.isNotEmpty) {
+    for( dynamic item in list) {
+      var id = _getChildId(item);
+
+      DataSnapshot snapshot;
+      try {
+        snapshot = await _database.reference().child(tableName).child(id).once().timeout(Duration(seconds: 2));
+      } catch(e) {
+        print("Exception ${e.toString()} on table $tableName for id $id with path ${_database.reference().child(tableName).child(id).path}");
+      }
+
+      if (snapshot == null || snapshot.value == null) {
+        await _deleteItem(item);
+      }
+    }
+  }
+
+  return true;
 }
 
 // ####################################################################################################

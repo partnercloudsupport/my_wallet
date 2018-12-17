@@ -391,6 +391,10 @@ Future<void> dropAllTables() {
   return _lock.synchronized(() => db._deleteDb());
 }
 
+Future<void> deleteTable(String table) {
+  return _lock.synchronized(() => db.deleteTable(table));
+}
+
 // ------------------------------------------------------------------------------------------------------------------------
 // update
 Future<int> updateAccount(Account acc) {
@@ -654,6 +658,13 @@ class _Database {
     await db.close();
 
     await deleteDatabase(path);
+  }
+
+  Future<void> deleteTable(String name) async {
+    Database db = await _openDatabase();
+
+    db.delete(name);
+    await db.close();
   }
 
   void _notifyObservers(String table) {
