@@ -21,37 +21,7 @@ class _CreateCategoryState extends CleanArchitectureView<CreateCategory, CreateC
 
   @override
   Widget build(BuildContext context) {
-    return PlainScaffold(
-      appBar: MyWalletAppBar(
-        title: "Create Category",
-        actions: <Widget>[
-          FlatButton(
-            onPressed: _saveCategory,
-            child: Text("Save"),
-          )
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          ListTile(
-            title: TextField(
-              onChanged: _onNameChanged,
-              decoration: InputDecoration(
-                hintText: "Category Name",
-                hintStyle: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey.withOpacity(0.6)),
-                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.darkBlue, width: 1.0)),
-                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.darkBlue, width: 1.0)),
-              ),
-              style: Theme.of(context).textTheme.subhead.apply(color: AppTheme.darkBlue),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _saveCategory() {
-    presenter.saveCategory(_name);
+    return InputName("Create Category", _onNameChanged, hintText: "Category Name",);
   }
 
   @override
@@ -75,6 +45,6 @@ class _CreateCategoryState extends CleanArchitectureView<CreateCategory, CreateC
 
 
   void _onNameChanged(String name) {
-    _name = name;
+    presenter.saveCategory(_name);
   }
 }

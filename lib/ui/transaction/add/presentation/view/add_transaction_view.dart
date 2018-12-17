@@ -102,7 +102,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
           children: <Widget>[
           Expanded(
             child: Container(
-              width: MediaQuery.of(context).size.width,
+              color: AppTheme.white,
+              alignment: Alignment.center,
               child: FittedBox(
                 child: Column(children: <Widget> [
                   ConversationRow(
@@ -143,7 +144,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                   DateTimeRow(_date, _showDatePicker, _showTimePicker,),
                 ],),
               ),
-              color: AppTheme.white,
             ),
           ),
             Align(
