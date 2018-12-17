@@ -22,6 +22,8 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
   var budgetList = <BudgetEntity>[];
   var _nf = NumberFormat("\$##0.00");
 
+  final crossAxisCount = 3;
+
   @override
   void init() {
     presenter.dataView = this;
@@ -50,14 +52,14 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size.width / 4 - 20;
+    var size = MediaQuery.of(context).size.width / crossAxisCount - 20;
     var padding = size /4;
     return GradientScaffold(
       appBar: MyWalletAppBar(
         title: "Your budget settings",
       ),
       body: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: crossAxisCount),
         itemCount: budgetList.length + 1,
         itemBuilder: (context, index) {
           if(index == budgetList.length) return _btnAddCategory(padding);
@@ -110,7 +112,12 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Text(budgetList[index].categoryName, style: Theme.of(context).textTheme.title,)
+            child: Text(
+              budgetList[index].categoryName,
+              style: Theme.of(context).textTheme.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,)
           )
         ],
       ),);

@@ -94,8 +94,9 @@ Future<double> sumTransactionsByDay(DateTime day, TransactionType type) async {
     return sum[0].values.first ?? 0.0;
 }
 
-Future<double> sumTransactionsByCategory({@required int catId, @required DateTime start, @required DateTime end}) async {
-  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN ${start.millisecondsSinceEpoch} AND ${end.millisecondsSinceEpoch}) AND $_transCategory = $catId"));
+Future<double> sumTransactionsByCategory({@required int catId, @required List<TransactionType> type, @required DateTime start, @required DateTime end}) async {
+  String types = type.map((f) => "${f.id}").toString();
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN ${start.millisecondsSinceEpoch} AND ${end.millisecondsSinceEpoch}) AND $_transCategory = $catId AND $_transType in $types"));
 
   return sum[0].values.first ?? 0.0;
 }

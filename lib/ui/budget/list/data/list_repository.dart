@@ -21,9 +21,11 @@ class ListBudgetsRepository extends CleanArchitectureRepository{
       for(AppCategory f in cats) {
         double budget = await db.queryBudgetAmount(catId : f.id, start: firstDay, end: lastDay);
 
-        double spend = await db.sumTransactionsByCategory(catId: f.id, start: firstDay, end: lastDay);
+        double spend = await db.sumTransactionsByCategory(catId: f.id, type: TransactionType.typeExpense, start: firstDay, end: lastDay);
 
-        entities.add(BudgetEntity(f.name, spend, budget == null ? 0 : budget));
+        double earn = await db.sumTransactionsByCategory(catId: f.id, type: TransactionType.typeIncome, start: firstDay, end: lastDay);
+
+        entities.add(BudgetEntity(f.name, spend - earn, budget == null ? 0 : budget));
       }
     }
     return entities;
