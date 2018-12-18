@@ -423,11 +423,11 @@ Future<int> updateBudget(Budget budget) {
 // private helper
 // ################################################################################################################
 AppTransaction _toTransaction(Map<String, dynamic> map) {
-  return AppTransaction(map[_transID], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], map[_transAmount], map[_transDesc], TransactionType.all[map[_transType]], map[_transUid]);
+  return AppTransaction(map[_transID], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], map[_transAmount] * 1.0, map[_transDesc], TransactionType.all[map[_transType]], map[_transUid]);
 }
 
 Account _toAccount(Map<String, dynamic> map) {
-  return new Account(map[_accID], map[_accName], map[_accBalance], AccountType.all[map[_accType]], map[_accCurrency]);
+  return new Account(map[_accID], map[_accName], map[_accBalance] * 1.0, AccountType.all[map[_accType]], map[_accCurrency]);
 }
 
 AppCategory _toCategory(Map<String, dynamic> map) {
@@ -440,7 +440,7 @@ AppCategory _toCategory(Map<String, dynamic> map) {
 }
 
 Budget _toBudget(Map<String, dynamic> map) {
-  return Budget(map[_budgetId], map[_budgetCategoryId], map[_budgetPerMonth], DateTime.fromMicrosecondsSinceEpoch(map[_budgetStart]), DateTime.fromMillisecondsSinceEpoch(map[_budgetEnd]));
+  return Budget(map[_budgetId], map[_budgetCategoryId], map[_budgetPerMonth] * 1.0, DateTime.fromMicrosecondsSinceEpoch(map[_budgetStart]), DateTime.fromMillisecondsSinceEpoch(map[_budgetEnd]));
 }
 
 User _toUser(Map<String, dynamic> map) {
