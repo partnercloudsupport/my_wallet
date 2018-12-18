@@ -145,7 +145,7 @@ class MyApp extends StatelessWidget {
                     title: "Coming Soon",
                   ),
                   body: Center(
-                    child: Text("Unknown page ${settings.name}"),
+                    child: Text("Unknown page ${settings.name}", style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),),
                   ),
                 );
               }
@@ -227,6 +227,10 @@ class MyApp extends StatelessWidget {
           return TransactionList(title, day: day,);
         } catch(e) {}
       } while (false);
+    }
+
+    if(name.startsWith(routes.AddBudget)) {
+      return BudgetDetail("Budget", categoryId: int.parse(name.replaceFirst("${routes.AddBudget}/", "")),);
     }
 
     return null;

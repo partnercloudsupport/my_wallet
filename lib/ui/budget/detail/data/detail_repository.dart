@@ -1,9 +1,10 @@
 import 'package:my_wallet/ca/data/ca_repository.dart';
 
-import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/data/database_manager.dart' as db;
 import 'package:my_wallet/data/firebase/database.dart' as fd;
-export 'package:my_wallet/data/data.dart';
+
+import 'package:my_wallet/ui/budget/detail/data/detail_entity.dart';
+export 'package:my_wallet/ui/budget/detail/data/detail_entity.dart';
 
 class BudgetDetailRepository extends CleanArchitectureRepository {
   final BudgetDetailDatabaseRepository _dbRepo = BudgetDetailDatabaseRepository();
@@ -11,6 +12,10 @@ class BudgetDetailRepository extends CleanArchitectureRepository {
 
   Future<List<AppCategory>> loadCategoryList() {
     return _dbRepo.loadCategoryList();
+  }
+
+  Future<AppCategory> loadCategory(int categoryId) {
+    return _dbRepo.loadCategory(categoryId);
   }
 
   Future<int> generateBudgetId() {
@@ -31,6 +36,15 @@ class BudgetDetailDatabaseRepository {
   Future<int> findBudgetId(int catId, DateTime startMonth, DateTime endMonth ) {
     return db.queryBudget(catId: catId, start: startMonth, end: endMonth);
   }
+
+  Future<AppCategory> loadCategory(int categoryId) async {
+    List<AppCategory> cats = await db.queryCategory(id: categoryId);
+
+    if(cats != null && cats.length == 1) return cats[0];
+
+    return null;
+  }
+
   Future<int> generateBudgetId() {
     return db.generateBudgetId();
   }

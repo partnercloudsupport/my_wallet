@@ -82,45 +82,49 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
   }
 
   Widget _budgetItem(int index, padding) {
-    return Center(
-      child: Stack(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(padding),
-            child: Stack(
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: ClipRect(
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      heightFactor: budgetList == null ? 0.0 : budgetList[index].total == 0 ? 0.0 : budgetList[index].spent / budgetList[index].total,
-                      child: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.pinkAccent),
+    return InkWell(
+      onTap: () => Navigator.pushNamed(context, routes.EditBudget(categoryId: budgetList[index].categoryId)),
+      child: Center(
+        child: Stack(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(padding),
+              child: Stack(
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: ClipRect(
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        heightFactor: budgetList == null ? 0.0 : budgetList[index].total == 0 ? 0.0 : budgetList[index].spent / budgetList[index].total,
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.pinkAccent),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.pinkAccent, width: 3.0)),
-                ),
-                Center(child: Text("${_nf.format(budgetList[index].total)}", style: Theme.of(context).textTheme.subhead,),)
-              ],
+                  Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.pinkAccent, width: 3.0)),
+                  ),
+                  Center(child: Text("${_nf.format(budgetList[index].total)}", style: Theme.of(context).textTheme.subhead,),)
+                ],
+              ),
             ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Text(
-              budgetList[index].categoryName,
-              style: Theme.of(context).textTheme.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,)
-          )
-        ],
-      ),);
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                budgetList[index].categoryName,
+                style: Theme.of(context).textTheme.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,)
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   @override

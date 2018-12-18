@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class routes {
   static const AddTransaction = "AddTransaction";
   static const TransactionListAccount = "TransactionListAccount";
@@ -32,5 +34,9 @@ class routes {
     if(datetime != null) return "$TransactionListDate/${datetime.millisecondsSinceEpoch}:$title";
 
     return "Unknown";
+  }
+
+  static String EditBudget({@required int categoryId}) {
+    return "$AddBudget/$categoryId";
   }
 }

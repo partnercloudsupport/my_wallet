@@ -25,7 +25,7 @@ class ListBudgetsRepository extends CleanArchitectureRepository{
 
         double earn = await db.sumTransactionsByCategory(catId: f.id, type: TransactionType.typeIncome, start: firstDay, end: lastDay);
 
-        entities.add(BudgetEntity(f.name, spend - earn, budget == null ? 0 : budget));
+        entities.add(BudgetEntity(f.id, f.name, spend - earn > 0 ? spend - earn : 0, budget == null ? 0 : budget));
       }
     }
     return entities;

@@ -8,8 +8,9 @@ import 'package:intl/intl.dart';
 
 class BudgetDetail extends StatefulWidget {
   final String title;
+  final int categoryId;
 
-  BudgetDetail(this.title);
+  BudgetDetail(this.title, {this.categoryId});
 
   @override
   State<StatefulWidget> createState() {
@@ -22,7 +23,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
   GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
 
-  String _number, _decimal, _name;
+  String _number, _decimal;
   DateTime _from, _to;
   AppCategory _category;
   double _amount = 0.0;
@@ -45,6 +46,10 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
     _to = Utils.lastDayOfMonth(DateTime.now());
 
     presenter.loadCategoryList();
+
+    if(widget.categoryId != null) {
+      presenter.loadCategoryBudget(widget.categoryId);
+    }
   }
 
   @override
@@ -186,5 +191,17 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
               ],
             )
     );
+  }
+
+  @override
+  void onBudgetLoaded(BudgetDetailEntity entity) {
+    if(entity != null) {
+      setState(() {
+        this._to = entity.to;
+        this._from = entity.from;
+        this._amount = entity.amount;
+        this._category = entity.category;
+      });
+    }
   }
 }

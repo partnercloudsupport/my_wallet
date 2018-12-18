@@ -10,6 +10,10 @@ class BudgetDetailPresenter extends CleanArchitecturePresenter<BudgetDetailUseCa
     useCase.loadCategoryList(dataView.updateCategoryList);
   }
 
+  void loadCategoryBudget(int categoryId) {
+    useCase.loadCategoryBudget(categoryId, dataView.onBudgetLoaded);
+  }
+
   void saveBudget(
       AppCategory _cat,
       double _amount,
