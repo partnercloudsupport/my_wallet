@@ -16,7 +16,7 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         await repo.saveUserReference(user.uuid);
 
-        onNext(true);
+        onNext(user.displayName != null && user.displayName.isNotEmpty);
       } while (false);
     } catch (e) {
       handleError(onError, e);
@@ -71,9 +71,25 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         await repo.saveUserReference(user.uuid);
 
-        next(true);
+        next(user.displayName != null && user.displayName.isNotEmpty);
       } while (false);
     } catch (e) {
+      handleError(error, e);
+    }
+  }
+
+  void signInWithFacebook(onNext<bool> next, onError error) async {
+    try {
+      do {
+        User user = await repo.signInWithFacebook();
+
+        if(user == null) break;
+
+        await repo.saveUserReference(user.uuid);
+
+        next(user.displayName != null && user.displayName.isNotEmpty);
+      } while(false);
+    } catch(e) {
       handleError(error, e);
     }
   }

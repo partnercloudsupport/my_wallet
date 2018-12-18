@@ -9,6 +9,10 @@ import 'package:my_wallet/data/data.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 const _members = "members";
 const _homes = "homes";
 const _host = "host";
@@ -56,10 +60,42 @@ Future<User> signInWithGoogle() async {
     FirebaseUser _user = await _auth.signInWithGoogle(idToken: _authentication.idToken, accessToken: _authentication.accessToken);
 
     if(_user != null) {
+      print(await _auth.currentUser());
       return User(_user.uid, _user.email, _user.displayName, _user.photoUrl, null);
     }
 
     throw Exception("Failed to signin with Google");
+  });
+}
+
+Future<User> signInWithFacebook() async {
+  return _lock.synchronized(() async {
+    FacebookLogin _login = FacebookLogin();
+    FacebookLoginResult _result = await _login.logInWithReadPermissions(['email']);
+
+    if(_result.status == FacebookLoginStatus.loggedIn) {
+      var graphResponse = await http.get(
+          'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${_result.accessToken.token}');
+
+      JsonDecoder json = JsonDecoder();
+      var profile = json.convert(graphResponse.body);
+      print(profile.toString());
+
+      var displayName = profile['name'];
+      print("Name: ${profile['name']}");
+
+      FirebaseUser _user = await _auth.signInWithFacebook(accessToken: _result.accessToken.token);
+
+      if (_user != null) {
+        UserUpdateInfo userUpdateInfo = UserUpdateInfo();
+        userUpdateInfo.displayName = displayName;
+        await _user.updateProfile(userUpdateInfo);
+
+        return User(_user.uid, _user.email, _user.displayName, _user.photoUrl, null);
+      }
+    }
+
+    throw Exception("Failed to signin with Facebook");
   });
 }
 

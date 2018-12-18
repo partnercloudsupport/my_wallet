@@ -75,6 +75,10 @@ class LoginRepository extends CleanArchitectureRepository{
   Future<User> signInWithGoogle() {
     return _fbRepo.signInWithGoogle();
   }
+
+  Future<User> signInWithFacebook() {
+    return _fbRepo.signInWithFacebook();
+  }
 }
 
 class _LoginFirebaseRepository {
@@ -111,6 +115,10 @@ class _LoginFirebaseRepository {
 
   Future<User> signInWithGoogle() {
     return fm.signInWithGoogle();
+  }
+
+  Future<User> signInWithFacebook() {
+    return fm.signInWithFacebook();
   }
 }
 

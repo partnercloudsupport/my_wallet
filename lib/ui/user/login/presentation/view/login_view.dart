@@ -37,9 +37,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           Image.asset("assets/nartus.png"),
-          Padding(
-            padding: EdgeInsets.only(left: 20.0, right: 20.0),
-            child: Row(
+          Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
@@ -70,7 +68,6 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
                   ),
                 ),
               ],
-            ),
           ),
           Column(
             mainAxisSize: MainAxisSize.max,
@@ -123,7 +120,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   }
 
   @override
-  void onSignInSuccess(bool result) {
+  void onSignInSuccess(bool hasDisplayName) {
     _signingIn = false;
 
     _loginKey.currentState.stop();
@@ -171,6 +168,11 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
 
   void _onFacebookButtonPressed() {
     print("Facebook authentication");
+    if(_signingIn) return;
+
+    _signingIn = true;
+    _facebookKey.currentState.process();
+    presenter.signInWithFacebook();
   }
 
   void _onGoogleButtonPressed() {

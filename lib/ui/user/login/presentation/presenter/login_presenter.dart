@@ -16,4 +16,8 @@ class LoginPresenter extends CleanArchitecturePresenter<LoginUseCase, LoginDataV
   void signInWithGoogle() {
     useCase.signInWithGoogle(dataView.onSignInSuccess, dataView.onSignInFailed);
   }
+
+  void signInWithFacebook() {
+    useCase.signInWithFacebook(dataView.onSignInSuccess, dataView.onSignInFailed);
+  }
 }

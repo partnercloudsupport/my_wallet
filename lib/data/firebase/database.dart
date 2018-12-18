@@ -40,7 +40,7 @@ Future<void> setupDatabase(final String homeKey) async {
     }
 
     if(snapShot == null || snapShot.documentID == null || snapShot.documentID.isEmpty) {
-      print("drop all table ${snapShot.documentID}");
+      print("drop all table");
       // drop database
       await db.dropAllTables();
     }
