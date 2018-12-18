@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:my_wallet/data/data.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:my_wallet/data/data_observer.dart';
+import 'package:my_wallet/utils.dart' as Utils;
 
 import 'package:flutter/foundation.dart';
 
@@ -263,10 +264,14 @@ Future<List<Budget>> queryBudgets() async {
 }
 
 Future<int> queryBudget({@required int catId, @required DateTime start, @required DateTime end}) async {
-  String where ="SELECT $_budgetId FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart = ${start.millisecondsSinceEpoch}";
+
+  var monthStart = Utils.firstMomentOfMonth(start);
+
+  String where ="SELECT $_budgetId FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart = ${monthStart.millisecondsSinceEpoch}";
 
   if(end != null) {
-    where += "  AND $_budgetEnd = ${end.millisecondsSinceEpoch}";
+    var monthEnd = Utils.lastDayOfMonth(end);
+    where += "  AND $_budgetEnd = ${monthEnd.millisecondsSinceEpoch}";
   }
 
   var id = await _lock.synchronized(() => db._executeSql(where));
@@ -275,7 +280,10 @@ Future<int> queryBudget({@required int catId, @required DateTime start, @require
 }
 
 Future<double> queryBudgetAmount({@required int catId, @required DateTime start, @required DateTime end}) async {
-  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart >= ${start.millisecondsSinceEpoch} AND $_budgetEnd <= ${end.millisecondsSinceEpoch}"));
+  var monthStart = Utils.firstMomentOfMonth(start);
+  var monthEnd = Utils.lastDayOfMonth(end);
+
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart >= ${monthStart.millisecondsSinceEpoch} AND $_budgetEnd <= ${monthEnd.millisecondsSinceEpoch}"));
 
   print("sum $sum");
 

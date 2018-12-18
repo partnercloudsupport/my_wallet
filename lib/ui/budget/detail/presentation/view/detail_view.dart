@@ -2,8 +2,8 @@ import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 
 import 'package:my_wallet/ui/budget/detail/presentation/presenter/detail_presenter.dart';
 import 'package:my_wallet/ui/budget/detail/presentation/view/detail_data_view.dart';
+import 'package:my_wallet/data/data_observer.dart' as observer;
 
-import 'package:my_wallet/utils.dart' as Utils;
 import 'package:intl/intl.dart';
 
 class BudgetDetail extends StatefulWidget {
@@ -18,8 +18,10 @@ class BudgetDetail extends StatefulWidget {
   }
 }
 
-class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetailPresenter> implements BudgetDetailDataView {
+class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetailPresenter> implements BudgetDetailDataView, observer.DatabaseObservable {
   _BudgetDetailState() : super(BudgetDetailPresenter());
+
+  var tables = [observer.tableCategory, observer.tableBudget];
 
   GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
 
@@ -33,18 +35,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
   List<AppCategory> _categories = [];
 
-  @override
-  void init() {
-    presenter.dataView = this;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _from = Utils.firstMomentOfMonth(DateTime.now());
-    _to = Utils.lastDayOfMonth(DateTime.now());
-
+  void loadData() {
     presenter.loadCategoryList();
 
     if(widget.categoryId != null) {
@@ -53,7 +44,29 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   }
 
   @override
+  void init() {
+    presenter.dataView = this;
+  }
+
+  @override
+  void onDatabaseUpdate(String table) {
+    loadData();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    observer.registerDatabaseObservable(tables, this);
+
+    _from = _to = DateTime.now();
+
+    loadData();
+  }
+
+  @override
   void dispose() {
+    observer.unregisterDatabaseObservable(tables, this);
     super.dispose();
   }
 

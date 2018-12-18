@@ -18,6 +18,10 @@ class BudgetDetailRepository extends CleanArchitectureRepository {
     return _dbRepo.loadCategory(categoryId);
   }
 
+  Future<double> loadBudgetThisMonth(int categoryId) {
+    return _dbRepo.loadBudgetThisMonth(categoryId);
+  }
+
   Future<int> generateBudgetId() {
     return _dbRepo.generateBudgetId();
   }
@@ -43,6 +47,10 @@ class BudgetDetailDatabaseRepository {
     if(cats != null && cats.length == 1) return cats[0];
 
     return null;
+  }
+
+  Future<double> loadBudgetThisMonth(int categoryId) {
+    return db.queryBudgetAmount(catId: categoryId, start: DateTime.now(), end: DateTime.now());
   }
 
   Future<int> generateBudgetId() {

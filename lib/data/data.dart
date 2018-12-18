@@ -1,3 +1,5 @@
+import 'package:my_wallet/utils.dart' as Utils;
+
 // #############################################################################################################################
 // classes to be used in database
 // #############################################################################################################################
@@ -120,16 +122,19 @@ class Budget {
   final int id;
   final int categoryId;
   final double budgetPerMonth;
-  final DateTime budgetStart;
-  final DateTime budgetEnd;
+  final DateTime _start;
+  final DateTime _end;
 
-  const Budget(
+  Budget(
       this.id,
       this.categoryId,
       this.budgetPerMonth,
-      this.budgetStart,
-      this.budgetEnd
+      this._start,
+      this._end
       );
+
+  get budgetStart => Utils.firstMomentOfMonth(this._start);
+  get budgetEnd => Utils.lastDayOfMonth(this._end);
 }
 
 class User {

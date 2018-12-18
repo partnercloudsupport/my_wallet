@@ -11,9 +11,10 @@ class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepositor
 
   void loadCategoryBudget(int categoryId, onNext<BudgetDetailEntity> next) async {
     AppCategory category = await repo.loadCategory(categoryId);
-//    repo.loadCategoryBudget(categoryId).then((value) => next(value));
 
-  next(BudgetDetailEntity(category, 0, DateTime.now(), DateTime.now()));
+    double amount = await repo.loadBudgetThisMonth(categoryId);
+
+  next(BudgetDetailEntity(category, amount, DateTime.now(), DateTime.now()));
   }
 
   void saveBudget(

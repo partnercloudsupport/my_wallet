@@ -60,6 +60,6 @@ class _InputNameState extends State<InputName> {
   void _onNameSaved() {
     widget.onNameChanged(_controller.text);
 
-    Navigator.pop(context);
+    if(widget.autoDismiss) Navigator.pop(context);
   }
 }

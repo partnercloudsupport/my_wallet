@@ -75,7 +75,12 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
       padding: EdgeInsets.all(padding),
       child: CircleAvatar(
         child: IconButton(
-          onPressed: () => Navigator.pushNamed(context, routes.AddBudget),
+          onPressed: () {
+            Navigator.pushNamed(context, routes.CreateCategory)
+                .then((value) {
+                  if(value != null) Navigator.pushNamed(context, routes.EditBudget(categoryId: value));
+                });
+          },
           icon: Icon(Icons.add, color: AppTheme.darkBlue, size: 30,),),
       ),
     );

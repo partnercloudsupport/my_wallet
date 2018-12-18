@@ -23,8 +23,8 @@ class _CreateCategoryState extends CleanArchitectureView<CreateCategory, CreateC
   }
 
   @override
-  void onCreateCategorySuccess(bool result) {
-    Navigator.pop(context, result);
+  void onCreateCategorySuccess(int categoryId) {
+    Navigator.pop(context, categoryId);
   }
 
   @override
