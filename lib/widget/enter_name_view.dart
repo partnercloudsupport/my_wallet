@@ -26,7 +26,7 @@ class _InputNameState extends State<InputName> {
         title: widget.title,
         actions: <Widget>[
           FlatButton(
-            onPressed: () => widget.onNameChanged(_controller.text),
+            onPressed: _onNameSaved,
             child: Text("Save"),
           )
         ],
@@ -54,5 +54,11 @@ class _InputNameState extends State<InputName> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  void _onNameSaved() {
+    widget.onNameChanged(_controller.text);
+
+    Navigator.pop(context);
   }
 }
