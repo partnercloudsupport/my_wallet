@@ -61,4 +61,20 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
       onError(LoginException(e.toString()));
     }
   }
+
+  void signInWithGoogle(onNext<bool> next, onError error) async {
+    try {
+      do {
+        User user = await repo.signInWithGoogle();
+
+        if (user == null) break;
+
+        await repo.saveUserReference(user.uuid);
+
+        next(true);
+      } while (false);
+    } catch (e) {
+      handleError(error, e);
+    }
+  }
 }

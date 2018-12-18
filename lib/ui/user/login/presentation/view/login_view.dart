@@ -1,6 +1,7 @@
 import 'package:my_wallet/ui/user/login/presentation/view/login_data_view.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/user/login/presentation/presenter/login_presenter.dart';
+import 'package:my_wallet/font/my_flutter_app_icons.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -16,6 +17,9 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   final TextEditingController _passwordController = TextEditingController();
 
   final GlobalKey<RoundedButtonState> _loginKey = GlobalKey();
+  final GlobalKey<RoundedButtonState> _googleKey = GlobalKey();
+  final GlobalKey<RoundedButtonState> _facebookKey = GlobalKey();
+
   bool _obscureText = true;
 
   bool _signingIn = false;
@@ -33,6 +37,41 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           Image.asset("assets/nartus.png"),
+          Padding(
+            padding: EdgeInsets.only(left: 20.0, right: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                  child: RoundedButton(
+                    key: _facebookKey,
+                    onPressed: _onFacebookButtonPressed,
+                    padding: EdgeInsets.all(10.0),
+                    child: Icon(
+                      MyFlutterApp.facebook_rect,
+                      color: AppTheme.white,
+                    ),
+                    radius: 5.0,
+                    color: AppTheme.facebookColor,
+                  ),
+                ),
+                Expanded(
+                  child: RoundedButton(
+                    key: _googleKey,
+                    onPressed: _onGoogleButtonPressed,
+                    padding: EdgeInsets.all(10.0),
+                    child: Icon(
+                      MyFlutterApp.googleplus_rect,
+                      color: AppTheme.white,
+                    ),
+                    radius: 5.0,
+                    color: AppTheme.googleColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Column(
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
@@ -88,6 +127,8 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
     _signingIn = false;
 
     _loginKey.currentState.stop();
+    _googleKey.currentState.stop();
+    _facebookKey.currentState.stop();
 
     presenter.checkUserHome();
   }
@@ -96,6 +137,8 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   void onSignInFailed(Exception e) {
     _signingIn = false;
     _loginKey.currentState.stop();
+    _googleKey.currentState.stop();
+    _facebookKey.currentState.stop();
 
     showDialog(context: context, builder: (_) => AlertDialog(
       title: Text("Sign in failed"),
@@ -124,5 +167,18 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
 
   void _register() {
     Navigator.pushNamed(context, routes.Register);
+  }
+
+  void _onFacebookButtonPressed() {
+    print("Facebook authentication");
+  }
+
+  void _onGoogleButtonPressed() {
+    print("Google Authentication");
+    if(_signingIn) return;
+
+    _signingIn = true;
+    _googleKey.currentState.process();
+    presenter.signInWithGoogle();
   }
 }

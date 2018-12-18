@@ -7,6 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:my_wallet/data/data.dart';
 
+import 'package:google_sign_in/google_sign_in.dart';
+
 const _members = "members";
 const _homes = "homes";
 const _host = "host";
@@ -42,6 +44,22 @@ Future<User> login(String email, String password) async {
     }
 
     throw Exception("Failed to signin to firebase");
+  });
+}
+
+Future<User> signInWithGoogle() async {
+  return _lock.synchronized(() async {
+    GoogleSignIn _signin = GoogleSignIn();
+    GoogleSignInAccount _account = await _signin.signIn();
+    GoogleSignInAuthentication _authentication = await _account.authentication;
+    
+    FirebaseUser _user = await _auth.signInWithGoogle(idToken: _authentication.idToken, accessToken: _authentication.accessToken);
+
+    if(_user != null) {
+      return User(_user.uid, _user.email, _user.displayName, _user.photoUrl, null);
+    }
+
+    throw Exception("Failed to signin with Google");
   });
 }
 

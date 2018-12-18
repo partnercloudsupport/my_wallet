@@ -71,6 +71,10 @@ class LoginRepository extends CleanArchitectureRepository{
   Future<User> getUserDetailFromFbDatabase(String homeKey, User user) {
     return _fbRepo.getUserDetailFromFbDatabase(homeKey, user);
   }
+
+  Future<User> signInWithGoogle() {
+    return _fbRepo.signInWithGoogle();
+  }
 }
 
 class _LoginFirebaseRepository {
@@ -103,6 +107,10 @@ class _LoginFirebaseRepository {
 
   Future<User> getCurrentUser() {
     return fm.getCurrentUser();
+  }
+
+  Future<User> signInWithGoogle() {
+    return fm.signInWithGoogle();
   }
 }
 
