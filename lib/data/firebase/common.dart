@@ -1,9 +1,12 @@
 import 'package:my_wallet/data/data.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 export 'package:synchronized/synchronized.dart';
 export 'package:my_wallet/data/data.dart';
 export 'package:flutter/services.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+export 'package:cloud_firestore/cloud_firestore.dart';
 
 const tblAccount = "Account";
 const tblTransaction = "Transaction";
@@ -30,6 +33,17 @@ const fldColor = "color";
 const fldStart = "start";
 const fldEnd = "end";
 
-User snapshotToUser(DataSnapshot snapshot) {
-  return User(snapshot.value[fldUuid], snapshot.value[fldEmail], snapshot.value[fldDisplayName], snapshot.value[fldPhotoUrl], snapshot.value[fldColor]);
+User snapshotToUser(DocumentSnapshot snapshot) {
+  return User(snapshot.data[fldUuid], snapshot.data[fldEmail], snapshot.data[fldDisplayName], snapshot.data[fldPhotoUrl], snapshot.data[fldColor]);
+}
+
+Firestore _firestore;
+
+Future<Firestore> firestore(FirebaseApp app) async {
+  if(_firestore == null) {
+    _firestore = Firestore(app: app);
+    await _firestore.settings(timestampsInSnapshotsEnabled: true);
+  }
+
+  return _firestore;
 }

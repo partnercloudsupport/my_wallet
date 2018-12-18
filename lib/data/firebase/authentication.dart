@@ -1,8 +1,9 @@
 import 'package:my_wallet/data/firebase/common.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:my_wallet/data/data.dart';
 
@@ -16,7 +17,7 @@ FirebaseAuth _auth;
 bool _isInit = false;
 final Lock _lock = Lock();
 
-DatabaseReference _database;
+Firestore _firestore;
 
 
 Future<void> init(FirebaseApp app) async {
@@ -27,7 +28,7 @@ Future<void> init(FirebaseApp app) async {
 
     _auth = FirebaseAuth.fromApp(app);
 
-    _database = FirebaseDatabase(app: app).reference();
+    _firestore = await firestore(app);
   });
 }
 
@@ -107,61 +108,52 @@ Future<User> getCurrentUser() async {
 /// This method will try to access user's home table to get user detail from /data/<homekey>/User
 Future<User> getUserDetail(String homeKey, User user) async {
   return _lock.synchronized(() async {
-    DataSnapshot snapshot = await _database.reference().child(_data).child(homeKey).child(tblUser).child(user.uuid).once();
+    DocumentSnapshot snapshot;
+  try {
+    snapshot = await _firestore.collection(_data).document(homeKey).collection(tblUser).document(user.uuid).get();
+  } catch(e) {
+    throw Exception("User not found");
+  }
 
-    if(snapshot == null) throw Exception("User not found");
+    if (snapshot == null) throw Exception("User not found");
 
-    return snapshotToUser(snapshot);
+    return _snapshotToUser(snapshot);
   });
 }
 
 Future<bool> joinHome(Home home, User user) async  {
   return _lock.synchronized(() async {
-    DatabaseReference _ref = _database.reference().child(_homes).child(home.key).child(_members);
+    CollectionReference _ref = _firestore.collection(_homes).document(home.key).collection(_members);
 
-    DataSnapshot members = await _ref.once();
+    QuerySnapshot members = await _ref.getDocuments();
 
-    int id = members == null || members.value == null ? 0 : members.value.length;
+    int id = members == null || members.documents == null ? 0 : members.documents.length;
 
-    var result = await _ref.child("$id").runTransaction((data) async {
-      data.value = {
-        fldEmail : user.email
-      };
-
-      return data;
-    });
-    return result.committed;
+    await _ref.document("$id").setData({fldEmail : user.email});
+    return true;
   });
 }
 
 Future<Home> findHomeOfHost(String host) async {
   return _lock.synchronized(() async {
-    DataSnapshot _allHomes = await _database.reference().child(_homes).once();
+    QuerySnapshot _allHomes = await _firestore.collection(_homes).getDocuments();
 
     Home home;
+
     do {
-      if (_allHomes == null) break;
+      if(_allHomes == null) break;
 
-      if (_allHomes.value == null) break;
+      if(_allHomes.documents == null) break;
 
-      if (!(_allHomes.value is Map<dynamic, dynamic>)) break;
+      if(_allHomes.documents.isEmpty) break;
 
-      Map map = _allHomes.value as Map<dynamic, dynamic>;
-
-      for (dynamic key in map.keys) {
-        dynamic value = map[key];
-
-        if(value[_host] != null && value[_host]== host) {
-          home = Home(key, value[_host], value[fldName]);
-
-          break;
-        }
+      var _hostHome = _allHomes.documents.firstWhere((f) => f.data[_host] == host);
+      if(_hostHome != null) {
+        home = Home(_hostHome.documentID, _hostHome.data[_host], _hostHome.data[fldName]);
       }
-
     } while (false);
 
     return home;
-
   });
 }
 
@@ -171,64 +163,48 @@ Future<void> createHome(
     String homeName,
     ) {
   return _lock.synchronized(() async {
-    DatabaseReference _ref = _database.reference().child(_homes);
+    CollectionReference _ref = _firestore.collection(_homes);
 
-    var result = await _ref.child("$homeKey").runTransaction((data) async {
-      data.value = {
-        _host : hostEmail,
-        fldName: homeName,
-      };
-
-      return data;
+    await _ref.document(homeKey).setData({
+      _host: hostEmail,
+      fldName: homeName
     });
 
-    return result.committed;
+    return true;
   });
 }
 
 Future<bool> isHost(User user) {
   return _lock.synchronized(() async {
-    DatabaseReference _ref = _database.reference().child(_homes);
-
-    DataSnapshot snapshot = await _ref.child(user.uuid).once();
-
-    return snapshot != null && snapshot.value != null;
+    QuerySnapshot snapshot = await _firestore.collection(_homes).where(_host, isEqualTo: user.email).getDocuments();
+    return snapshot.documents != null && snapshot.documents.isNotEmpty;
   });
 }
 
 Future<Home> searchUserHome(User user) {
   return _lock.synchronized(() async {
-    DataSnapshot _allHomes = await _database.reference().child(_homes).once();
-
     Home home;
     do {
-      if (_allHomes == null) break;
+    QuerySnapshot _snapshot = await _firestore.collection(_homes).getDocuments();
+    if(_snapshot == null || _snapshot.documents == null || _snapshot.documents.isEmpty) break;
 
-      if (_allHomes.value == null) break;
+    // check each document in this snapshot
+    for (DocumentSnapshot f in _snapshot.documents) {
+      List<DocumentSnapshot> _memSnapshot = (await f.reference.collection(_members).where(fldEmail, isEqualTo: user.email).getDocuments()).documents;
 
-      if (!(_allHomes.value is Map<dynamic, dynamic>)) break;
+      if(_memSnapshot != null && _memSnapshot.isNotEmpty) {
+        home = Home(f.documentID, f.data[_host], f.data[fldName]);
 
-      Map map = _allHomes.value as Map<dynamic, dynamic>;
-
-      for (dynamic key in map.keys) {
-        dynamic value = map[key];
-
-        if(value[_members] != null && value[_members] is List) {
-          List list = value[_members];
-
-          Iterable found = list.where((f) => f[fldEmail] == user.email);
-
-          if(found.length >= 1) {
-            home = Home(key, value[_host], value[fldName]);
-
-            break;
-          }
-        }
+        break;
       }
-
+    }
     } while (false);
 
     return home;
   });
 }
 
+
+User _snapshotToUser(DocumentSnapshot snapshot) {
+  return User(snapshot.documentID, snapshot.data[fldEmail], snapshot.data[fldDisplayName], snapshot.data[fldPhotoUrl], snapshot.data[fldColor]);
+}

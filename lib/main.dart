@@ -29,6 +29,7 @@ import 'package:flutter/services.dart';
 
 import 'package:my_wallet/firebase_config.dart' as fbConfig;
 import 'package:firebase_core/firebase_core.dart';
+
 import 'dart:io' show Platform;
 
 void main() async {
