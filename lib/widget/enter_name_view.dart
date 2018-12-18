@@ -7,8 +7,9 @@ class InputName extends StatefulWidget {
   final String title;
   final String hintText;
   final ValueChanged<String> onNameChanged;
+  final bool autoDismiss;
 
-  InputName(this.title, this.onNameChanged, {this.hintText = "Enter a name"});
+  InputName(this.title, this.onNameChanged, {this.hintText = "Enter a name", this.autoDismiss = true});
 
   @override
   State<StatefulWidget> createState() {

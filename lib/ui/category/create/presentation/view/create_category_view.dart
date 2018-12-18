@@ -12,8 +12,6 @@ class CreateCategory extends StatefulWidget {
 class _CreateCategoryState extends CleanArchitectureView<CreateCategory, CreateCategoryPresenter> implements CreateCategoryDataView {
   _CreateCategoryState() : super(CreateCategoryPresenter());
 
-  String _name = "";
-
   @override
   void init() {
     presenter.dataView = this;
@@ -21,7 +19,7 @@ class _CreateCategoryState extends CleanArchitectureView<CreateCategory, CreateC
 
   @override
   Widget build(BuildContext context) {
-    return InputName("Create Category", _onNameChanged, hintText: "Category Name",);
+    return InputName("Create Category", _onNameChanged, hintText: "Category Name", autoDismiss: false);
   }
 
   @override
@@ -45,6 +43,6 @@ class _CreateCategoryState extends CleanArchitectureView<CreateCategory, CreateC
 
 
   void _onNameChanged(String name) {
-    presenter.saveCategory(_name);
+    presenter.saveCategory(name);
   }
 }
