@@ -77,8 +77,7 @@ Future<User> signInWithFacebook() async {
       var graphResponse = await http.get(
           'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${_result.accessToken.token}');
 
-      JsonDecoder json = JsonDecoder();
-      var profile = json.convert(graphResponse.body);
+      var profile = json.decode(graphResponse.body);
       print(profile.toString());
 
       var displayName = profile['name'];
