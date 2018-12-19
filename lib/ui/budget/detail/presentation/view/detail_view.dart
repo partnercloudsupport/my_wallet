@@ -3,6 +3,7 @@ import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/budget/detail/presentation/presenter/detail_presenter.dart';
 import 'package:my_wallet/ui/budget/detail/presentation/view/detail_data_view.dart';
 import 'package:my_wallet/data/data_observer.dart' as observer;
+import 'package:flutter/cupertino.dart';
 
 import 'package:intl/intl.dart';
 
@@ -32,7 +33,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   AppCategory _category;
   double _amount = 0.0;
 
-  DateFormat _df = DateFormat("dd MMM, yyyy");
+  DateFormat _df = DateFormat("MMM, yyyy");
   NumberFormat _nf = NumberFormat("\$##0.00");
 
   List<AppCategory> _categories = [];
@@ -160,13 +161,47 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   }
 
   void _showFromMonth() {
-    showDatePicker(context: context, initialDate: _from, firstDate: _from.subtract(_duration), lastDate: _from.add(_duration),).then((value) => setState(() => _from = value));
+    showBottomSheetForMonths(_from, (date) {
+      if(date.isAfter(_to)) _to = date;
+
+      setState(() => _from = date);
+      Navigator.pop(context);
+    });
   }
 
   void _showToMonth() {
-    showDatePicker(context: context, initialDate: _to, firstDate: _from, lastDate: _from.add(_duration)).then((value) => setState(() => _to = value));
+    showBottomSheetForMonths(_from, (date) {
+      setState(() => _to = date);
+
+      Navigator.pop(context);
+    });
   }
 
+  void showBottomSheetForMonths(DateTime _month, ValueChanged<DateTime> onSelected) {
+    showModalBottomSheet(
+        context: context,
+        builder: (_) => BottomViewContent.count(context, 12, (_, index) {
+          int month = _from.month + index;
+          int year = _from.year;
+
+          if(month > 12) {
+            month -= 12;
+            year += 1;
+          }
+
+          var date = DateTime(year, month, 1);
+
+          return InkWell(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Text(_df.format(date), style: Theme.of(context).textTheme.headline.apply(color: AppTheme.darkBlue),),
+              ),
+            ),
+            onTap: () => onSelected(date)
+          );
+        }));
+  }
   void _onNumberInput(String number, String decimal) {
     setState(() {
       this._number = number;

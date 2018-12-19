@@ -46,7 +46,7 @@ class BudgetDetailDatabaseRepository {
   }
 
   Future<Budget> loadBudgetThisMonth(int categoryId) async {
-    return await db.queryBudget(catId: categoryId, start: DateTime.now(), end: DateTime.now());
+    return await db.queryBudgetAmount(catId: categoryId, start: DateTime.now(), end: DateTime.now());
   }
 
   Future<int> generateBudgetId() {

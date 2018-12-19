@@ -19,7 +19,7 @@ class ListBudgetsRepository extends CleanArchitectureRepository{
     
     if(cats != null) {
       for(AppCategory f in cats) {
-        double budget = await db.queryBudgetAmount(catId : f.id, start: firstDay, end: lastDay);
+        double budget = (await db.queryBudgetAmount(catId : f.id, start: firstDay, end: lastDay)).budgetPerMonth;
 
         double spend = await db.sumTransactionsByCategory(catId: f.id, type: TransactionType.typeExpense, start: firstDay, end: lastDay);
 

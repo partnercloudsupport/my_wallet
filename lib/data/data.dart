@@ -122,16 +122,19 @@ class Budget {
   final int id;
   final int categoryId;
   final double budgetPerMonth;
-  final DateTime budgetStart;
-  final DateTime budgetEnd;
+  final DateTime _start;
+  final DateTime _end;
 
   Budget(
       this.id,
       this.categoryId,
       this.budgetPerMonth,
-      this.budgetStart,
-      this.budgetEnd
+      this._start,
+      this._end
       );
+
+  get budgetStart => Utils.firstMomentOfMonth(_start);
+  get budgetEnd => Utils.lastDayOfMonth(_end);
 }
 
 class User {

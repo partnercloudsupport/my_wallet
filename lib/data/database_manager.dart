@@ -263,45 +263,45 @@ Future<List<Budget>> queryBudgets() async {
   return map == null ? null : map.map((f) => _toBudget(f)).toList();
 }
 
-Future<Budget> queryBudget({@required int catId, @required DateTime start, @required DateTime end}) async {
+//Future<Budget> queryBudget({@required int catId, @required DateTime start, @required DateTime end}) async {
+//
+//  var monthStart = Utils.firstMomentOfMonth(start);
+//
+//  String where ="SELECT * FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart >= ${monthStart.millisecondsSinceEpoch}";
+//
+//  var monthEnd;
+//  if(end != null) {
+//    monthEnd = Utils.lastDayOfMonth(end);
+//    where += "  AND $_budgetEnd <= ${monthEnd.millisecondsSinceEpoch}";
+//  } else {
+//    monthEnd = Utils.lastDayOfMonth(start);
+//  }
+//
+//  var budgets = await _lock.synchronized(() => db._executeSql(where));
+//
+//  if(budgets == null || budgets.isEmpty ) return null;
+//
+//  double amount = 0;
+//
+//  budgets.map((f) => _toBudget(f)).forEach((f) {
+//    amount += f.budgetPerMonth;
+//
+//    print("${f.budgetStart}");
+//  });
+//
+//  return Budget(0, catId, amount, monthStart, monthEnd);
+//}
 
-  var monthStart = Utils.firstMomentOfMonth(start);
-
-  String where ="SELECT * FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart >= ${monthStart.millisecondsSinceEpoch}";
-
-  if(end != null) {
-    var monthEnd = Utils.lastDayOfMonth(end);
-    where += "  AND $_budgetEnd <= ${monthEnd.millisecondsSinceEpoch}";
-  }
-
-  var budgets = await _lock.synchronized(() => db._executeSql(where));
-
-  if(budgets == null || budgets.isEmpty ) return null;
-
-  double amount = 0;
-  DateTime budgetStart = DateTime.now();
-  DateTime budgetEnd = DateTime.now();
-
-  budgets.map((f) => _toBudget(f)).forEach((f) {
-    amount += f.budgetPerMonth;
-    budgetStart = budgetStart.isAfter(f.budgetStart) ? f.budgetStart : budgetStart;
-    budgetEnd = budgetEnd.isBefore(f.budgetEnd) ? f.budgetEnd : budgetEnd;
-
-    print("${f.budgetStart}");
-  });
-
-  return Budget(0, catId, amount, budgetStart, budgetEnd);
-}
-
-Future<double> queryBudgetAmount({@required int catId, @required DateTime start, @required DateTime end}) async {
+Future<Budget> queryBudgetAmount({@required int catId, @required DateTime start, @required DateTime end}) async {
   var monthStart = Utils.firstMomentOfMonth(start);
   var monthEnd = Utils.lastDayOfMonth(end);
 
-  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart >= ${monthStart.millisecondsSinceEpoch} AND $_budgetEnd <= ${monthEnd.millisecondsSinceEpoch}"));
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart <= ${monthStart.millisecondsSinceEpoch} AND $_budgetEnd >= ${monthEnd.millisecondsSinceEpoch}"));
 
   print("sum $sum");
 
-  return sum == null || sum.isEmpty ? 0.0 : sum[0].values.first ?? 0.0;
+  var amount = sum == null || sum.isEmpty ? 0.0 : sum[0].values.first ?? 0.0;
+  return Budget(0, catId, amount, monthStart, monthEnd);
 }
 
 Future<int> generateAccountId() {

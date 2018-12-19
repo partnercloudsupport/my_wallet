@@ -14,7 +14,7 @@ class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepositor
 
     Budget budget = await repo.loadBudgetThisMonth(categoryId);
 
-    next(BudgetDetailEntity(category, budget.budgetPerMonth, budget.budgetStart, budget.budgetEnd));
+    next(BudgetDetailEntity(category, budget == null ? 0.0 : budget.budgetPerMonth, budget == null ? DateTime.now() : budget.budgetStart, budget == null ? DateTime.now() : budget.budgetEnd));
   }
 
   void saveBudget(
@@ -26,7 +26,11 @@ class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepositor
       onError error
       ) async {
     int id = await repo.generateBudgetId();
-    Budget budget = Budget(id, _cat.id, _amount, startMonth, endMonth);
-    repo.saveBudget(budget).then((value) => next(value)).catchError(error);
+
+    // save multiple budgets, 1 budget per month
+//    while(isSameMonth(startMonth, endMonth)) {
+      Budget budget = Budget(id, _cat.id, _amount, startMonth, endMonth);
+      repo.saveBudget(budget).then((value) => next(value)).catchError(error);
+//    }
   }
 }
