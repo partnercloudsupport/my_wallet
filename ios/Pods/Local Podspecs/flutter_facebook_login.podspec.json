@@ -1,0 +1,29 @@
+{
+  "name": "flutter_facebook_login",
+  "version": "0.0.1",
+  "summary": "A Flutter plugin for allowing users to authenticate with native Android &amp; iOS Facebook login SDKs.",
+  "description": "A Flutter plugin for allowing users to authenticate with native Android &amp; iOS Facebook login SDKs.",
+  "homepage": "http://example.com",
+  "license": {
+    "file": "../LICENSE"
+  },
+  "authors": {
+    "Your Company": "email@example.com"
+  },
+  "source": {
+    "path": "."
+  },
+  "source_files": "Classes/**/*",
+  "public_header_files": "Classes/**/*.h",
+  "dependencies": {
+    "Flutter": [
+
+    ],
+    "FBSDKLoginKit": [
+      "~> 4.29"
+    ]
+  },
+  "platforms": {
+    "ios": "8.0"
+  }
+}
