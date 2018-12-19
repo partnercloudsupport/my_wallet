@@ -6,7 +6,7 @@ import 'package:my_wallet/ui/user/homeprofile/gohome/domain/gohome_use_case.dart
 class GoHomePresenter extends CleanArchitecturePresenter<GoHomeUseCase, GoHomeDataView> {
   GoHomePresenter() : super(GoHomeUseCase());
 
-  void goHome(String homeKey) {
-    useCase.goHome(homeKey, dataView.onHomeSetupDone);
+  void goHome(String homeKey, String homeName, String hostEmail) {
+    useCase.goHome(homeKey, homeName, hostEmail, dataView.onHomeSetupDone);
   }
 }

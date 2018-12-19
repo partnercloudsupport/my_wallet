@@ -7,12 +7,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserDetailUseCase extends CleanArchitectureUseCase<UserDetailRepository> {
   UserDetailUseCase() : super(UserDetailRepository());
 
-  void loadCurrentUser(onNext<User> next) async {
+  void loadCurrentUser(onNext<UserDetailEntity> next) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     String uuid = sharedPreferences.get(UserUUID);
 
-    User user = await repo.loadUserWithUuid(uuid);
+    UserDetailEntity user = await repo.loadUserWithUuid(uuid);
 
     next(user);
   }

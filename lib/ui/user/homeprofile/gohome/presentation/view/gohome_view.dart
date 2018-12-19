@@ -71,7 +71,7 @@ class _GoHomeState extends CleanArchitectureView<GoHome, GoHomePresenter> implem
     _goingHome = true;
     _goHomeState.currentState.process();
 
-    presenter.goHome(widget.homeKey);
+    presenter.goHome(widget.homeKey, widget.homeName, widget.hostEmail);
   }
 
   @override

@@ -16,7 +16,7 @@ class UserDetail extends StatefulWidget {
 class _UserDetailState extends CleanArchitectureView<UserDetail, UserDetailPresenter> implements UserDetailDataView {
   _UserDetailState() : super(UserDetailPresenter());
 
-  User _user;
+  UserDetailEntity _user;
 
   @override
   init() {
@@ -56,7 +56,29 @@ class _UserDetailState extends CleanArchitectureView<UserDetail, UserDetailPrese
             ),
           ),
           Center(child: Text(_user != null ? _user.displayName : "", style: Theme.of(context).textTheme.headline,),),
-          Center(child: Text(_user != null ? _user.email : "", style: Theme.of(context).textTheme.title,),)
+          Center(child: Text(_user != null ? _user.email : "", style: Theme.of(context).textTheme.title,),),
+          Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text("Home", style: Theme.of(context).textTheme.title,),
+                Text(_user != null ? _user.homeName : "", style: Theme.of(context).textTheme.title.apply(fontSizeFactor: 0.9),)
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text("Host", style: Theme.of(context).textTheme.title,),
+                Text(_user != null ? _user.hostEmail : "", style: Theme.of(context).textTheme.title.apply(fontSizeFactor: 0.9),)
+              ],
+            ),
+          )
         ],
       ),
     );
@@ -76,7 +98,7 @@ class _UserDetailState extends CleanArchitectureView<UserDetail, UserDetailPrese
   }
 
   @override
-  void onUserLoaded(User user) {
+  void onUserLoaded(UserDetailEntity user) {
     if(user != null) {
       setState(() => _user = user);
     }

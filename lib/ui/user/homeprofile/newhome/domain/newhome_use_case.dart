@@ -16,7 +16,7 @@ class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
       if(homeKey == null) throw NewHomeException("Failed to create this new home");
 
       // save this key to shared preference
-      await repo.saveKey(homeKey);
+      await repo.saveHome(homeKey, name, host.email);
 
       await repo.updateDatabaseReference(homeKey);
 
@@ -41,7 +41,7 @@ class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
       if(!result) throw NewHomeException("Failed to join home with $host");
 
       // save this home key
-      await repo.saveKey(home.key);
+      await repo.saveHome(home.key, home.name, home.host);
 
       // and finally update database reference
       await repo.updateDatabaseReference(home.key);

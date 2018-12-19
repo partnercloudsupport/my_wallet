@@ -34,10 +34,12 @@ class NewHomeRepository extends CleanArchitectureRepository {
     return _fbRepo.joinHome(home, user);
   }
 
-  Future<void> saveKey(String homeKey) async {
+  Future<void> saveHome(String homeKey, String homeName, String hostEmail) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
 
     pref.setString(prefHomeProfile, homeKey);
+    pref.setString(prefHomeName, homeName);
+    pref.setString(prefHostEmail, hostEmail);
   }
 
   Future<void> updateDatabaseReference(String key) {

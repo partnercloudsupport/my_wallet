@@ -5,8 +5,8 @@ import 'package:my_wallet/ui/user/homeprofile/gohome/data/gohome_repository.dart
 class GoHomeUseCase extends CleanArchitectureUseCase<GoHomeRepository> {
   GoHomeUseCase() : super(GoHomeRepository());
 
-  void goHome(String homeKey, onNext<bool> next) async {
-    await repo.updateHomeReference(homeKey);
+  void goHome(String homeKey, String homeName, String hostEmail, onNext<bool> next) async {
+    await repo.updateHomeReference(homeKey, homeName, hostEmail);
 
     await repo.switchReference(homeKey);
 
