@@ -263,20 +263,34 @@ Future<List<Budget>> queryBudgets() async {
   return map == null ? null : map.map((f) => _toBudget(f)).toList();
 }
 
-Future<int> queryBudget({@required int catId, @required DateTime start, @required DateTime end}) async {
+Future<Budget> queryBudget({@required int catId, @required DateTime start, @required DateTime end}) async {
 
   var monthStart = Utils.firstMomentOfMonth(start);
 
-  String where ="SELECT $_budgetId FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart = ${monthStart.millisecondsSinceEpoch}";
+  String where ="SELECT * FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart >= ${monthStart.millisecondsSinceEpoch}";
 
   if(end != null) {
     var monthEnd = Utils.lastDayOfMonth(end);
-    where += "  AND $_budgetEnd = ${monthEnd.millisecondsSinceEpoch}";
+    where += "  AND $_budgetEnd <= ${monthEnd.millisecondsSinceEpoch}";
   }
 
-  var id = await _lock.synchronized(() => db._executeSql(where));
+  var budgets = await _lock.synchronized(() => db._executeSql(where));
 
-  return id == null || id.isEmpty ? null : id[0].values.first ?? null;
+  if(budgets == null || budgets.isEmpty ) return null;
+
+  double amount = 0;
+  DateTime budgetStart = DateTime.now();
+  DateTime budgetEnd = DateTime.now();
+
+  budgets.map((f) => _toBudget(f)).forEach((f) {
+    amount += f.budgetPerMonth;
+    budgetStart = budgetStart.isAfter(f.budgetStart) ? f.budgetStart : budgetStart;
+    budgetEnd = budgetEnd.isBefore(f.budgetEnd) ? f.budgetEnd : budgetEnd;
+
+    print("${f.budgetStart}");
+  });
+
+  return Budget(0, catId, amount, budgetStart, budgetEnd);
 }
 
 Future<double> queryBudgetAmount({@required int catId, @required DateTime start, @required DateTime end}) async {
@@ -448,7 +462,12 @@ AppCategory _toCategory(Map<String, dynamic> map) {
 }
 
 Budget _toBudget(Map<String, dynamic> map) {
-  return Budget(map[_budgetId], map[_budgetCategoryId], map[_budgetPerMonth] * 1.0, DateTime.fromMicrosecondsSinceEpoch(map[_budgetStart]), DateTime.fromMillisecondsSinceEpoch(map[_budgetEnd]));
+  return Budget(
+      map[_budgetId],
+      map[_budgetCategoryId],
+      map[_budgetPerMonth] * 1.0,
+      DateTime.fromMillisecondsSinceEpoch(map[_budgetStart]),
+      DateTime.fromMillisecondsSinceEpoch(map[_budgetEnd]));
 }
 
 User _toUser(Map<String, dynamic> map) {

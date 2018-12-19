@@ -18,7 +18,7 @@ class BudgetDetailRepository extends CleanArchitectureRepository {
     return _dbRepo.loadCategory(categoryId);
   }
 
-  Future<double> loadBudgetThisMonth(int categoryId) {
+  Future<Budget> loadBudgetThisMonth(int categoryId) {
     return _dbRepo.loadBudgetThisMonth(categoryId);
   }
 
@@ -37,10 +37,6 @@ class BudgetDetailDatabaseRepository {
     return db.queryCategory();
   }
 
-  Future<int> findBudgetId(int catId, DateTime startMonth, DateTime endMonth ) {
-    return db.queryBudget(catId: catId, start: startMonth, end: endMonth);
-  }
-
   Future<AppCategory> loadCategory(int categoryId) async {
     List<AppCategory> cats = await db.queryCategory(id: categoryId);
 
@@ -49,8 +45,8 @@ class BudgetDetailDatabaseRepository {
     return null;
   }
 
-  Future<double> loadBudgetThisMonth(int categoryId) {
-    return db.queryBudgetAmount(catId: categoryId, start: DateTime.now(), end: DateTime.now());
+  Future<Budget> loadBudgetThisMonth(int categoryId) async {
+    return await db.queryBudget(catId: categoryId, start: DateTime.now(), end: DateTime.now());
   }
 
   Future<int> generateBudgetId() {

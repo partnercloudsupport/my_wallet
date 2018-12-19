@@ -23,6 +23,8 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
   var tables = [observer.tableCategory, observer.tableBudget];
 
+  final _duration = Duration(days: 365);
+
   GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
 
   String _number, _decimal;
@@ -30,7 +32,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   AppCategory _category;
   double _amount = 0.0;
 
-  DateFormat _df = DateFormat("MMM, yyyy");
+  DateFormat _df = DateFormat("dd MMM, yyyy");
   NumberFormat _nf = NumberFormat("\$##0.00");
 
   List<AppCategory> _categories = [];
@@ -93,26 +95,22 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
                 child: Column(
                   children: <Widget>[
                     ConversationRow(
-                      "Create a budget for",
+                      "A monthly budget for",
                       _category == null ? "Select Category" : _category.name,
                       AppTheme.pinkAccent,
                       onPressed: _onCategoryPressed,
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
                         ConversationRow(
                           "from",
                           _df.format(_from),
                           AppTheme.darkBlue,
+                          onPressed: _showFromMonth,
                         ),
-                        ConversationRow(
-                          "to",
-                          _df.format(_to),
-                          AppTheme.darkBlue,
-                        ),
-                      ],
+                    ConversationRow(
+                      "to",
+                      _df.format(_to),
+                      AppTheme.darkBlue,
+                      onPressed: _showToMonth,
                     ),
                     ConversationRow(
                       "at max",
@@ -159,6 +157,14 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
             )
         )
     );
+  }
+
+  void _showFromMonth() {
+    showDatePicker(context: context, initialDate: _from, firstDate: _from.subtract(_duration), lastDate: _from.add(_duration),).then((value) => setState(() => _from = value));
+  }
+
+  void _showToMonth() {
+    showDatePicker(context: context, initialDate: _to, firstDate: _from, lastDate: _from.add(_duration)).then((value) => setState(() => _to = value));
   }
 
   void _onNumberInput(String number, String decimal) {
