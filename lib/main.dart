@@ -57,14 +57,14 @@ void main() async {
 
   await auth.init(_app);
 
+  var user = await auth.getCurrentUser();
   var sharedPref = await SharedPreferences.getInstance();
 
-  var user = sharedPref.getString(UserUUID);
   var profile = sharedPref.getString(prefHomeProfile);
 
   await fdb.init(_app, homeProfile: profile);
 
-  runApp(MyApp(user != null && user.isNotEmpty, profile != null && profile.isNotEmpty));
+  runApp(MyApp(user != null && user.uuid != null && user.uuid.isNotEmpty, profile != null && profile.isNotEmpty));
 }
 
 class _MaterialPageRoute<T> extends MaterialPageRoute<T> {
