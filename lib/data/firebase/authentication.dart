@@ -16,7 +16,6 @@ import 'dart:convert';
 const _members = "members";
 const _homes = "homes";
 const _host = "host";
-const _key = "key";
 const _data = "data";
 
 FirebaseAuth _auth;
@@ -176,13 +175,11 @@ Future<User> getUserDetail(String homeKey, User user) async {
 
 Future<bool> joinHome(Home home, User user) async  {
   return _lock.synchronized(() async {
-    CollectionReference _ref = _firestore.collection(_homes).document(home.key).collection(_members);
+    await _firestore.collection(_members).document(user.uuid).setData({
+      fldEmail: user.email,
+      _homes: home.key,
+    });
 
-    QuerySnapshot members = await _ref.getDocuments();
-
-    int id = members == null || members.documents == null ? 0 : members.documents.length;
-
-    await _ref.document("$id").setData({fldEmail : user.email});
     return true;
   });
 }
@@ -223,6 +220,11 @@ Future<void> createHome(
       fldName: homeName
     });
 
+    await _firestore.collection(_members).document().setData({
+      fldEmail: hostEmail,
+      _homes: homeKey,
+    });
+
     return true;
   });
 }
@@ -238,19 +240,30 @@ Future<Home> searchUserHome(User user) {
   return _lock.synchronized(() async {
     Home home;
     do {
-    QuerySnapshot _snapshot = await _firestore.collection(_homes).getDocuments();
-    if(_snapshot == null || _snapshot.documents == null || _snapshot.documents.isEmpty) break;
+      DocumentSnapshot _snapshot = await _firestore.collection(_members).document(user.uuid).get();
 
-    // check each document in this snapshot
-    for (DocumentSnapshot f in _snapshot.documents) {
-      List<DocumentSnapshot> _memSnapshot = (await f.reference.collection(_members).where(fldEmail, isEqualTo: user.email).getDocuments()).documents;
-
-      if(_memSnapshot != null && _memSnapshot.isNotEmpty) {
-        home = Home(f.documentID, f.data[_host], f.data[fldName]);
-
+      if(_snapshot == null || _snapshot.data == null) {
+        // user not found
         break;
       }
-    }
+
+      // get user's home key
+      String key = _snapshot.data[_homes];
+
+      // ensure user has a home
+      if(key == null || key.isEmpty) break;
+      // find home info
+      DocumentSnapshot _home = await _firestore.collection(_homes).document(key).get();
+
+      if(_home == null || _home.data == null) {
+        // invalid home, delete this user reference to this home as well
+        _snapshot.reference.delete();
+        break;
+      }
+
+      print(_home.data);
+      home = Home(key, _home.data[_host], _home.data[fldName]);
+
     } while (false);
 
     return home;
