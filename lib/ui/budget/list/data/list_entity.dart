@@ -6,3 +6,11 @@ class BudgetEntity {
 
   BudgetEntity(this.categoryId, this.categoryName, this.spent, this.total);
 }
+
+class BudgetSummary {
+  final DateTime month;
+  final double total;
+  final double spent;
+
+  BudgetSummary(this.month, this.total, this.spent);
+}

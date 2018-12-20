@@ -9,4 +9,8 @@ class ListBudgetsPresenter extends CleanArchitecturePresenter<ListBudgetsUseCase
   void loadThisMonthBudgetList(DateTime month) {
     useCase.loadThisMonthBudgetList(month, dataView.onBudgetLoaded);
   }
+
+  void loadSummary() {
+    useCase.loadSummary(dataView.onSummaryLoaded);
+  }
 }

@@ -263,11 +263,23 @@ Future<List<Budget>> queryBudgets() async {
   return map == null ? null : map.map((f) => _toBudget(f)).toList();
 }
 
-Future<Budget> queryBudgetAmount({@required int catId, @required DateTime start, @required DateTime end}) async {
+Future<DateTime> queryMinBudgetStart() async {
+  var min = await _lock.synchronized(() => db._executeSql("SELECT MIN($_budgetStart) FROM $_tableBudget"));
+
+  return min == null ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(min[0].values.first);
+}
+
+Future<DateTime> queryMaxBudgetEnd() async {
+  var max = await _lock.synchronized(() => db._executeSql("SELECT MAX($_budgetEnd) FROM $_tableBudget"));
+
+  return max == null ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(max[0].values.first);
+}
+
+Future<Budget> queryBudgetAmount({int catId, @required DateTime start, @required DateTime end}) async {
   var monthStart = Utils.firstMomentOfMonth(start);
   var monthEnd = Utils.lastDayOfMonth(end);
 
-  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart <= ${monthStart.millisecondsSinceEpoch} AND $_budgetEnd >= ${monthEnd.millisecondsSinceEpoch}"));
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE ${catId == null ? "" : "$_budgetCategoryId = $catId AND "}$_budgetStart <= ${monthStart.millisecondsSinceEpoch} AND $_budgetEnd >= ${monthEnd.millisecondsSinceEpoch}"));
 
   print("sum $sum");
 
