@@ -77,15 +77,18 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
             _month = month;
             loadData();
           }),
-          GridView.builder(
-            shrinkWrap: true,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: crossAxisCount),
-            itemCount: _budgetList.length + 1,
-            itemBuilder: (context, index) {
-              if (index == _budgetList.length) return _btnAddCategory(padding);
+          Expanded(
+            child: GridView.builder(
+              shrinkWrap: true,
+              primary: true,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: crossAxisCount),
+              itemCount: _budgetList.length + 1,
+              itemBuilder: (context, index) {
+                if (index == _budgetList.length) return _btnAddCategory(padding);
 
-              return _budgetItem(index, padding);
-            },
+                return _budgetItem(index, padding);
+              },
+            ),
           )
         ],
       ),
@@ -249,7 +252,7 @@ class _MonthSummaryState extends State<_MonthSummary> {
                   alignment: Alignment.bottomCenter,
                   width: _columnWidth,
                   child: Text(
-                      summary == null || index >= summary.length ? "" : "${df.format(summary[index].month)}",
+                      summary == null || index >= summary.length ? "${df.format(monthsAfter(DateTime.now(), index))}" : "${df.format(summary[index].month)}",
                     style: Theme.of(context).textTheme.subhead.apply(color: AppTheme.white),
                     textAlign: TextAlign.center,
                   ),
