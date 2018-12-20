@@ -10,10 +10,10 @@ class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepositor
     repo.loadCategoryList().then((value) => next(value));
   }
 
-  void loadCategoryBudget(int categoryId, onNext<BudgetDetailEntity> next) async {
+  void loadCategoryBudget(int categoryId, DateTime from, DateTime to, onNext<BudgetDetailEntity> next) async {
     AppCategory category = await repo.loadCategory(categoryId);
 
-    Budget budget = await repo.loadBudgetThisMonth(categoryId);
+    Budget budget = await repo.loadBudgetThisMonth(categoryId, from, to);
 
     next(BudgetDetailEntity(category, budget == null ? 0.0 : budget.budgetPerMonth, budget == null ? DateTime.now() : budget.budgetStart, budget == null ? DateTime.now() : budget.budgetEnd));
   }
@@ -35,6 +35,8 @@ class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepositor
         // save multiple budgets, 1 budget per month
         Budget budget = Budget(id, _cat.id, _amount, date, end);
         await repo.saveBudget(budget);
+
+//        await Future.delayed(Duration(seconds: 2));
 
         var month = date.month + 1;
         var year = date.year;

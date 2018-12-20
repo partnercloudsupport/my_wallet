@@ -230,7 +230,25 @@ class MyApp extends StatelessWidget {
     }
 
     if(name.startsWith(routes.AddBudget)) {
-      return BudgetDetail("Budget", categoryId: int.parse(name.replaceFirst("${routes.AddBudget}/", "")),);
+      do {
+        // get month date/time:
+        List<String> splits = name.split(":");
+
+        if(splits.length != 2) break;
+
+        String date = splits[1];
+        String title = splits[0];
+
+        if (date == null || date.isEmpty) break;
+
+        try {
+          int millisecondsSinceEpoch = int.parse(date);
+
+          DateTime day = DateTime.fromMillisecondsSinceEpoch(millisecondsSinceEpoch);
+
+          return BudgetDetail("Budget", categoryId: int.parse(title.replaceFirst("${routes.AddBudget}/", "")), month: day,);
+        } catch(e) {}
+      } while (false);
     }
 
     return null;

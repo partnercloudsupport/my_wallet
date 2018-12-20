@@ -36,7 +36,7 @@ class routes {
     return "Unknown";
   }
 
-  static String EditBudget({@required int categoryId}) {
-    return "$AddBudget/$categoryId";
+  static String EditBudget({@required int categoryId, @required DateTime month}) {
+    return "$AddBudget/$categoryId:${month.millisecondsSinceEpoch}";
   }
 }

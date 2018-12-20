@@ -6,7 +6,7 @@ import 'package:my_wallet/ui/budget/list/presentation/view/list_data_view.dart';
 class ListBudgetsPresenter extends CleanArchitecturePresenter<ListBudgetsUseCase, ListBudgetsDataView> {
   ListBudgetsPresenter() : super(ListBudgetsUseCase());
 
-  void loadThisMonthBudgetList() {
-    useCase.loadThisMonthBudgetList(dataView.onBudgetLoaded);
+  void loadThisMonthBudgetList(DateTime month) {
+    useCase.loadThisMonthBudgetList(month, dataView.onBudgetLoaded);
   }
 }

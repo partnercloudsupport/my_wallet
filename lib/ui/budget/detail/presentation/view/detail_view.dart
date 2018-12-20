@@ -3,15 +3,14 @@ import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/budget/detail/presentation/presenter/detail_presenter.dart';
 import 'package:my_wallet/ui/budget/detail/presentation/view/detail_data_view.dart';
 import 'package:my_wallet/data/data_observer.dart' as observer;
-import 'package:flutter/cupertino.dart';
-
-import 'package:intl/intl.dart';
+import 'package:my_wallet/ui/budget/budget_config.dart';
 
 class BudgetDetail extends StatefulWidget {
   final String title;
   final int categoryId;
+  final DateTime month;
 
-  BudgetDetail(this.title, {this.categoryId});
+  BudgetDetail(this.title, {this.categoryId, this.month});
 
   @override
   State<StatefulWidget> createState() {
@@ -34,7 +33,6 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   AppCategory _category;
   double _amount = 0.0;
 
-  DateFormat _df = DateFormat("MMM, yyyy");
   NumberFormat _nf = NumberFormat("\$##0.00");
 
   List<AppCategory> _categories = [];
@@ -43,7 +41,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
     presenter.loadCategoryList();
 
     if(widget.categoryId != null) {
-      presenter.loadCategoryBudget(widget.categoryId);
+      presenter.loadCategoryBudget(widget.categoryId, _from, _to);
     }
   }
 
@@ -65,7 +63,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
     observer.registerDatabaseObservable(tables, this);
 
-    _from = _to = DateTime.now();
+    _from = _to = widget.month == null ? DateTime.now() : widget.month;
 
     loadData();
   }
@@ -106,13 +104,13 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
                     ),
                         ConversationRow(
                           "from",
-                          _df.format(_from),
+                          df.format(_from),
                           AppTheme.darkBlue,
                           onPressed: _showFromMonth,
                         ),
                     ConversationRow(
                       "to",
-                      _df.format(_to),
+                      df.format(_to),
                       AppTheme.darkBlue,
                       onPressed: _showToMonth,
                     ),
@@ -164,7 +162,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   }
 
   void _showFromMonth() {
-    showBottomSheetForMonths(_from, (date) {
+    showBottomSheetForMonths((date) {
       if(date.isAfter(_to)) _to = date;
 
       setState(() => _from = date);
@@ -173,32 +171,24 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   }
 
   void _showToMonth() {
-    showBottomSheetForMonths(_from, (date) {
+    showBottomSheetForMonths((date) {
       setState(() => _to = date);
 
       Navigator.pop(context);
     });
   }
 
-  void showBottomSheetForMonths(DateTime _month, ValueChanged<DateTime> onSelected) {
+  void showBottomSheetForMonths(ValueChanged<DateTime> onSelected) {
     showModalBottomSheet(
         context: context,
-        builder: (_) => BottomViewContent.count(context, 12, (_, index) {
-          int month = _from.month + index;
-          int year = _from.year;
-
-          if(month > 12) {
-            month -= 12;
-            year += 1;
-          }
-
-          var date = DateTime(year, month, 1);
+        builder: (_) => BottomViewContent.count(context, maxMonthSupport, (_, index) {
+          var date = monthsAfter(DateTime.now(), index);
 
           return InkWell(
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.all(18.0),
-                child: Text(_df.format(date), style: Theme.of(context).textTheme.headline.apply(color: AppTheme.darkBlue),),
+                child: Text(df.format(date), style: Theme.of(context).textTheme.headline.apply(color: AppTheme.darkBlue),),
               ),
             ),
             onTap: () => onSelected(date)

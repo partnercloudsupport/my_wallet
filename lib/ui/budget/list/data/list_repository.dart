@@ -9,13 +9,12 @@ import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/utils.dart' as Utils;
 
 class ListBudgetsRepository extends CleanArchitectureRepository{
-  Future<List<BudgetEntity>> loadThisMonthBudgetList() async {
+  Future<List<BudgetEntity>> loadThisMonthBudgetList(DateTime month) async {
     List<BudgetEntity> entities = [];
     
     List<AppCategory> cats = await db.queryCategory();
-    DateTime now = DateTime.now();
-    DateTime firstDay = Utils.firstMomentOfMonth(now);
-    DateTime lastDay = Utils.lastDayOfMonth(now);
+    DateTime firstDay = Utils.firstMomentOfMonth(month);
+    DateTime lastDay = Utils.lastDayOfMonth(month);
     
     if(cats != null) {
       for(AppCategory f in cats) {
