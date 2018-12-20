@@ -263,35 +263,6 @@ Future<List<Budget>> queryBudgets() async {
   return map == null ? null : map.map((f) => _toBudget(f)).toList();
 }
 
-//Future<Budget> queryBudget({@required int catId, @required DateTime start, @required DateTime end}) async {
-//
-//  var monthStart = Utils.firstMomentOfMonth(start);
-//
-//  String where ="SELECT * FROM $_tableBudget WHERE $_budgetCategoryId = $catId AND $_budgetStart >= ${monthStart.millisecondsSinceEpoch}";
-//
-//  var monthEnd;
-//  if(end != null) {
-//    monthEnd = Utils.lastDayOfMonth(end);
-//    where += "  AND $_budgetEnd <= ${monthEnd.millisecondsSinceEpoch}";
-//  } else {
-//    monthEnd = Utils.lastDayOfMonth(start);
-//  }
-//
-//  var budgets = await _lock.synchronized(() => db._executeSql(where));
-//
-//  if(budgets == null || budgets.isEmpty ) return null;
-//
-//  double amount = 0;
-//
-//  budgets.map((f) => _toBudget(f)).forEach((f) {
-//    amount += f.budgetPerMonth;
-//
-//    print("${f.budgetStart}");
-//  });
-//
-//  return Budget(0, catId, amount, monthStart, monthEnd);
-//}
-
 Future<Budget> queryBudgetAmount({@required int catId, @required DateTime start, @required DateTime end}) async {
   var monthStart = Utils.firstMomentOfMonth(start);
   var monthEnd = Utils.lastDayOfMonth(end);
@@ -302,6 +273,15 @@ Future<Budget> queryBudgetAmount({@required int catId, @required DateTime start,
 
   var amount = sum == null || sum.isEmpty ? 0.0 : sum[0].values.first ?? 0.0;
   return Budget(0, catId, amount, monthStart, monthEnd);
+}
+
+Future<Budget> findBudget(int catId, DateTime start, DateTime end) async {
+  var monthStart = Utils.firstMomentOfMonth(start);
+  var monthEnd = Utils.lastDayOfMonth(end);
+
+  var listMap = await _lock.synchronized(() => db._query(_tableBudget, where: "$_budgetCategoryId = $catId AND $_budgetStart = ${monthStart.millisecondsSinceEpoch} AND $_budgetEnd = ${monthEnd.millisecondsSinceEpoch}"));
+
+  return listMap == null || listMap.isEmpty ? null : _toBudget(listMap[0]);
 }
 
 Future<int> generateAccountId() {

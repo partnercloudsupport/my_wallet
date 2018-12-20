@@ -24,9 +24,10 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
   var tables = [observer.tableCategory, observer.tableBudget];
 
-  final _duration = Duration(days: 365);
+  var _savingBudget = false;
 
   GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
+  GlobalKey alertDialog = GlobalKey();
 
   String _number, _decimal;
   DateTime _from, _to;
@@ -53,6 +54,8 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
   @override
   void onDatabaseUpdate(String table) {
+    if(_savingBudget) return;
+
     loadData();
   }
 
@@ -217,6 +220,27 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   }
 
   void _saveBudget() {
+    if(_savingBudget) return;
+
+    _savingBudget = true;
+
+    showDialog(context: context, builder: (_) => AlertDialog(
+      key: alertDialog,
+      content: SizedBox(
+        width: 300.0,
+        height: 300.0,
+        child: Stack(
+          children: <Widget>[
+            Center(child: SizedBox(
+              width: 200.0,
+              height: 200.0,
+              child: CircularProgressIndicator(),
+            ),),
+            Center(child: Text("Saving...", style: Theme.of(context).textTheme.title,),)
+          ],
+        ),
+      ),
+    ));
     presenter.saveBudget(
       _category,
       _amount,
@@ -227,11 +251,14 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
   @override
   void onSaveBudgetSuccess(bool result) {
+    dismissDialog();
     Navigator.pop(context);
   }
 
   @override
   void onSaveBudgetFailed(Exception e) {
+    dismissDialog();
+
     showDialog(context: context,
         builder: (context) =>
             AlertDialog(
@@ -256,6 +283,13 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
         this._amount = entity.amount;
         this._category = entity.category;
       });
+    }
+  }
+
+  void dismissDialog() {
+    if(alertDialog.currentContext != null) {
+      // alert dialog is showing
+      Navigator.pop(context);
     }
   }
 }

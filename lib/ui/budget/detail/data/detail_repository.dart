@@ -22,12 +22,15 @@ class BudgetDetailRepository extends CleanArchitectureRepository {
     return _dbRepo.loadBudgetThisMonth(categoryId);
   }
 
-  Future<int> generateBudgetId() {
-    return _dbRepo.generateBudgetId();
+  Future<int> findBudgetId(int catId, DateTime start, DateTime end) {
+    return _dbRepo.findBudgetId(catId, start, end);
   }
 
-  Future<bool> saveBudget(Budget budget) {
-    return _fbRepo.saveBudget(budget);
+  Future<bool> saveBudget(Budget budget) async {
+    await _fbRepo.saveBudget(budget);
+    await _dbRepo.saveBudget(budget);
+
+    return true;
   }
 }
 
@@ -49,8 +52,16 @@ class BudgetDetailDatabaseRepository {
     return await db.queryBudgetAmount(catId: categoryId, start: DateTime.now(), end: DateTime.now());
   }
 
-  Future<int> generateBudgetId() {
-    return db.generateBudgetId();
+  Future<int> findBudgetId(int catId, DateTime start, DateTime end) async {
+    var curBudget = await db.findBudget(catId, start, end);
+
+    print("current id for $start to $end is ${curBudget == null ? "not found" : curBudget.id}");
+    return curBudget == null ? await db.generateBudgetId() : curBudget.id;
+  }
+
+  Future<bool> saveBudget(Budget budget) async {
+    db.insertBudget(budget).catchError((e) => db.updateBudget(budget));
+    return true;
   }
 }
 

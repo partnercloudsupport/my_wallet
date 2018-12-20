@@ -1,6 +1,7 @@
 import 'package:my_wallet/ca/domain/ca_use_case.dart';
 
 import 'package:my_wallet/ui/budget/detail/data/detail_repository.dart';
+import 'package:my_wallet/utils.dart';
 
 class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepository> {
   BudgetDetailUseCase() : super(BudgetDetailRepository());
@@ -17,20 +18,37 @@ class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepositor
     next(BudgetDetailEntity(category, budget == null ? 0.0 : budget.budgetPerMonth, budget == null ? DateTime.now() : budget.budgetStart, budget == null ? DateTime.now() : budget.budgetEnd));
   }
 
-  void saveBudget(
-      AppCategory _cat,
-      double _amount,
-      DateTime startMonth,
-      DateTime endMonth,
-      onNext<bool> next,
-      onError error
-      ) async {
-    int id = await repo.generateBudgetId();
+  void saveBudget(AppCategory _cat, double _amount, DateTime startMonth, DateTime endMonth, onNext<bool> next, onError error) async {
+    try {
+      startMonth = firstMomentOfMonth(startMonth);
+      endMonth = lastDayOfMonth(endMonth);
 
-    // save multiple budgets, 1 budget per month
-//    while(isSameMonth(startMonth, endMonth)) {
-      Budget budget = Budget(id, _cat.id, _amount, startMonth, endMonth);
-      repo.saveBudget(budget).then((value) => next(value)).catchError(error);
-//    }
+      print("period $startMonth to $endMonth");
+
+      var date = startMonth;
+
+      while (date.isBefore(endMonth)) {
+        var end = lastDayOfMonth(date);
+
+        int id = await repo.findBudgetId(_cat.id, date, end);
+
+        // save multiple budgets, 1 budget per month
+        Budget budget = Budget(id, _cat.id, _amount, date, end);
+        await repo.saveBudget(budget);
+
+        var month = date.month + 1;
+        var year = date.year;
+
+        if (month > 12) {
+          month -= 12;
+          year += 1;
+        }
+        date = DateTime(year, month, 1);
+      }
+
+      next(true);
+    } catch (e) {
+      error(e);
+    }
   }
 }
