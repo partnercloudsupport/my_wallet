@@ -281,8 +281,6 @@ Future<Budget> queryBudgetAmount({int catId, @required DateTime start, @required
 
   var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE ${catId == null ? "" : "$_budgetCategoryId = $catId AND "}$_budgetStart <= ${monthStart.millisecondsSinceEpoch} AND $_budgetEnd >= ${monthEnd.millisecondsSinceEpoch}"));
 
-  print("sum $sum");
-
   var amount = sum == null || sum.isEmpty ? 0.0 : sum[0].values.first ?? 0.0;
   return Budget(0, catId, amount, monthStart, monthEnd);
 }
@@ -648,8 +646,6 @@ class _Database {
     var result = await db.delete(table, where: where, whereArgs: whereArgs);
 
     await db.close();
-
-    print("Delete from $table where $where with arg $whereArgs");
 
     _notifyObservers(table);
 

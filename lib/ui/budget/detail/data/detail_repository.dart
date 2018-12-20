@@ -55,7 +55,6 @@ class BudgetDetailDatabaseRepository {
   Future<int> findBudgetId(int catId, DateTime start, DateTime end) async {
     var curBudget = await db.findBudget(catId, start, end);
 
-    print("current id for $start to $end is ${curBudget == null ? "not found" : curBudget.id}");
     return curBudget == null ? await db.generateBudgetId() : curBudget.id;
   }
 

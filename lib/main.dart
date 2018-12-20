@@ -62,11 +62,11 @@ void main() async {
   if(user != null) {
     var home = await auth.searchUserHome(user);
     if (home != null) profile = home.key;
-  }
 
-  if(profile == null) {
-    var host = await auth.findHomeOfHost(user.email);
-    if(host != null) profile = host.key;
+    if(profile == null) {
+      var host = await auth.findHomeOfHost(user.email);
+      if(host != null) profile = host.key;
+    }
   }
 
   await fdb.init(_app, homeProfile: profile);

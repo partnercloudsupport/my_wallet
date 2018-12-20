@@ -59,7 +59,6 @@ Future<User> signInWithGoogle() async {
     FirebaseUser _user = await _auth.signInWithGoogle(idToken: _authentication.idToken, accessToken: _authentication.accessToken);
 
     if(_user != null) {
-      print(await _auth.currentUser());
       return User(_user.uid, _user.email, _user.displayName, _user.photoUrl, null);
     }
 
@@ -77,11 +76,7 @@ Future<User> signInWithFacebook() async {
           'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${_result.accessToken.token}');
 
       var profile = json.decode(graphResponse.body);
-      print(profile.toString());
-
       var displayName = profile['name'];
-      print("Name: ${profile['name']}");
-
       FirebaseUser _user = await _auth.signInWithFacebook(accessToken: _result.accessToken.token);
 
       if (_user != null) {
@@ -261,7 +256,6 @@ Future<Home> searchUserHome(User user) {
         break;
       }
 
-      print(_home.data);
       home = Home(key, _home.data[_host], _home.data[fldName]);
 
     } while (false);

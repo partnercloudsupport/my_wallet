@@ -23,8 +23,6 @@ class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepositor
       startMonth = firstMomentOfMonth(startMonth);
       endMonth = lastDayOfMonth(endMonth);
 
-      print("period $startMonth to $endMonth");
-
       var date = startMonth;
 
       while (date.isBefore(endMonth)) {

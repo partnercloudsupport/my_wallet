@@ -10,13 +10,10 @@ class ListBudgetsUseCase extends CleanArchitectureUseCase<ListBudgetsRepository>
   void loadThisMonthBudgetList(DateTime month, onNext<List<BudgetEntity>> next) async{
     var list = await repo.loadThisMonthBudgetList(month);
 
-    print("list in usecase ${list.length}");
     next(list);
   }
 
   void loadSummary(onNext<List<BudgetSummary>> next) async {
-//    var list = await repo.loadAllBudgets();
-
     List<BudgetSummary> summary = [];
 
     DateTime firstDay = await repo.queryMinBudgetStart();
