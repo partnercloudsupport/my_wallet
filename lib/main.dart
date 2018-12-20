@@ -14,8 +14,6 @@ import 'package:my_wallet/ui/category/create/presentation/view/create_category_v
 
 import 'package:my_wallet/data/firebase/database.dart' as fdb;
 import 'package:my_wallet/data/firebase/authentication.dart' as auth;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:my_wallet/shared_pref/shared_preference.dart';
 
 import 'package:my_wallet/ui/user/login/presentation/view/login_view.dart';
 import 'package:my_wallet/ui/user/register/presentation/view/register_view.dart';
@@ -58,9 +56,18 @@ void main() async {
   await auth.init(_app);
 
   var user = await auth.getCurrentUser();
-  var sharedPref = await SharedPreferences.getInstance();
 
-  var profile = sharedPref.getString(prefHomeProfile);
+  var profile;
+
+  if(user != null) {
+    var home = await auth.searchUserHome(user);
+    if (home != null) profile = home.key;
+  }
+
+  if(profile == null) {
+    var host = await auth.findHomeOfHost(user.email);
+    if(host != null) profile = host.key;
+  }
 
   await fdb.init(_app, homeProfile: profile);
 
