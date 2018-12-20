@@ -1,7 +1,7 @@
 class ChartTitleEntity {
   final double expensesAmount;
   final double incomeAmount;
-  final double savingAmount;
+  final double budgetPercentage;
 
-  ChartTitleEntity(this.expensesAmount, this.incomeAmount, this.savingAmount);
+  ChartTitleEntity(this.expensesAmount, this.incomeAmount, this.budgetPercentage);
 }

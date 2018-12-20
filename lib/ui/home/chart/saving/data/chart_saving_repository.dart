@@ -9,14 +9,10 @@ class SavingChartRepository extends CleanArchitectureRepository {
     var start = Utils.firstMomentOfMonth(DateTime.now());
     var today = DateTime.now();
 
+    var expenseThisMonth = await _db.sumAllTransactionBetweenDateByType(start, today, TransactionType.typeExpense) ?? 0.0;
 
-    var incomeThisMonth = await _db.sumAllTransactionBetweenDateByType(start, today, TransactionType.typeIncome);
-    var expenseThisMonth = await _db.sumAllTransactionBetweenDateByType(start, today, TransactionType.typeExpense);
+    var monthlyBudget = await _db.sumAllBudget(start, Utils.lastDayOfMonth(start)) ?? 0.0;
 
-    var monthlySaving = incomeThisMonth - expenseThisMonth;
-
-    var monthlyBudget = await _db.sumAllBudget(start, Utils.lastDayOfMonth(start));
-
-    return SavingEntity(monthlySaving, monthlySaving > 0 ? monthlyBudget > 0 ? monthlySaving/monthlyBudget : 1.0 : 0.0);
+    return SavingEntity(expenseThisMonth, monthlyBudget == 0 ? 0.0 : expenseThisMonth < monthlyBudget ? expenseThisMonth / monthlyBudget : 1.0);
   }
 }

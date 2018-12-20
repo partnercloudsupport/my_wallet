@@ -27,6 +27,7 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
 
   ChartTitleEntity entity;
   NumberFormat _nf = NumberFormat("\$#,##0.00");
+  NumberFormat _percentage = NumberFormat("#,##0.00%");
 
   @override
   void init() {
@@ -56,6 +57,7 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
 
     return TabBar(
               tabs: <Widget>[
+
                 Padding(
                   padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                   child: Column(
@@ -89,14 +91,14 @@ class _ChartTitleViewState extends CleanArchitectureView<ChartTitleView, ChartTi
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      AutoSizeText("Saving",
-                      style: textStyle.apply(color: AppTheme.brightGreen),
+                      AutoSizeText("Budget",
+                        style: textStyle.apply(color: AppTheme.brightGreen),
                         maxLines: 1,
                       ),
-                      Text("${entity == null ? "\$0.00" : _nf.format(entity.savingAmount)}", style: subTitleStyle,)
+                      Text("${entity == null ? "0.00%" : _percentage.format(entity.budgetPercentage)}", style: subTitleStyle,)
                     ],
                   ),
-                )
+                ),
               ],
               controller: widget._controller,
               indicatorWeight: 4.0,
