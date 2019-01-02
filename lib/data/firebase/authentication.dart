@@ -1,15 +1,9 @@
 import 'package:my_wallet/data/firebase/common.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_wallet/firebase/auth/firebase_authentication.dart';
 
 import 'package:my_wallet/data/data.dart';
 
-import 'package:google_sign_in/google_sign_in.dart';
-
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -18,22 +12,22 @@ const _homes = "homes";
 const _host = "host";
 const _data = "data";
 
-FirebaseAuth _auth;
+FirebaseAuthentication _auth;
 bool _isInit = false;
 final Lock _lock = Lock();
 
-Firestore _firestore;
+FirebaseDatabase _firestore;
 
 
-Future<void> init(FirebaseApp app) async {
+Future<void> init(FirebaseApp _app) async {
   return _lock.synchronized(() async {
     if(_isInit) return;
 
     _isInit = true;
 
-    _auth = FirebaseAuth.fromApp(app);
+    _auth = FirebaseAuthentication(_app);
 
-    _firestore = await firestore(app);
+    _firestore = await firestore(_app);
   });
 }
 
@@ -52,15 +46,15 @@ Future<User> login(String email, String password) async {
 
 Future<User> signInWithGoogle() async {
   return _lock.synchronized(() async {
-    GoogleSignIn _signin = GoogleSignIn();
-    GoogleSignInAccount _account = await _signin.signIn();
-    GoogleSignInAuthentication _authentication = await _account.authentication;
-    
-    FirebaseUser _user = await _auth.signInWithGoogle(idToken: _authentication.idToken, accessToken: _authentication.accessToken);
-
-    if(_user != null) {
-      return User(_user.uid, _user.email, _user.displayName, _user.photoUrl, null);
-    }
+//    GoogleSignIn _signin = GoogleSignIn();
+//    GoogleSignInAccount _account = await _signin.signIn();
+//    GoogleSignInAuthentication _authentication = await _account.authentication;
+//
+//    FirebaseUser _user = await _auth.signInWithGoogle(idToken: _authentication.idToken, accessToken: _authentication.accessToken);
+//
+//    if(_user != null) {
+//      return User(_user.uid, _user.email, _user.displayName, _user.photoUrl, null);
+//    }
 
     throw Exception("Failed to signin with Google");
   });
@@ -68,25 +62,25 @@ Future<User> signInWithGoogle() async {
 
 Future<User> signInWithFacebook() async {
   return _lock.synchronized(() async {
-    FacebookLogin _login = FacebookLogin();
-    FacebookLoginResult _result = await _login.logInWithReadPermissions(['email']);
-
-    if(_result.status == FacebookLoginStatus.loggedIn) {
-      var graphResponse = await http.get(
-          'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${_result.accessToken.token}');
-
-      var profile = json.decode(graphResponse.body);
-      var displayName = profile['name'];
-      FirebaseUser _user = await _auth.signInWithFacebook(accessToken: _result.accessToken.token);
-
-      if (_user != null) {
-        UserUpdateInfo userUpdateInfo = UserUpdateInfo();
-        userUpdateInfo.displayName = displayName;
-        await _user.updateProfile(userUpdateInfo);
-
-        return User(_user.uid, _user.email, _user.displayName, _user.photoUrl, null);
-      }
-    }
+//    FacebookLogin _login = FacebookLogin();
+//    FacebookLoginResult _result = await _login.logInWithReadPermissions(['email']);
+//
+//    if(_result.status == FacebookLoginStatus.loggedIn) {
+//      var graphResponse = await http.get(
+//          'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${_result.accessToken.token}');
+//
+//      var profile = json.decode(graphResponse.body);
+//      var displayName = profile['name'];
+//      FirebaseUser _user = await _auth.signInWithFacebook(accessToken: _result.accessToken.token);
+//
+//      if (_user != null) {
+//        UserUpdateInfo userUpdateInfo = UserUpdateInfo();
+//        userUpdateInfo.displayName = displayName;
+//        await _user.updateProfile(userUpdateInfo);
+//
+//        return User(_user.uid, _user.email, _user.displayName, _user.photoUrl, null);
+//      }
+//    }
 
     throw Exception("Failed to signin with Facebook");
   });
@@ -96,8 +90,8 @@ Future<bool> checkCurrentUser() async {
   return _lock.synchronized(() async => await _auth.currentUser() != null);
 }
 
-Future<bool> registerEmail(String email, String password) async {
-  return _lock.synchronized(() async => await _auth.createUserWithEmailAndPassword(email: email, password: password) != null);
+Future<bool> registerEmail(String email, String password, {String displayName}) async {
+  return _lock.synchronized(() async => await _auth.createUserWithEmailAndPassword(email: email, password: password, displayName: displayName) != null);
 }
 
 Future<bool> updateDisplayName(String displayName) async {
@@ -132,9 +126,9 @@ Future<User> getCurrentUser() async {
       FirebaseUser user = await _auth.currentUser();
 
       if (user != null) {
-        var photoUrlList = user.providerData != null && user.providerData.isNotEmpty
+        var photoUrlList; /*user.providerData != null && user.providerData.isNotEmpty
             ? user.providerData.where((f) => f.photoUrl != null && f.photoUrl.isNotEmpty).map((f) => f.photoUrl).toList()
-            : [];
+            : [];*/
 
         _user = User(
             user.uid,

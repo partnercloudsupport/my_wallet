@@ -27,8 +27,8 @@ class RegisterRepository extends CleanArchitectureRepository {
     return _fbRepo.validatePassword(password);
   }
 
-  Future<bool> registerEmail(String email, String password) {
-    return _fbRepo.registerEmail(email, password);
+  Future<bool> registerEmail(String email, String password, String displayName) {
+    return _fbRepo.registerEmail(email, password, displayName);
   }
 
   Future<bool> updateDisplayName(String displayName)  {
@@ -63,9 +63,9 @@ class _RegisterFirebaseRepository {
     return true;
   }
 
-  Future<bool> registerEmail(String email, String password) async {
+  Future<bool> registerEmail(String email, String password, String displayName) async {
     try {
-      await fm.registerEmail(email, password);
+      await fm.registerEmail(email, password, displayName: displayName);
     } on PlatformException catch (e) {
       print("${e.code} :: ${e.message} :: ${e.toString()}");
       throw RegisterException(e.message);

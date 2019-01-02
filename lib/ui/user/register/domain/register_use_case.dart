@@ -6,7 +6,7 @@ class RegisterUseCase extends CleanArchitectureUseCase<RegisterRepository> {
   RegisterUseCase() : super(RegisterRepository());
 
   void registerEmail(String displayName, String email, String password, onNext<bool> next, onError error) async {
-    try {
+//    try {
       do {
         if(!await repo.validateDisplayName(displayName)) break;
 
@@ -14,9 +14,9 @@ class RegisterUseCase extends CleanArchitectureUseCase<RegisterRepository> {
 
         if(!await repo.validatePassword(password)) break;
 
-        if(!await repo.registerEmail(email, password)) break;
+        if(!await repo.registerEmail(email, password, displayName)) break;
 
-        await repo.updateDisplayName(displayName);
+//        await repo.updateDisplayName(displayName);
 
         User user = await repo.getCurrentUser();
 //        await repo.saveUser(user);
@@ -25,8 +25,8 @@ class RegisterUseCase extends CleanArchitectureUseCase<RegisterRepository> {
 
         next(true);
       } while (false);
-    } catch(e) {
-      error(e);
-    }
+//    } catch(e) {
+//      error(e);
+//    }
   }
 }

@@ -1,7 +1,6 @@
 import 'package:my_wallet/data/firebase/common.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:my_wallet/data/database_manager.dart' as db;
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_wallet/firebase/database/firebase_database.dart';
 import 'dart:async';
 
 const _data = "data";
@@ -94,7 +93,12 @@ Map<String, dynamic> _AccountToMap(Account acc) {
 }
 
 Account _snapshotToAccount(DocumentSnapshot snapshot) {
-  return Account(_toId(snapshot), snapshot.data[fldName], double.parse("${snapshot.data[fldBalance]}"), AccountType.all[snapshot.data[fldType]], snapshot.data[fldCurrency]);
+  return Account
+    (_toId(snapshot),
+      snapshot.data[fldName],
+      double.parse("${snapshot.data[fldBalance]}"),
+      snapshot.data[fldType] == null ? null : AccountType.all[snapshot.data[fldType]],
+      snapshot.data[fldCurrency]);
 }
 
 Map<String, dynamic> _CategoryToMap(AppCategory cat) {
@@ -110,12 +114,21 @@ Map<String, dynamic> _BudgetToMap(Budget budget) {
 }
 
 Budget _snapshotToBudget(DocumentSnapshot snapshot) {
-  return Budget(_toId(snapshot), snapshot.data[fldCategoryId], snapshot.data[fldAmount] * 1.0, DateTime.fromMillisecondsSinceEpoch(snapshot.data[fldStart]), snapshot.data[fldEnd] != null ? DateTime.fromMillisecondsSinceEpoch(snapshot.data[fldEnd]) : null);
+  return Budget(
+      _toId(snapshot),
+      snapshot.data[fldCategoryId],
+      snapshot.data[fldAmount] == null ? null : snapshot.data[fldAmount] * 1.0,
+      snapshot.data[fldStart] == null ? null : DateTime.fromMillisecondsSinceEpoch(snapshot.data[fldStart]),
+      snapshot.data[fldEnd] != null ? DateTime.fromMillisecondsSinceEpoch(snapshot.data[fldEnd]) : null);
 }
 
 
 AppCategory _snapshotToCategory(DocumentSnapshot snapshot) {
-  return AppCategory(_toId(snapshot), snapshot.data[fldName], snapshot.data[fldColorHex], double.parse("${snapshot.data[fldBalance]}"));
+  return AppCategory(
+      _toId(snapshot),
+      snapshot.data[fldName],
+      snapshot.data[fldColorHex],
+      snapshot.data[fldBalance] != null ? double.parse("${snapshot.data[fldBalance]}") : null);
 }
 
 Map<String, dynamic> _TransactionToMap(AppTransaction trans) {
@@ -123,7 +136,15 @@ Map<String, dynamic> _TransactionToMap(AppTransaction trans) {
 }
 
 AppTransaction _snapshotToTransaction(DocumentSnapshot snapshot) {
-  return AppTransaction(_toId(snapshot), DateTime.fromMillisecondsSinceEpoch(snapshot.data[fldDateTime]), snapshot.data[fldAccountId], snapshot.data[fldCategoryId], double.parse("${snapshot.data[fldAmount]}"), snapshot.data[fldDesc], TransactionType.all[snapshot.data[fldType]], snapshot.data[fldUuid]);
+  return AppTransaction(
+      _toId(snapshot),
+      snapshot.data[fldDateTime] == null ? null : DateTime.fromMillisecondsSinceEpoch(snapshot.data[fldDateTime]),
+      snapshot.data[fldAccountId],
+      snapshot.data[fldCategoryId],
+      snapshot.data[fldAmount] == null ? null : double.parse("${snapshot.data[fldAmount]}"),
+      snapshot.data[fldDesc],
+      snapshot.data[fldType] == null ? null : TransactionType.all[snapshot.data[fldType]],
+      snapshot.data[fldUuid]);
 }
 
 int _toId(DocumentSnapshot snapshot) {
@@ -195,8 +216,9 @@ Lock _lock = Lock();
 
 Future<bool> addAccount(Account acc) async {
   return _lock.synchronized(() async {
-    _firestore.collection(tblAccount).document("${acc.id}").setData(_AccountToMap(acc));
-  return true;
+    print("add account ${acc.name} ${_firestore.path}");
+    await _firestore.collection(tblAccount).document("${acc.id}").setData(_AccountToMap(acc));
+    return true;
   });
 }
 

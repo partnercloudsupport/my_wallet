@@ -26,7 +26,7 @@ import 'package:my_wallet/ui/budget/detail/presentation/view/detail_view.dart';
 import 'package:flutter/services.dart';
 
 import 'package:my_wallet/firebase_config.dart' as fbConfig;
-import 'package:firebase_core/firebase_core.dart';
+import 'package:my_wallet/firebase/firebase_common.dart';
 
 import 'dart:io' show Platform;
 
@@ -45,6 +45,7 @@ void main() async {
         gcmSenderID: fbConfig.firebase_gcm_sender_id,
         projectID: fbConfig.firebase_project_id,
         databaseURL: fbConfig.firebase_database_url,
+        apiKey: fbConfig.firebase_api_key,
       )
           : const FirebaseOptions(
         googleAppID: fbConfig.firebase_android_app_id,

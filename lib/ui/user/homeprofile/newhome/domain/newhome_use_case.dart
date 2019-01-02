@@ -24,6 +24,7 @@ class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
 
       next(true);
     } catch (e) {
+      print(e);
       err(e);
     }
   }

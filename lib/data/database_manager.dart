@@ -471,33 +471,77 @@ User _toUser(Map<String, dynamic> map) {
 }
 
 Map<String, dynamic> _transactionToMap(AppTransaction transaction) {
-  return {_transID: transaction.id, _transDateTime: transaction.dateTime.millisecondsSinceEpoch, _transAcc: transaction.accountId, _transCategory: transaction.categoryId, _transAmount: transaction.amount, _transDesc: transaction.desc, _transType: transaction.type.id, _transUid: transaction.userUid};
+  if(transaction.id == null) return null;
+
+  var map = <String, dynamic>{};
+
+  if(transaction.dateTime != null) map.putIfAbsent(_transDateTime, () => transaction.dateTime.millisecondsSinceEpoch);
+  if(transaction.accountId != null) map.putIfAbsent(_transAcc, () => transaction.accountId);
+  if(transaction.categoryId != null) map.putIfAbsent(_transCategory, () => transaction.categoryId);
+  if(transaction.amount != null) map.putIfAbsent(_transAmount, () => transaction.amount);
+  if(transaction.desc != null) map.putIfAbsent(_transDesc, () => transaction.desc);
+  if(transaction.type != null) map.putIfAbsent(_transType, () => transaction.type.id);
+  if(transaction.userUid != null) map.putIfAbsent(_transUid, () => transaction.userUid);
+
+  map.putIfAbsent(_transID, () => transaction.id);
+
+  return map;
 }
 
 Map<String, dynamic> _accountToMap(Account acc) {
-  return {_accID: acc.id, _accName: acc.name, _accBalance: acc.balance, _accType: acc.type.id, _accCurrency: acc.type.id};
+  if(acc.id == null) return null;
+
+  var map = <String, dynamic>{};
+
+  if(acc.name != null) map.putIfAbsent(_accName, () => acc.name);
+  if(acc.balance != null) map.putIfAbsent(_accBalance, () => acc.balance);
+  if(acc.type != null) map.putIfAbsent(_accType, () => acc.type.id);
+  if(acc.currency != null) map.putIfAbsent(_accCurrency, () => acc.currency);
+
+  map.putIfAbsent(_accID, () => acc.id);
+
+  return map;
 }
 
 Map<String, dynamic> _categoryToMap(AppCategory cat) {
-  return {
-    _catId: cat.id,
-    _catName: cat.name,
-    _catColorHex: cat.colorHex,
-  };
+  if(cat.id == null) return null;
+
+  var map = <String, dynamic>{};
+
+  if(cat.name != null) map.putIfAbsent(_catName, () => cat.name);
+  if(cat.colorHex != null) map.putIfAbsent(_catColorHex, () => cat.colorHex);
+
+  map.putIfAbsent(_catId, () => cat.id);
+
+  return map;
 }
 
 Map<String, dynamic> _budgetToMap(Budget budget) {
-  return {_budgetId: budget.id, _budgetCategoryId: budget.categoryId, _budgetPerMonth: budget.budgetPerMonth, _budgetStart: budget.budgetStart.millisecondsSinceEpoch, _budgetEnd: budget.budgetEnd.millisecondsSinceEpoch};
+  if(budget.id == null) return null;
+
+  var map = <String, dynamic>{};
+
+  if(budget.categoryId != null) map.putIfAbsent(_budgetCategoryId, () => budget.categoryId);
+  if(budget.budgetPerMonth != null) map.putIfAbsent(_budgetPerMonth, () => budget.budgetPerMonth);
+  if(budget.budgetStart != null) map.putIfAbsent(_budgetStart, () => budget.budgetStart);
+  if(budget.budgetEnd != null) map.putIfAbsent(_budgetEnd, () => _budgetEnd);
+
+  map.putIfAbsent(_budgetId, () => budget.id);
+
+  return map;
 }
 
 Map<String, dynamic> _userToMap(User user) {
-  return {
-    _userUid: user.uuid,
-    _userEmail: user.email,
-    _userDisplayName: user.displayName,
-    _userPhotoUrl: user.photoUrl,
-  _userColor: user.color,
-  };
+  if(user.uuid == null) return null;
+
+  var map = <String, dynamic>{};
+
+  if(user.email != null) map.putIfAbsent(_userEmail, () => user.email);
+  if(user.displayName != null) map.putIfAbsent(_userDisplayName, () => user.displayName);
+  if(user.photoUrl != null) map.putIfAbsent(_userPhotoUrl, () => user.photoUrl);
+  if(user.color != null) map.putIfAbsent(_userColor, () => user.color);
+
+  map.putIfAbsent(_userUid, () => user.uuid);
 }
 
 

@@ -22,16 +22,14 @@ dependencies:
   sqflite: any
   path_provider: any
   flutter_staggered_grid_view: any
-  firebase_core: any
-  firebase_auth: any
-  google_sign_in: any
+#  google_sign_in: any
   shared_preferences: any
   gradient_app_bar: any
   auto_size_text: any
+  w3c_event_source: any
 #  keyboard_visibility: any
 #  image_picker: any
-  cloud_firestore: any
-  flutter_facebook_login: '^1.1.1'
+#  flutter_facebook_login: '^1.1.1'
   http: any
 
 dev_dependencies:
