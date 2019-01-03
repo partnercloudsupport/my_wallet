@@ -266,13 +266,13 @@ Future<List<Budget>> queryBudgets() async {
 Future<DateTime> queryMinBudgetStart() async {
   var min = await _lock.synchronized(() => db._executeSql("SELECT MIN($_budgetStart) FROM $_tableBudget"));
 
-  return min == null ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(min[0].values.first);
+  return min == null || min[0].values == null || min[0].values.first == null ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(min[0].values.first);
 }
 
 Future<DateTime> queryMaxBudgetEnd() async {
   var max = await _lock.synchronized(() => db._executeSql("SELECT MAX($_budgetEnd) FROM $_tableBudget"));
 
-  return max == null ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(max[0].values.first);
+  return max == null || max[0].values == null || max[0].values.first == null ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(max[0].values.first);
 }
 
 Future<Budget> queryBudgetAmount({int catId, @required DateTime start, @required DateTime end}) async {
@@ -523,8 +523,8 @@ Map<String, dynamic> _budgetToMap(Budget budget) {
 
   if(budget.categoryId != null) map.putIfAbsent(_budgetCategoryId, () => budget.categoryId);
   if(budget.budgetPerMonth != null) map.putIfAbsent(_budgetPerMonth, () => budget.budgetPerMonth);
-  if(budget.budgetStart != null) map.putIfAbsent(_budgetStart, () => budget.budgetStart);
-  if(budget.budgetEnd != null) map.putIfAbsent(_budgetEnd, () => _budgetEnd);
+  if(budget.budgetStart != null) map.putIfAbsent(_budgetStart, () => budget.budgetStart.millisecondsSinceEpoch);
+  if(budget.budgetEnd != null) map.putIfAbsent(_budgetEnd, () => budget.budgetEnd.millisecondsSinceEpoch);
 
   map.putIfAbsent(_budgetId, () => budget.id);
 
@@ -542,6 +542,8 @@ Map<String, dynamic> _userToMap(User user) {
   if(user.color != null) map.putIfAbsent(_userColor, () => user.color);
 
   map.putIfAbsent(_userUid, () => user.uuid);
+
+  return map;
 }
 
 
