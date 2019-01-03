@@ -6,7 +6,6 @@ import 'dart:async';
 import 'package:w3c_event_source/w3c_event_source.dart';
 
 FirebaseApp _app;
-List<StreamSubscription> subscriptions = [];
 
 String _url(String path, {dynamic isEqualTo, dynamic startAt, dynamic endAt, String orderBy}) {
   var projectId = _app.options.projectID;
@@ -164,9 +163,14 @@ class Query {
               var change;
               String id;
               if(map['data'] == null) {
-                type = DocumentChangeType.removed;
-                change = null;
-                id = dataPath.substring(dataPath.lastIndexOf("/")).replaceAll("/", "");
+                if(dataPath != "/") {
+                  type = DocumentChangeType.removed;
+                  change = null;
+                  id = dataPath.substring(dataPath.lastIndexOf("/")).replaceAll("/", "");
+                  print("delete $id");
+
+                  snapshot._documentChanges.add(DocumentChange(document: DocumentSnapshot(documentID: id, data: change), type: type));
+                }
               } else {
                 var dataValue = map['data'];
 
