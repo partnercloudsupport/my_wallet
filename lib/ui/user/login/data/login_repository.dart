@@ -39,10 +39,15 @@ class LoginRepository extends CleanArchitectureRepository{
     return _fbRepo.getCurrentUser();
   }
 
-  Future<void> saveHome(String homeKey) async {
+  Future<Home> getHome(String hostEmail) {
+    return _fbRepo.getHome(hostEmail);
+  }
+
+  Future<void> saveHome(Home home) async {
     var sharePref = await SharedPreferences.getInstance();
 
-    await sharePref.setString(prefHomeProfile, homeKey);
+    await sharePref.setString(prefHomeProfile, home.key);
+    await sharePref.setString(prefHomeName, home.name);
   }
 
   Future<void> saveUserReference(String uuid) async {
@@ -111,6 +116,10 @@ class _LoginFirebaseRepository {
 
   Future<User> getCurrentUser() {
     return fm.getCurrentUser();
+  }
+
+  Future<Home> getHome(String hostEmail) {
+    return fm.findHomeOfHost(hostEmail);
   }
 
   Future<User> signInWithGoogle() {

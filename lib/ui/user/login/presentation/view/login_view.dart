@@ -121,12 +121,6 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
 
   @override
   void onSignInSuccess(bool hasDisplayName) {
-    _signingIn = false;
-
-    _loginKey.currentState.stop();
-    _googleKey.currentState.stop();
-    _facebookKey.currentState.stop();
-
     presenter.checkUserHome();
   }
 
@@ -153,10 +147,22 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   }
 
   void onUserHomeResult(bool exist) {
+    _signingIn = false;
+
+    _loginKey.currentState.stop();
+    _googleKey.currentState.stop();
+    _facebookKey.currentState.stop();
+
     Navigator.pushReplacementNamed(context, exist ? routes.MyHome : routes.HomeProfile);
   }
 
   void onUserHomeFailed(Exception e) {
+    _signingIn = false;
+
+    _loginKey.currentState.stop();
+    _googleKey.currentState.stop();
+    _facebookKey.currentState.stop();
+
     print(e.toString());
 
     onUserHomeResult(true);

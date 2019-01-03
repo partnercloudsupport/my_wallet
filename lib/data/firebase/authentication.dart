@@ -175,7 +175,7 @@ Future<bool> joinHome(Home home, User user) async  {
 
 Future<Home> findHomeOfHost(String host) async {
   return _lock.synchronized(() async {
-    QuerySnapshot _allHomes = await _firestore.collection(_homes).getDocuments();
+    QuerySnapshot _allHomes = await _firestore.collection(_homes).where("$_host", isEqualTo: host).getDocuments();
 
     Home home;
 
@@ -209,7 +209,7 @@ Future<void> createHome(
       fldName: homeName
     });
 
-    await _firestore.collection(_members).document().setData({
+    await _firestore.collection(_members).document(homeKey).setData({
       fldEmail: hostEmail,
       _homes: homeKey,
     });

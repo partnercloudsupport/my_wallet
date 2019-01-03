@@ -8,9 +8,17 @@ import 'package:w3c_event_source/w3c_event_source.dart';
 FirebaseApp _app;
 List<StreamSubscription> subscriptions = [];
 
-String _url(String path) {
+String _url(String path, {dynamic isEqualTo, dynamic startAt, dynamic endAt, String orderBy}) {
   var projectId = _app.options.projectID;
-  return "https://$projectId.firebaseio.com/$path.json";
+
+  var query = <String, String>{};
+  if(isEqualTo != null) query.putIfAbsent("equalTo", () => "\"$isEqualTo\"");
+  if(startAt != null) query.putIfAbsent("startAt", () => "$startAt");
+  if(endAt != null) query.putIfAbsent("endAt", () => "$endAt");
+  
+  if(query.isNotEmpty) query.putIfAbsent("orderBy", () => "\"$orderBy\"");
+
+  return Uri.https("$projectId.firebaseio.com", "$path.json", query.isEmpty ? null : query).toString();
 }
 
 var _headers = {"auth": token};
@@ -77,11 +85,17 @@ class QuerySnapshot {
 class Query {
   final String path;
   dynamic isEqualTo;
+  dynamic startAt;
+  dynamic endAt;
+  String orderBy;
 
   Query({this.path});
 
-  Query where(String key, {dynamic isEqualTo}) {
+  Query where(String key, {dynamic isEqualTo, dynamic startAt, dynamic endAt}) {
     this.isEqualTo = isEqualTo;
+    this.startAt = startAt;
+    this.endAt = endAt;
+    this.orderBy = key;
 
     return this;
   }
@@ -89,7 +103,8 @@ class Query {
   Future<QuerySnapshot> getDocuments() async {
     var headers = _headers;
 
-    var response = await http.get(_url(path), headers: headers);
+    print("path ${_url(path, isEqualTo: isEqualTo, startAt: startAt, endAt: endAt, orderBy: orderBy)}");
+    var response = await http.get(_url(path, isEqualTo: isEqualTo, startAt: startAt, endAt: endAt, orderBy: orderBy), headers: headers);
 
     if(response.statusCode != 200) {
       throw http.ClientException(response.reasonPhrase);

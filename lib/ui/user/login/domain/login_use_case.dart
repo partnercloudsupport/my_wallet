@@ -31,8 +31,10 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
         bool isHost = await repo.checkHost(user);
 
         if (isHost) {
+          Home home = await repo.getHome(user.email);
+
           // save his home to shared pref
-          await repo.saveHome(user.uuid);
+          await repo.saveHome(home);
 
           user = await repo.getUserDetailFromFbDatabase(user.uuid, user);
 

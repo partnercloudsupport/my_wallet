@@ -64,7 +64,7 @@ class _UserDetailState extends CleanArchitectureView<UserDetail, UserDetailPrese
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text("Home", style: Theme.of(context).textTheme.title,),
-                Text(_user != null ? _user.homeName : "", style: Theme.of(context).textTheme.title.apply(fontSizeFactor: 0.9),)
+                Text(_user != null && _user.homeName != null ? _user.homeName : "", style: Theme.of(context).textTheme.title.apply(fontSizeFactor: 0.9),)
               ],
             ),
           ),
@@ -75,7 +75,7 @@ class _UserDetailState extends CleanArchitectureView<UserDetail, UserDetailPrese
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text("Host", style: Theme.of(context).textTheme.title,),
-                Text(_user != null ? _user.hostEmail : "", style: Theme.of(context).textTheme.title.apply(fontSizeFactor: 0.9),)
+                Text(_user != null && _user.hostEmail != null ? _user.hostEmail : "", style: Theme.of(context).textTheme.title.apply(fontSizeFactor: 0.9),)
               ],
             ),
           )
