@@ -32,14 +32,25 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
 
         int id;
         TransactionDetail currentTransaction;
-        if(_id == null) {
+        if (_id == null) {
           id = await repo.generateId();
         } else {
           id = _id;
           currentTransaction = await repo.loadTransactionDetail(_id);
         }
 
-        result = await repo.saveTransaction(id, _type, _account, _category, _amount, _date, _category.name);
+        if (_amount == 0 && currentTransaction != null) {
+          result = await repo.deleteTransaction(id);
+        } else {
+          result = await repo.saveTransaction(
+              id,
+              _type,
+              _account,
+              _category,
+              _amount,
+              _date,
+              _category.name);
+        }
 
         if (!result) break;
 

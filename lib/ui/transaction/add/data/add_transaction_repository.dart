@@ -38,6 +38,10 @@ class AddTransactionRepository extends CleanArchitectureRepository {
     return _fbRepo.saveTransaction(id, _type, _account, _category, _amount, _date, _desc);
   }
 
+  Future<bool> deleteTransaction(int id) {
+    return _fbRepo.deleteTransaction(id);
+  }
+
   Future<bool> updateAccount(
       TransactionDetail currentTransaction,
       Account acc,
@@ -170,6 +174,10 @@ class _AddTransactionFirebaseRepository {
     var uuid = sharedPref.getString(UserUUID);
 
     return await _fm.addTransaction(AppTransaction(id, _date, _account.id, _category.id, _amount, _desc, _type, uuid));
+  }
+
+  Future<bool> deleteTransaction(int id) {
+    return _fm.deleteTransaction(AppTransaction(id, null, null, null, null, null, null, null));
   }
 
   Future<bool> updateAccount(
