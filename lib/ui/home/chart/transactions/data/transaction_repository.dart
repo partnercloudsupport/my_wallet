@@ -19,7 +19,12 @@ class _ChartTransactionDatabaseRepository {
     var to = Utils.lastDayOfMonth(DateTime.now());
 
     var transactions = await db.queryCategoryWithTransaction(from: from, to: to, type: type, filterZero: true);
+    var total = await db.sumAllTransactionBetweenDateByType(from, to, type);
+    var list = transactions == null ? [] : transactions.map((f) => TransactionEntity(f.name, f.balance, f.colorHex)).toList().sublist(0, transactions.length > 3 ? 3 : transactions.length);
+    var balance = list.fold(0.0, (pre, next) => pre + next.amount);
 
-    return transactions == null ? [] : transactions.map((f) => TransactionEntity(f.name, f.balance, f.colorHex)).toList();
+    if(total - balance > 0) list.add(TransactionEntity("Others", total - balance, "#1B5E20"));
+
+    return list;
   }
 }

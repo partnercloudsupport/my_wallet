@@ -13,6 +13,8 @@ class ListBudgets extends StatefulWidget {
   }
 }
 
+typedef OnMonthSelected = Function(DateTime month, double budget);
+
 class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPresenter> implements ListBudgetsDataView, observer.DatabaseObservable {
   _ListBudgetsState() : super(ListBudgetsPresenter());
 
@@ -22,6 +24,7 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
   var _nf = NumberFormat("\$##0.00");
 
   var _month = DateTime.now();
+  var _amount = 0.0;
 
   final crossAxisCount = 3;
 
@@ -73,10 +76,15 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
             alignment: Alignment.center,
             child: Text(df.format(_month), style: Theme.of(context).textTheme.title,),
           ),
-          _MonthSummary(_summaryKey, _month, (month) {
+          _MonthSummary(_summaryKey, _month, (month, total) {
             _month = month;
+            _amount = total;
             loadData();
           }),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text("Total ${_nf.format(_amount)}", style: Theme.of(context).textTheme.title,),
+          ),
           Expanded(
             child: GridView.builder(
               shrinkWrap: true,
@@ -133,14 +141,14 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
                         heightFactor: _budgetList == null ? 0.0 : _budgetList[index].total == 0 ? 0.0 : _budgetList[index].spent / _budgetList[index].total,
                         child: Container(
                           alignment: Alignment.center,
-                          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.pinkAccent),
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: AppTheme.pinkAccent),
                         ),
                       ),
                     ),
                   ),
                   Container(
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.pinkAccent, width: 3.0)),
+                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: AppTheme.pinkAccent, width: 3.0)),
                   ),
                   Center(
                     child: Text(
@@ -182,14 +190,14 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
   @override
   void onSummaryLoaded(List<BudgetSummary> summary) {
     if(_summaryKey.currentState != null) {
-      _summaryKey.currentState.updateSummary(summary);
+      _summaryKey.currentState.updateSummary(summary, _month);
     }
   }
 }
 
 class _MonthSummary extends StatefulWidget {
   final DateTime month;
-  final ValueChanged<DateTime> onMonthSelected;
+  final OnMonthSelected onMonthSelected;
 
   _MonthSummary(key, this.month, this.onMonthSelected) : super(key: key);
   @override
@@ -205,8 +213,16 @@ class _MonthSummaryState extends State<_MonthSummary> {
   final _columnWidth = 50.0;
   final _columnHeight = 110.0;
 
-  void updateSummary(List<BudgetSummary> summary) {
+  final _simpleDf = DateFormat("MMM");
+
+  void updateSummary(List<BudgetSummary> summary, DateTime month) {
     setState(() => this.summary = summary);
+
+    this._month = month;
+
+    if(summary != null && summary.isNotEmpty) {
+      widget.onMonthSelected(summary[0].month, summary[0].total);
+    }
   }
 
   @override
@@ -230,7 +246,10 @@ class _MonthSummaryState extends State<_MonthSummary> {
                 Container(
                   alignment: Alignment.center,
                   width: _columnWidth,
-                  color: Color(0xff7e7db7),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: summary != null && summary.isNotEmpty && index < summary.length && _isSelected(summary[index].month, _month)  ? AppTheme.white : AppTheme.transparent, width: 1.0),
+                    color: AppTheme.lightBlue.withOpacity(0.5),
+                  ),
                 ),
                 Container(
                   alignment: Alignment.bottomCenter,
@@ -249,17 +268,31 @@ class _MonthSummaryState extends State<_MonthSummary> {
                   ),
                 ),
                 Container(
+                  alignment: Alignment.topCenter,
+                  width: _columnWidth,
+                  child: Text(
+                      summary == null || index >= summary.length ? "${showYear(monthsAfter(DateTime.now(), index))}" : "${showYear(summary[index].month)}",
+                    style: Theme.of(context).textTheme.caption.apply(color: AppTheme.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Container(
                   alignment: Alignment.bottomCenter,
                   width: _columnWidth,
                   child: Text(
-                      summary == null || index >= summary.length ? "${df.format(monthsAfter(DateTime.now(), index))}" : "${df.format(summary[index].month)}",
-                    style: Theme.of(context).textTheme.subhead.apply(color: AppTheme.white),
+                    summary == null || index >= summary.length ? "${_simpleDf.format(monthsAfter(DateTime.now(), index))}" : "${_simpleDf.format(summary[index].month)}",
+                    style: Theme.of(context).textTheme.caption.apply(color: AppTheme.white),
                     textAlign: TextAlign.center,
                   ),
                 ),
               ],
             ),
-            onTap: () => widget.onMonthSelected(summary[index].month),
+            onTap: () {
+              widget.onMonthSelected(summary[index].month, summary[index].total);
+              _month = summary[index].month;
+
+              setState(() {});
+            },
           ),
           padding: EdgeInsets.only(left: 5.0, right: 5.0),
         ),
@@ -268,58 +301,11 @@ class _MonthSummaryState extends State<_MonthSummary> {
     );
   }
 
-//  @override
-//  Widget build(BuildContext context) {
-//    return InkWell(
-//      child: Stack(
-//        children: <Widget>[
-//          Center(
-//            child: Padding(
-//              padding: const EdgeInsets.all(8.0),
-//              child: Text(
-//                df.format(_month),
-//                style: Theme.of(context).textTheme.title,
-//              ),
-//            ),
-//          ),
-//          Align(
-//            alignment: Alignment.centerRight,
-//            child: Padding(
-//              padding: EdgeInsets.all(8.0),
-//              child: Icon(Icons.arrow_right),
-//            ),
-//          )
-//        ],
-//      ),
-//      onTap: () => Navigator.push(
-//          context,
-//          SlidePageRoute(
-//              builder: (_) => Scaffold(
-//                appBar: MyWalletAppBar(
-//                  title: "Select a month",
-//                ),
-//                body: ListView.builder(
-//                  itemBuilder: (_, index) {
-//                    DateTime newTime = monthsAfter(DateTime.now(), index);
-//                    return ListTile(
-//                      title: Center(
-//                        child: Text(
-//                          df.format(newTime),
-//                          style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),
-//                        ),
-//                      ),
-//                      onTap: () {
-//                        Navigator.pop(context);
-//
-//                        setState(() => _month = newTime);
-//
-//                        widget.onMonthSelected(_month);
-//                      },
-//                    );
-//                  },
-//                  itemCount: maxMonthSupport,
-//                ),
-//              ))),
-//    );
-//  }
+  bool _isSelected(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month;
+  }
+
+  String showYear(DateTime time) {
+    return time.month == DateTime.january ? "${time.year}" : "";
+  }
 }

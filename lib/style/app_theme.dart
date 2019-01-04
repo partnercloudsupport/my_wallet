@@ -13,6 +13,8 @@ class AppTheme {
   static const black = Color(0xFF000000);
   static const facebookColor = Color(0xFF3B5998);
   static const googleColor = Color(0xFFDB4437);
+  static const transparent = Color(0x00000000);
+  static const lightBlue = Color(0xff7e7db7);
 
   static ThemeData appTheme = ThemeData(
       brightness: Brightness.dark,
