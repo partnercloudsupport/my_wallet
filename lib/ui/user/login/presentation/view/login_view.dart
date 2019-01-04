@@ -37,38 +37,72 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           Image.asset("assets/nartus.png"),
-          Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Expanded(
-                  child: RoundedButton(
-                    key: _facebookKey,
-                    onPressed: _onFacebookButtonPressed,
-                    padding: EdgeInsets.all(10.0),
-                    child: Icon(
-                      MyFlutterApp.facebook_rect,
-                      color: AppTheme.white,
-                    ),
-                    radius: 5.0,
-                    color: AppTheme.facebookColor,
-                  ),
-                ),
-                Expanded(
-                  child: RoundedButton(
-                    key: _googleKey,
-                    onPressed: _onGoogleButtonPressed,
-                    padding: EdgeInsets.all(10.0),
-                    child: Icon(
-                      MyFlutterApp.googleplus_rect,
-                      color: AppTheme.white,
-                    ),
-                    radius: 5.0,
-                    color: AppTheme.googleColor,
-                  ),
-                ),
-              ],
-          ),
+//          Text(
+//            "Login with your social account",
+//            style: Theme.of(context).textTheme.title,
+//          ),
+//          Row(
+//              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//              mainAxisSize: MainAxisSize.max,
+//              children: <Widget>[
+//                Expanded(
+//                  child: RoundedButton(
+//                    key: _facebookKey,
+//                    onPressed: _onFacebookButtonPressed,
+//                    padding: EdgeInsets.all(10.0),
+//                    child: Icon(
+//                      MyFlutterApp.facebook_rect,
+//                      color: AppTheme.white,
+//                    ),
+//                    radius: 5.0,
+//                    color: AppTheme.facebookColor,
+//                  ),
+//                ),
+//                Expanded(
+//                  child: RoundedButton(
+//                    key: _googleKey,
+//                    onPressed: _onGoogleButtonPressed,
+//                    padding: EdgeInsets.all(10.0),
+//                    child: Icon(
+//                      MyFlutterApp.googleplus_rect,
+//                      color: AppTheme.white,
+//                    ),
+//                    radius: 5.0,
+//                    color: AppTheme.googleColor,
+//                  ),
+//                ),
+//              ],
+//          ),
+//          Padding(
+//              padding: EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20.0, right: 20.0),
+//              child: Row(
+//                children: <Widget>[
+//                  Expanded(
+//                    child: Container(
+//                      height: 1.0,
+//                      color: AppTheme.white,
+//                    ),
+//                  ),
+//                  Padding(
+//                    padding: EdgeInsets.all(5.0),
+//                    child: Text(
+//                      "OR",
+//                      style: Theme.of(context).textTheme.title,
+//                    ),
+//                  ),
+//                  Expanded(
+//                    child: Container(
+//                      height: 1.0,
+//                      color: AppTheme.white,
+//                    ),
+//                  )
+//                ],
+//              ),
+//            ),
+//          Text(
+//            "Login with your email",
+//            style: Theme.of(context).textTheme.title,
+//          ),
           Column(
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
@@ -101,7 +135,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
               ),
               RoundedButton(
                 onPressed: _register,
-                child: Padding(padding: EdgeInsets.all(12.0), child: Text("Register new account", style: TextStyle(color: AppTheme.darkBlue),),),
+                child: Padding(padding: EdgeInsets.all(12.0), child: Text("Register your email", style: TextStyle(color: AppTheme.darkBlue),),),
                 color: AppTheme.white,
               )
             ],),
@@ -126,10 +160,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
 
   @override
   void onSignInFailed(Exception e) {
-    _signingIn = false;
-    _loginKey.currentState.stop();
-    _googleKey.currentState.stop();
-    _facebookKey.currentState.stop();
+    stopProcessing();
 
     showDialog(context: context, builder: (_) => AlertDialog(
       title: Text("Sign in failed"),
@@ -147,21 +178,13 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   }
 
   void onUserHomeResult(bool exist) {
-    _signingIn = false;
-
-    _loginKey.currentState.stop();
-    _googleKey.currentState.stop();
-    _facebookKey.currentState.stop();
+    stopProcessing();
 
     Navigator.pushReplacementNamed(context, exist ? routes.MyHome : routes.HomeProfile);
   }
 
   void onUserHomeFailed(Exception e) {
-    _signingIn = false;
-
-    _loginKey.currentState.stop();
-    _googleKey.currentState.stop();
-    _facebookKey.currentState.stop();
+    stopProcessing();
 
     print(e.toString());
 
@@ -188,5 +211,14 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
     _signingIn = true;
     _googleKey.currentState.process();
     presenter.signInWithGoogle();
+  }
+
+  void stopProcessing() {
+    _signingIn = false;
+
+    if(_loginKey.currentState != null) _loginKey.currentState.stop();
+    if(_googleKey.currentState != null) _googleKey.currentState.stop();
+    if(_facebookKey.currentState != null) _facebookKey.currentState.stop();
+
   }
 }
