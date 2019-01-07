@@ -16,14 +16,12 @@ class CreateAccount extends StatefulWidget {
 class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAccountPresenter> implements CreateAccountDataView {
   _CreateAccountState() : super(CreateAccountPresenter());
 
-  final GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
+  final GlobalKey<NumberInputPadState> _numPadKey = GlobalKey();
   final _nf = NumberFormat("\$#,##0.00");
 
   AccountType _type = AccountType.paymentAccount;
   String _name = "";
   double _amount = 0;
-
-  bool showNumberInputPad = false;
 
   init() {
     presenter.dataView = this;
@@ -75,7 +73,7 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
             ),
           ),
           Align(
-            child: NumberInputPad(numPadKey, _onNumberInput, null, null, showNumPad: true,),
+            child: NumberInputPad(_numPadKey, _onNumberInput, null, null, showNumPad: true,),
             alignment: Alignment.bottomCenter,
           )
         ],
@@ -84,7 +82,7 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
   }
 
   void _showAccountTypeSelection() {
-    numPadKey.currentState.hide();
+    _numPadKey.currentState.hide();
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(AccountType.all, (f) =>
             Align(
@@ -96,7 +94,7 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
                 onTap: () {
                   setState(() => _type = f);
 
-                  numPadKey.currentState.show();
+                  _numPadKey.currentState.show();
 
                   Navigator.pop(context);
                 },

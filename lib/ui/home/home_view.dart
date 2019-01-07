@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 import 'package:my_wallet/ui/home/overview/presentation/view/overview_view.dart';
 import 'package:my_wallet/ui/home/chart/chart_row_view.dart';
-import 'package:my_wallet/ui/home/expenseslist/data/expense_list_entity.dart';
 import 'package:my_wallet/ui/home/expenseslist/presentation/view/expense_list_view.dart';
 import 'package:my_wallet/ui/home/drawer/presentation/view/drawer_view.dart';
 
@@ -16,14 +15,12 @@ class MyWalletHome extends StatefulWidget {
 }
 
 class _MyWalletState extends State<MyWalletHome> {
-  TextStyle titleStyle = TextStyle(color: AppTheme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
-  List<ExpenseEntity> homeEntities = [];
-
+  final _titleStyle = TextStyle(color: AppTheme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
   DateFormat _df = DateFormat("MMM, yyyy");
 
-  final overviewRatio = 0.15;
-  final chartRatio = 0.5;
-  final titleHeight = 22.0;
+  final _overviewRatio = 0.15;
+  final _chartRatio = 0.5;
+  final _titleHeight = 22.0;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +50,7 @@ class _MyWalletState extends State<MyWalletHome> {
     List<Widget> list = [];
 
     list.add(SliverAppBar(
-      expandedHeight: MediaQuery.of(context).size.height * (overviewRatio + chartRatio) + titleHeight,
+      expandedHeight: MediaQuery.of(context).size.height * (_overviewRatio + _chartRatio) + _titleHeight,
       pinned: true,
       flexibleSpace: Container(
         alignment: Alignment.center,
@@ -61,7 +58,7 @@ class _MyWalletState extends State<MyWalletHome> {
         child: FlexibleSpaceBar(
           centerTitle: true,
           title: SizedBox(
-            height: titleHeight,
+            height: _titleHeight,
             width: MediaQuery.of(context).size.width,
             child: Center(
               child: Text(
@@ -74,8 +71,8 @@ class _MyWalletState extends State<MyWalletHome> {
           background: ListView(
             physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
-              HomeOverview(titleStyle, MediaQuery.of(context).size.height * overviewRatio),
-              ChartRow(MediaQuery.of(context).size.height * chartRatio),
+              HomeOverview(_titleStyle, MediaQuery.of(context).size.height * _overviewRatio),
+              ChartRow(MediaQuery.of(context).size.height * _chartRatio),
             ],
           ),
         ),
