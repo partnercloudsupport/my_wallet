@@ -32,8 +32,6 @@ class _HomeOverviewState extends CleanArchitectureView<HomeOverview, HomeOvervie
 
   void init() {
     presenter.dataView = this;
-
-    presenter.loadTotal();
   }
 
   void onLoadTotalSuccess(double value) {
@@ -47,6 +45,8 @@ class _HomeOverviewState extends CleanArchitectureView<HomeOverview, HomeOvervie
     super.initState();
 
     observer.registerDatabaseObservable(databaseWatch, this);
+
+    presenter.loadTotal();
   }
 
   @override
@@ -65,7 +65,7 @@ class _HomeOverviewState extends CleanArchitectureView<HomeOverview, HomeOvervie
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text("Overview", style: widget.titleStyle,),
+          Text("Saving this month", style: widget.titleStyle,),
           Text("${nf.format(_total)}", style: Theme.of(context).textTheme.headline.apply(fontSizeFactor: 1.8, color: _total <= 0 ? AppTheme.pinkAccent : AppTheme.tealAccent),)
         ],
       ),

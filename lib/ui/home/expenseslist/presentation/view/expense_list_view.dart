@@ -56,20 +56,6 @@ class _ExpensesListViewState extends CleanArchitectureView<ExpensesListView, Exp
         shrinkWrap: true,
         children: homeEntities
             .map((f) => ListTile(
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(f.name, style: TextStyle(color: AppTheme.darkBlue),),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text("Earn: ${_nf.format(f.income)}", style: Theme.of(context).textTheme.caption.apply(color: AppTheme.tealAccent),),
-                          Text("Spent: ${_nf.format(f.expense)}", style: Theme.of(context).textTheme.caption.apply(color: AppTheme.pinkAccent),),
-                          Text("Budget: ${_nf.format(f.budget)}", style: Theme.of(context).textTheme.caption.apply(color: AppTheme.darkBlue),)
-                        ],
-                      )
-                    ],
-                  ),
                  leading: Container(
                    width: iconSize,
                      height: iconSize,
@@ -101,6 +87,8 @@ class _ExpensesListViewState extends CleanArchitectureView<ExpensesListView, Exp
                    ),
                  ),
                   onTap: () => Navigator.pushNamed(context, routes.TransactionList(f.name, categoryId: f.categoryId)),
+          title: Text(f.name, style: TextStyle(color: AppTheme.darkBlue),),
+          trailing: Text(_nf.format(f.expense), style: TextStyle(color: AppTheme.darkBlue),),
                 ))
             .toList(),
       ),
@@ -119,31 +107,5 @@ class _ExpensesListViewState extends CleanArchitectureView<ExpensesListView, Exp
 
   void onDatabaseUpdate(String table) {
     _loadDetails();
-  }
-}
-
-class _LeftDrawer extends StatelessWidget {
-  final drawerListItems = {"Categories": routes.ListCategories, "Accounts": routes.ListAccounts};
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(color: Theme.of(context).primaryColorDark),
-      width: MediaQuery.of(context).size.width * 0.85,
-      alignment: Alignment.center,
-      child: ListView(
-        padding: EdgeInsets.all(10.0),
-        shrinkWrap: true,
-        children: drawerListItems.keys
-            .map((f) => ListTile(
-                  title: Text(
-                    f,
-                    style: Theme.of(context).textTheme.title.apply(color: Colors.white),
-                  ),
-                  onTap: () => Navigator.popAndPushNamed(context, drawerListItems[f]),
-                ))
-            .toList(),
-      ),
-    );
   }
 }
