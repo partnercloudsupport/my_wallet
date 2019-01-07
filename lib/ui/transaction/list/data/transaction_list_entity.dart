@@ -4,7 +4,8 @@ class TransactionEntity {
   final String transactionDesc;
   final double amount;
   final DateTime dateTime;
-  final int color;
+  final int userColor;
+  final int transactionColor;
 
   TransactionEntity(
       this.id,
@@ -12,6 +13,7 @@ class TransactionEntity {
       this.transactionDesc,
       this.amount,
       this.dateTime,
-      this.color
+      this.userColor,
+      this.transactionColor
       );
 }

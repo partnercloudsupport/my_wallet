@@ -88,6 +88,7 @@ class _MyWalletState extends State<MyWalletHome> {
       ),
     );
 
-    return CustomScrollView(slivers: list);
+    return CustomScrollView(
+        slivers: list);
   }
 }

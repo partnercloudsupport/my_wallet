@@ -1,21 +1,21 @@
-import 'package:my_wallet/ui/home/chart/saving/data/chart_saving_entity.dart';
-import 'package:my_wallet/ui/home/chart/saving/presentation/presenter/chart_saving_presenter.dart';
+import 'package:my_wallet/ui/home/chart/budget/data/chart_budget_entity.dart';
+import 'package:my_wallet/ui/home/chart/budget/presentation/presenter/chart_budget_presenter.dart';
 import 'package:intl/intl.dart';
 
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
-import 'package:my_wallet/ui/home/chart/saving/presentation/view/chart_saving_data_view.dart';
+import 'package:my_wallet/ui/home/chart/budget/presentation/view/chart_budget_data_view.dart';
 import 'package:my_wallet/data/data_observer.dart' as observer;
 
-class SavingChartView extends StatefulWidget {
+class ChartBudgetView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _SavingChartViewState();
+    return _ChartBudgetViewState();
   }
 }
 
-class _SavingChartViewState extends CleanArchitectureView<SavingChartView, SavingChartPresenter> implements ChartSavingDataView, observer.DatabaseObservable {
+class _ChartBudgetViewState extends CleanArchitectureView<ChartBudgetView, ChartBudgetPresenter> implements ChartBudgetDataView, observer.DatabaseObservable {
 
-  _SavingChartViewState() : super(SavingChartPresenter());
+  _ChartBudgetViewState() : super(ChartBudgetPresenter());
 
   final tables = [
     observer.tableTransactions
@@ -23,7 +23,7 @@ class _SavingChartViewState extends CleanArchitectureView<SavingChartView, Savin
 
   final NumberFormat _nf = NumberFormat("\$#,##0.00");
 
-  SavingEntity entity;
+  ChartBudgetEntity entity;
 
   @override
   void init() {
@@ -72,7 +72,7 @@ class _SavingChartViewState extends CleanArchitectureView<SavingChartView, Savin
           Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.pinkAccent, width: 3.0)),
-              child: Text(entity == null ? "\$0.00" : _nf.format(entity.monthlySaving), style: Theme.of(context).textTheme.display2,)
+              child: Text(entity == null ? "\$0.00" : _nf.format(entity.spent), style: Theme.of(context).textTheme.display2,),
           ),
         ],
       ),
@@ -83,7 +83,7 @@ class _SavingChartViewState extends CleanArchitectureView<SavingChartView, Savin
     presenter.loadSaving();
   }
 
-  void onDataAvailable(SavingEntity value) {
+  void onDataAvailable(ChartBudgetEntity value) {
     setState(() {
       entity = value;
     });

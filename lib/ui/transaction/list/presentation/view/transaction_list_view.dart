@@ -27,7 +27,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
   List<TransactionEntity> entities = [];
 
   NumberFormat nf = NumberFormat("#,##0.00");
-  DateFormat df = DateFormat("dd MMM, yyyy");
+  DateFormat df = DateFormat("dd MMM, yyyy HH:mm:ss");
 
   @override
   void init() {
@@ -63,10 +63,10 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
               title: Text(entities[index].transactionDesc, style: Theme.of(context).textTheme.body2.apply(color: AppTheme.darkBlue),),
               leading: CircleAvatar(
                 child: Text(entities[index].userInitial, style: Theme.of(context).textTheme.title.apply(color: AppTheme.white),),
-                backgroundColor: Color(entities[index].color),
+                backgroundColor: Color(entities[index].userColor),
               ),
               subtitle: Text(df.format(entities[index].dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
-              trailing: Text("\$${nf.format(entities[index].amount)}", style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),),
+              trailing: Text("\$${nf.format(entities[index].amount)}", style: Theme.of(context).textTheme.title.apply(color: Color(entities[index].transactionColor)),),
             onTap: () => Navigator.pushNamed(context, routes.EditTransaction(entities[index].id)),
             ),
             color: index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.2),

@@ -3,6 +3,7 @@ import 'package:my_wallet/utils.dart' as Utils;
 import 'package:my_wallet/ca/data/ca_repository.dart';
 import 'package:my_wallet/ui/transaction/list/data/transaction_list_entity.dart';
 import 'package:my_wallet/data/data.dart';
+import 'package:my_wallet/style/app_theme.dart';
 
 class TransactionListRepository extends CleanArchitectureRepository {
   final _TransactionListDatabaseRepository _dbRepo = _TransactionListDatabaseRepository();
@@ -89,7 +90,7 @@ class _TransactionListDatabaseRepository {
           var initial = splits.map((f) => f.substring(0, 1).toUpperCase()).join();
           initial = initial.substring(0, initial.length < 2 ? initial.length : 2);
 
-          entities.add(TransactionEntity(trans.id, initial, trans.desc, trans.amount, trans.dateTime, user.color));
+          entities.add(TransactionEntity(trans.id, initial, trans.desc, trans.amount, trans.dateTime, user.color, TransactionType.isIncome(trans.type) ? AppTheme.tealAccent.value : AppTheme.pinkAccent.value));
         }
       }
     }

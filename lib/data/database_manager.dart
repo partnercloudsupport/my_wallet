@@ -219,19 +219,24 @@ Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime 
   appCats = catMaps == null
       ? []
       : catMaps.map((f) {
-          var total = 0.0;
+          var income = 0.0;
+          var expense = 0.0;
           var catId = f[_catId];
-          trans.forEach((trans) => total += trans.categoryId == catId ? trans.amount : 0.0);
+          trans.forEach((trans) {
+            income += trans.categoryId == catId && TransactionType.isIncome(trans.type) ? trans.amount : 0.0;
+            expense += trans.categoryId == catId && TransactionType.isExpense(trans.type)? trans.amount : 0.0;
+          });
 
           return AppCategory(
             f[_catId],
             f[_catName],
             f[_catColorHex],
-            total,
+            income,
+            expense
           );
         }).toList();
 
-  if (filterZero) appCats.removeWhere((f) => f.balance == 0);
+  if (filterZero) appCats.removeWhere((f) => f.income == 0 && f.expense == 0);
 
   return appCats;
 }
@@ -447,7 +452,8 @@ AppCategory _toCategory(Map<String, dynamic> map) {
     map[_catId],
     map[_catName],
     map[_catColorHex],
-    0,
+    0.0,
+    0.0
   );
 }
 

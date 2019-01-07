@@ -2,7 +2,7 @@ import 'package:my_wallet/app_material.dart';
 
 import 'package:my_wallet/ui/home/chart/transactions/presentation/view/chart_transaction.dart';
 import 'package:my_wallet/ui/home/chart/title/presentation/view/chart_title_view.dart';
-import 'package:my_wallet/ui/home/chart/saving/presentation/view/chart_saving_view.dart';
+import 'package:my_wallet/ui/home/chart/budget/presentation/view/chart_budget_view.dart';
 
 class ChartRow extends StatefulWidget {
   final double height;
@@ -19,7 +19,7 @@ class _ChartRowState extends State<ChartRow> with TickerProviderStateMixin {
   final _tabViews = [
     IncomeChart(),
     ExpenseChart(),
-    SavingChartView(),
+    ChartBudgetView(),
   ];
 
   @override

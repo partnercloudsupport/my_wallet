@@ -12,9 +12,24 @@ class ExpenseRepository extends CleanArchitectureRepository {
 
 class _ExpenseDatabaseRepository {
   Future<List<ExpenseEntity>> loadExpense() async {
-    List<AppCategory> cats = await _db.queryCategoryWithTransaction(from: Utils.firstMomentOfMonth(DateTime.now()), to: Utils.lastDayOfMonth(DateTime.now()), filterZero: false);
+    var start = Utils.firstMomentOfMonth(DateTime.now());
+    var end = Utils.lastDayOfMonth(DateTime.now());
 
-    List<ExpenseEntity> homeEntities = cats == null ? [] : cats.map((f) => ExpenseEntity(f.id, f.name, f.balance, f.colorHex)).toList();
+    List<AppCategory> cats = await _db.queryCategoryWithTransaction(from: start, to: end, filterZero: false);
+
+    List<ExpenseEntity> homeEntities = [];
+
+    if (cats != null && cats.isNotEmpty) {
+      for(int i = 0; i < cats.length; i++) {
+        var budget = await _db.queryBudgetAmount(start: start, end: end, catId: cats[i].id);
+
+        var remainFactor = 1 - (budget == null || budget.budgetPerMonth == 0 ? 0.0 : cats[i].expense/budget.budgetPerMonth);
+
+        if(remainFactor < 0) remainFactor = 0;
+
+        homeEntities.add(ExpenseEntity(cats[i].id, cats[i].name, cats[i].income, cats[i].expense, cats[i].colorHex, remainFactor, budget.budgetPerMonth));
+      }
+    }
 
     return homeEntities;
   }

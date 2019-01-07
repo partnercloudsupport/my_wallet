@@ -2,13 +2,14 @@ import 'package:intl/intl.dart';
 import 'package:my_wallet/data/data_observer.dart' as observer;
 
 import 'package:my_wallet/ui/home/expenseslist/data/expense_list_entity.dart';
-import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_view.dart';
 
 import 'package:my_wallet/ui/home/expenseslist/presentation/presenter/expense_list_presenter.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/home/expenseslist/presentation/view/expese_list_dataview.dart';
 
 class ExpensesListView extends StatefulWidget {
+  ExpensesListView();
+
   @override
   State<StatefulWidget> createState() {
     return _ExpensesListViewState();
@@ -16,13 +17,10 @@ class ExpensesListView extends StatefulWidget {
 }
 
 class _ExpensesListViewState extends CleanArchitectureView<ExpensesListView, ExpensePresenter> implements observer.DatabaseObservable, ExpenseDataView {
-
   _ExpensesListViewState() : super(ExpensePresenter());
 
-  final tables = [
-    observer.tableTransactions,
-    observer.tableCategory
-  ];
+  final tables = [observer.tableTransactions, observer.tableCategory];
+  final iconSize = 45.0;
 
   TextStyle titleStyle = TextStyle(color: AppTheme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
   List<ExpenseEntity> homeEntities = [];
@@ -51,18 +49,60 @@ class _ExpensesListViewState extends CleanArchitectureView<ExpensesListView, Exp
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       color: AppTheme.white,
       child: ListView(
-        physics: NeverScrollableScrollPhysics(),
+        physics: ClampingScrollPhysics(),
         shrinkWrap: true,
-        children: homeEntities.map((f) => ListTile(
-          title: Text(f.name, style: TextStyle(color: AppTheme.darkBlue),),
-          leading: Icon(Icons.map, color: AppTheme.darkBlue,),
-          trailing: Text(_nf.format(f.amount), style: TextStyle(color: AppTheme.tealAccent),),
-          onTap: () => Navigator.pushNamed(context, routes.TransactionList(f.name, categoryId: f.categoryId)),
-        )).toList(),
+        children: homeEntities
+            .map((f) => ListTile(
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(f.name, style: TextStyle(color: AppTheme.darkBlue),),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text("Earn: ${_nf.format(f.income)}", style: Theme.of(context).textTheme.caption.apply(color: AppTheme.tealAccent),),
+                          Text("Spent: ${_nf.format(f.expense)}", style: Theme.of(context).textTheme.caption.apply(color: AppTheme.pinkAccent),),
+                          Text("Budget: ${_nf.format(f.budget)}", style: Theme.of(context).textTheme.caption.apply(color: AppTheme.darkBlue),)
+                        ],
+                      )
+                    ],
+                  ),
+                 leading: Container(
+                   width: iconSize,
+                     height: iconSize,
+                   child: Stack(
+                     children: <Widget>[
+                       Align(
+                         alignment: Alignment.bottomCenter,
+                         child: ClipRect(
+                           child: Align(
+                             alignment: Alignment.bottomCenter,
+                             child: Icon(
+                               Icons.monetization_on,
+                               color: Color(AppTheme.hexToInt(f.colorHex)),
+                               size: iconSize,),
+                             heightFactor: f.remainFactor,
+                           ),
+                         ),
+                       ),
+                       Container(
+                         alignment: Alignment.bottomCenter,
+                         width: iconSize,
+                         height: iconSize,
+                         decoration: BoxDecoration(
+                             shape: BoxShape.circle,
+                             border: Border.all(color: Color(AppTheme.hexToInt(f.colorHex)), width: 1.0)
+                         ),
+                       )
+                     ],
+                   ),
+                 ),
+                  onTap: () => Navigator.pushNamed(context, routes.TransactionList(f.name, categoryId: f.categoryId)),
+                ))
+            .toList(),
       ),
     );
   }
@@ -83,9 +123,7 @@ class _ExpensesListViewState extends CleanArchitectureView<ExpensesListView, Exp
 }
 
 class _LeftDrawer extends StatelessWidget {
-  final drawerListItems = {
-    "Categories": routes.ListCategories,
-    "Accounts": routes.ListAccounts};
+  final drawerListItems = {"Categories": routes.ListCategories, "Accounts": routes.ListAccounts};
 
   @override
   Widget build(BuildContext context) {
@@ -98,12 +136,12 @@ class _LeftDrawer extends StatelessWidget {
         shrinkWrap: true,
         children: drawerListItems.keys
             .map((f) => ListTile(
-          title: Text(
-            f,
-            style: Theme.of(context).textTheme.title.apply(color: Colors.white),
-          ),
-          onTap: () => Navigator.popAndPushNamed(context, drawerListItems[f]),
-        ))
+                  title: Text(
+                    f,
+                    style: Theme.of(context).textTheme.title.apply(color: Colors.white),
+                  ),
+                  onTap: () => Navigator.popAndPushNamed(context, drawerListItems[f]),
+                ))
             .toList(),
       ),
     );
