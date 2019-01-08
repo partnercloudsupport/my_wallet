@@ -13,6 +13,6 @@ class ChartBudgetRepository extends CleanArchitectureRepository {
 
     var monthlyBudget = await _db.sumAllBudget(start, Utils.lastDayOfMonth(start)) ?? 0.0;
 
-    return ChartBudgetEntity(expenseThisMonth, monthlyBudget, monthlyBudget == 0 ? 0.0 : expenseThisMonth < monthlyBudget ? expenseThisMonth / monthlyBudget : 1.0);
+    return ChartBudgetEntity(monthlyBudget - expenseThisMonth, monthlyBudget, 1 - (monthlyBudget == 0 ? 0.0 : expenseThisMonth < monthlyBudget ? expenseThisMonth / monthlyBudget : 1.0));
   }
 }
