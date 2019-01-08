@@ -78,13 +78,13 @@ class FirebaseAuthentication {
     return user;
   }
 
-  Future<FirebaseUser> signInWithGoogle({@required String idToken, @required String accessToken}) async {
-
-  }
-
-  Future<FirebaseUser> signInWithFacebook({@required String accessToken}) async {
-
-  }
+//  Future<FirebaseUser> signInWithGoogle({@required String idToken, @required String accessToken}) async {
+//
+//  }
+//
+//  Future<FirebaseUser> signInWithFacebook({@required String accessToken}) async {
+//
+//  }
 
   Future<FirebaseUser> currentUser() async {
     FirebaseUser user;
@@ -106,7 +106,7 @@ class FirebaseAuthentication {
   Future<FirebaseUser> getUserData(String token) async {
     FirebaseUser user;
     do {
-      var apiKey = (await _app.options).apiKey;
+      var apiKey = _app.options.apiKey;
 
       if (apiKey == null || apiKey.isEmpty) break;
 
@@ -191,9 +191,9 @@ class FirebaseUser {
     phoneNumber = map['phoneNumber'];
   }
 
-  Future<FirebaseUser> updateProfile(UserUpdateInfo info) {
-
-  }
+//  Future<FirebaseUser> updateProfile(UserUpdateInfo info) {
+//
+//  }
 }
 
 class UserUpdateInfo {

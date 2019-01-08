@@ -1,9 +1,6 @@
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/user/register/presentation/presenter/register_presenter.dart';
 import 'package:my_wallet/ui/user/register/presentation/view/register_data_view.dart';
-import 'package:my_wallet/ui/home/home_view.dart';
-
-import 'package:my_wallet/font/my_flutter_app_icons.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -216,13 +213,13 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
     ));
   }
 
-  void _onFacebookButtonPressed() {
-    print("Facebook");
-  }
-
-  void _onGoogleButtonPressed() {
-    print("Google");
-  }
+//  void _onFacebookButtonPressed() {
+//    print("Facebook");
+//  }
+//
+//  void _onGoogleButtonPressed() {
+//    print("Google");
+//  }
 
   void _registerEmail() {
     _registerKey.currentState.process();

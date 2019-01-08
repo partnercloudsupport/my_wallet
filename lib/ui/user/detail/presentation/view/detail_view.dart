@@ -4,8 +4,6 @@ import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/user/detail/presentation/presenter/detail_presenter.dart';
 import 'package:my_wallet/ui/user/detail/presentation/view/detail_data_view.dart';
 
-import 'package:my_wallet/data/data.dart';
-
 class UserDetail extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {

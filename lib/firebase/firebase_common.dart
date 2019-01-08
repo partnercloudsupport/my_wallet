@@ -32,7 +32,7 @@ class FirebaseApp {
     assert(options.googleAppID != null);
     final FirebaseApp existingApp = await FirebaseApp.appNamed(name);
     if (existingApp != null) {
-      assert(await existingApp.options == options);
+      assert(existingApp.options == options);
       return existingApp;
     }
 

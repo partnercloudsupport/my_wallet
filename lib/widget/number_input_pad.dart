@@ -1,6 +1,5 @@
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 class NumberInputPad extends StatefulWidget {
   final Function(String, String) _onValueChanged;

@@ -31,9 +31,9 @@ class RegisterRepository extends CleanArchitectureRepository {
     return _fbRepo.registerEmail(email, password, displayName);
   }
 
-  Future<bool> updateDisplayName(String displayName)  {
-    return _fbRepo.updateDisplayName(displayName);
-  }
+//  Future<bool> updateDisplayName(String displayName)  {
+//    return _fbRepo.updateDisplayName(displayName);
+//  }
 
   Future<User> getCurrentUser() {
     return _fbRepo.getCurrentUser();
@@ -76,17 +76,17 @@ class _RegisterFirebaseRepository {
     return true;
   }
 
-  Future<bool> updateDisplayName(String displayName) async {
-    try {
-      await fm.updateDisplayName(displayName);
-    } on PlatformException catch (e) {
-      throw RegisterException(e.message);
-    } catch (e) {
-      throw RegisterException(e.toString());
-    }
-
-    return true;
-  }
+//  Future<bool> updateDisplayName(String displayName) async {
+//    try {
+//      await fm.updateDisplayName(displayName);
+//    } on PlatformException catch (e) {
+//      throw RegisterException(e.message);
+//    } catch (e) {
+//      throw RegisterException(e.toString());
+//    }
+//
+//    return true;
+//  }
 
   Future<User> getCurrentUser() {
     return fm.getCurrentUser();

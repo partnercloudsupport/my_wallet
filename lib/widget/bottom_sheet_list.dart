@@ -25,10 +25,10 @@ class BottomViewContent<T> extends StatelessWidget {
   }
 
   static Widget count(BuildContext context, int count, Function(BuildContext, int) builder) {
-    var delegate = ListWheelChildBuilderDelegate(
-      builder: builder,
-      childCount: count
-    );
+//    var delegate = ListWheelChildBuilderDelegate(
+//      builder: builder,
+//      childCount: count
+//    );
     return Container(
       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
       height: MediaQuery.of(context).size.height * 0.5,

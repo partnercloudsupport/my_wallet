@@ -1,7 +1,6 @@
 import 'package:my_wallet/ui/user/login/presentation/view/login_data_view.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/user/login/presentation/presenter/login_presenter.dart';
-import 'package:my_wallet/font/my_flutter_app_icons.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -195,23 +194,23 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
     Navigator.pushNamed(context, routes.Register);
   }
 
-  void _onFacebookButtonPressed() {
-    print("Facebook authentication");
-    if(_signingIn) return;
-
-    _signingIn = true;
-    _facebookKey.currentState.process();
-    presenter.signInWithFacebook();
-  }
-
-  void _onGoogleButtonPressed() {
-    print("Google Authentication");
-    if(_signingIn) return;
-
-    _signingIn = true;
-    _googleKey.currentState.process();
-    presenter.signInWithGoogle();
-  }
+//  void _onFacebookButtonPressed() {
+//    print("Facebook authentication");
+//    if(_signingIn) return;
+//
+//    _signingIn = true;
+//    _facebookKey.currentState.process();
+//    presenter.signInWithFacebook();
+//  }
+//
+//  void _onGoogleButtonPressed() {
+//    print("Google Authentication");
+//    if(_signingIn) return;
+//
+//    _signingIn = true;
+//    _googleKey.currentState.process();
+//    presenter.signInWithGoogle();
+//  }
 
   void stopProcessing() {
     _signingIn = false;

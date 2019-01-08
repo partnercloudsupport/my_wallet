@@ -4,9 +4,6 @@ import 'package:my_wallet/firebase/auth/firebase_authentication.dart';
 
 import 'package:my_wallet/data/data.dart';
 
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
 const _members = "members";
 const _homes = "homes";
 const _host = "host";
@@ -94,19 +91,19 @@ Future<bool> registerEmail(String email, String password, {String displayName}) 
   return _lock.synchronized(() async => await _auth.createUserWithEmailAndPassword(email: email, password: password, displayName: displayName) != null);
 }
 
-Future<bool> updateDisplayName(String displayName) async {
-  return _lock.synchronized(() async {
-    FirebaseUser user = await _auth.currentUser();
-
-    if(user == null) throw Exception("No user available");
-
-    UserUpdateInfo userUpdateInfo = UserUpdateInfo();
-    userUpdateInfo.displayName = displayName;
-    await user.updateProfile(userUpdateInfo);
-
-    return true;
-  });
-}
+//Future<bool> updateDisplayName(String displayName) async {
+//  return _lock.synchronized(() async {
+//    FirebaseUser user = await _auth.currentUser();
+//
+//    if(user == null) throw Exception("No user available");
+//
+//    UserUpdateInfo userUpdateInfo = UserUpdateInfo();
+//    userUpdateInfo.displayName = displayName;
+//    await user.updateProfile(userUpdateInfo);
+//
+//    return true;
+//  });
+//}
 
 Future<bool> signOut() async {
   return _lock.synchronized(() async {
