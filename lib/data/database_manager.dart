@@ -45,6 +45,8 @@ final _budgetCategoryId = "_catId";
 final _budgetPerMonth = "_budgetPerMonth";
 final _budgetStart = "_budgetStart";
 final _budgetEnd = "_budgetEnd";
+final _budgetSpent = "_budgetSpent";
+final _budgetEarn = "_budgetEarn";
 
 final _tableUser = tableUser;
 final _userUid = _id;
@@ -463,7 +465,9 @@ Budget _toBudget(Map<String, dynamic> map) {
       map[_budgetCategoryId],
       map[_budgetPerMonth] * 1.0,
       DateTime.fromMillisecondsSinceEpoch(map[_budgetStart]),
-      DateTime.fromMillisecondsSinceEpoch(map[_budgetEnd]));
+      DateTime.fromMillisecondsSinceEpoch(map[_budgetEnd]),
+      spent: map[_budgetSpent] == null ? 0.0 : map[_budgetSpent],
+      earn: map[_budgetEarn] == null ? 0.0 : map[_budgetEarn]);
 }
 
 User _toUser(Map<String, dynamic> map) {
@@ -531,6 +535,8 @@ Map<String, dynamic> _budgetToMap(Budget budget) {
   if(budget.budgetPerMonth != null) map.putIfAbsent(_budgetPerMonth, () => budget.budgetPerMonth);
   if(budget.budgetStart != null) map.putIfAbsent(_budgetStart, () => budget.budgetStart.millisecondsSinceEpoch);
   if(budget.budgetEnd != null) map.putIfAbsent(_budgetEnd, () => budget.budgetEnd.millisecondsSinceEpoch);
+  map.putIfAbsent(_budgetSpent, () => budget.spent == null ? 0.0 : budget.spent);
+  map.putIfAbsent(_budgetEarn, () => budget.earn == null ? 0.0 : budget.earn);
 
   map.putIfAbsent(_budgetId, () => budget.id);
 
@@ -602,7 +608,9 @@ class _Database {
         $_budgetCategoryId INTEGER NOT NULL,
         $_budgetPerMonth DOUBLE NOT NULL,
         $_budgetStart INTEGER NOT NULL,
-        $_budgetEnd INTEGER
+        $_budgetEnd INTEGER,
+        $_budgetSpent DOUBLE,
+        $_budgetEarn DOUBLE
         )
         """);
 
@@ -666,7 +674,20 @@ class _Database {
         var id = await _generateId(table);
         item.putIfAbsent(_id, () => id);
       }
+
       result = await db.insert(table, item);
+
+      if(result >= 0) {
+        if (table == _tableBudget) {
+          // recalculate budget
+          await _recalculateBudget(item);
+        }
+
+        if (table == _tableTransactions) {
+          // recalculate budget for transaction
+          await _recalculateBudgetForTransaction(item);
+        }
+      }
     }
 
     if (items != null) {
@@ -682,6 +703,18 @@ class _Database {
           result = singleResult;
         else
           result += singleResult;
+
+        if(singleResult >= 0) {
+          if (table == _tableBudget) {
+            // recalculate budget
+            await _recalculateBudget(item);
+          }
+
+          if (table == _tableTransactions) {
+            // recalculate budget for transaction
+            await _recalculateBudgetForTransaction(item);
+          }
+        }
       }
     }
 
@@ -731,12 +764,88 @@ class _Database {
   Future<void> deleteTable(String name) async {
     Database db = await _openDatabase();
 
-    db.delete(name);
+    await db.delete(name);
     await db.close();
   }
 
-  void _notifyObservers(String table) {
+  void _notifyObservers(String table) async {
     if(_watchers[table] != null) _watchers[table].forEach((f) => f.onDatabaseUpdate(table));
+  }
+
+  Future<void> _recalculateBudget(Map<String, dynamic> budget) async {
+    do {
+      if(budget == null) break;
+      if(budget.isEmpty) break;
+
+      // get budget category ID out
+      var catId = budget[_budgetCategoryId];
+      // get startDate out
+      var startDate = budget[_budgetStart];
+      // and end date
+      var endDate = budget[_budgetEnd];
+      // get budget ID
+      var id = budget[_budgetId];
+      // get budget per month
+      var amount = budget[_budgetPerMonth];
+
+      // query all transactions of type income for this category between this start and end date
+      var typesList = TransactionType.typeExpense;
+      String types = typesList.map((f) => "${f.id}").toString();
+      var sql = "SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startDate AND $endDate) AND $_transCategory = $catId AND $_transType in $types";
+      var sum = await _executeSql(sql);
+      var spent = sum[0].values.first ?? 0.0;
+
+      typesList = TransactionType.typeIncome;
+      types = typesList.map((f) => "${f.id}").toString();
+      sql = "SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startDate AND $endDate) AND $_transCategory = $catId AND $_transType in $types";
+      sum = await _executeSql(sql);
+      var earn = sum[0].values.first ?? 0.0;
+
+      var newBudget = <String, dynamic>{
+        _budgetId: id,
+        _budgetCategoryId: catId,
+        _budgetStart: startDate,
+        _budgetEnd: endDate,
+        _budgetPerMonth: amount,
+        _budgetSpent: spent,
+        _budgetEarn: earn
+      };
+
+      // update this budget
+      _update(_tableBudget, newBudget, "$_budgetId = ?", [id]);
+    } while(false);
+  }
+
+  Future<void> _recalculateBudgetForTransaction(Map<String, dynamic> tran) async {
+    do {
+
+      if(tran == null) break;
+      if(tran.isEmpty) break;
+
+      // get full transaction info
+      var transactionId = tran[_transID];
+
+      var listTransactions = await _query(_tableTransactions,where: "$_transID = ?", whereArgs: [transactionId]);
+
+      if(listTransactions == null) break;
+      if(listTransactions.isEmpty) break;
+
+      var transaction = listTransactions[0];
+      var catId = transaction[_transCategory];
+
+      var transDate = transaction[_transDateTime];
+
+      var startDate = Utils.firstMomentOfMonth(DateTime.fromMillisecondsSinceEpoch(transDate)).millisecondsSinceEpoch;
+      var endDate = Utils.lastDayOfMonth(DateTime.fromMillisecondsSinceEpoch(transDate)).millisecondsSinceEpoch;
+
+      // query budget for thsi transaction
+      var budgets = await _query(_tableBudget, where: "$_budgetCategoryId = $catId AND ($_budgetStart BETWEEN $startDate AND $endDate)");
+      if(budgets == null) break;
+      if(budgets.isEmpty) break;
+
+      // update budget now
+      await _recalculateBudget(budgets[0]);
+    } while(false);
   }
 
   void registerDatabaseObservable(List<String> tables, DatabaseObservable observable) {
