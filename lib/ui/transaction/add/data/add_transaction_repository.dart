@@ -34,7 +34,9 @@ class AddTransactionRepository extends CleanArchitectureRepository {
       double _amount,
       DateTime _date,
       String _desc) {
-    return _fbRepo.saveTransaction(id, _type, _account, _category, _amount, _date, _desc);
+    _fbRepo.saveTransaction(id, _type, _account, _category, _amount, _date, _desc);
+
+    return _dbRepo.saveTransaction(id, _type, _account, _category, _amount, _date, _desc);
   }
 
   Future<bool> deleteTransaction(int id) {
@@ -156,6 +158,21 @@ class _AddTransactionDatabaseRepository {
     firstName = "${firstName.substring(0, 1).toUpperCase()}${firstName.substring(1, firstName.length)}";
 
     return user == null ? null : UserDetail(user.uuid, firstName);
+  }
+
+  Future<bool> saveTransaction(
+      int id,
+      TransactionType _type,
+      Account _account,
+      AppCategory _category,
+      double _amount,
+      DateTime _date,
+      String _desc) async {
+    SharedPreferences sharedPref = await SharedPreferences.getInstance();
+
+    var uuid = sharedPref.getString(UserUUID);
+
+    return (await _db.insertTransaction(AppTransaction(id, _date, _account.id, _category.id, _amount, _desc, _type, uuid))) >= 0;
   }
 }
 
