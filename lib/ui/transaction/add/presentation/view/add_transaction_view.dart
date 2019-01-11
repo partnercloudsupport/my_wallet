@@ -212,7 +212,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   }
 
   void _showDatePicker() {
-    showDatePicker(context: context, initialDate: _date, firstDate: _date, lastDate: _date.add(Duration(days: 365))).then((selected) {
+    showDatePicker(context: context, initialDate: _date, firstDate: _date.subtract(Duration(days: 365)), lastDate: _date.add(Duration(days: 365))).then((selected) {
       if(selected != null) setState(() => _date = DateTime(selected.year, selected.month, selected.day, _date.hour, _date.minute, _date.second, _date.millisecond));
     });
   }
