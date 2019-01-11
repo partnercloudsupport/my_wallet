@@ -10,10 +10,6 @@ class BudgetDetailRepository extends CleanArchitectureRepository {
   final BudgetDetailDatabaseRepository _dbRepo = BudgetDetailDatabaseRepository();
   final BudgetDetailFirebaseRepository _fbRepo = BudgetDetailFirebaseRepository();
 
-  Future<List<AppCategory>> loadCategoryList() {
-    return _dbRepo.loadCategoryList();
-  }
-
   Future<AppCategory> loadCategory(int categoryId) {
     return _dbRepo.loadCategory(categoryId);
   }
@@ -35,10 +31,6 @@ class BudgetDetailRepository extends CleanArchitectureRepository {
 }
 
 class BudgetDetailDatabaseRepository {
-
-  Future<List<AppCategory>> loadCategoryList() {
-    return db.queryCategory();
-  }
 
   Future<AppCategory> loadCategory(int categoryId) async {
     List<AppCategory> cats = await db.queryCategory(id: categoryId);

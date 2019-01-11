@@ -6,10 +6,6 @@ import 'package:my_wallet/utils.dart';
 class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepository> {
   BudgetDetailUseCase() : super(BudgetDetailRepository());
 
-  void loadCategoryList(onNext<List<AppCategory>> next) {
-    repo.loadCategoryList().then((value) => next(value));
-  }
-
   void loadCategoryBudget(int categoryId, DateTime from, DateTime to, onNext<BudgetDetailEntity> next) async {
     AppCategory category = await repo.loadCategory(categoryId);
 

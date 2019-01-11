@@ -6,10 +6,6 @@ import 'package:my_wallet/ui/budget/detail/presentation/view/detail_data_view.da
 class BudgetDetailPresenter extends CleanArchitecturePresenter<BudgetDetailUseCase, BudgetDetailDataView> {
   BudgetDetailPresenter() : super(BudgetDetailUseCase());
 
-  void loadCategoryList() {
-    useCase.loadCategoryList(dataView.updateCategoryList);
-  }
-
   void loadCategoryBudget(int categoryId, DateTime from, DateTime to) {
     useCase.loadCategoryBudget(categoryId, from, to, dataView.onBudgetLoaded);
   }

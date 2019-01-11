@@ -10,7 +10,7 @@ class BudgetDetail extends StatefulWidget {
   final int categoryId;
   final DateTime month;
 
-  BudgetDetail(this.title, {this.categoryId, this.month});
+  BudgetDetail(this.title, {@required this.categoryId, this.month});
 
   @override
   State<StatefulWidget> createState() {
@@ -35,14 +35,8 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
   NumberFormat _nf = NumberFormat("\$##0.00");
 
-  List<AppCategory> _categories = [];
-
   void loadData() {
-    presenter.loadCategoryList();
-
-    if(widget.categoryId != null) {
-      presenter.loadCategoryBudget(widget.categoryId, _from, _to);
-    }
+    presenter.loadCategoryBudget(widget.categoryId, _from, _to);
   }
 
   @override
@@ -54,7 +48,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   void onDatabaseUpdate(String table) {
     if(_savingBudget) return;
 
-    loadData();
+    if(table == observer.tableCategory) loadData();
   }
 
   @override
@@ -100,7 +94,6 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
                       "A monthly budget for",
                       _category == null ? "Select Category" : _category.name,
                       AppTheme.pinkAccent,
-                      onPressed: _onCategoryPressed,
                     ),
                         ConversationRow(
                           "from",
@@ -137,27 +130,6 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
           )
         ],
       ),
-    );
-  }
-
-  void _onCategoryPressed() {
-    showModalBottomSheet(context: context, builder: (context) =>
-        BottomViewContent(_categories, (f) =>
-            Align(
-              child: InkWell(
-                child: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue))
-                ),
-                onTap: () {
-                  setState(() => _category = f);
-
-                  Navigator.pop(context);
-                },
-              ),
-              alignment: Alignment.center,
-            )
-        )
     );
   }
 
@@ -202,11 +174,6 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
       _amount = double.parse("${_number == null || _number.isEmpty ? "0" : _number}.${_decimal == null || _decimal.isEmpty ? "0" : _decimal}");
     });
-  }
-
-  @override
-  void updateCategoryList(List<AppCategory> cats) {
-    if(cats != null) setState(() => _categories = cats);
   }
 
   void _saveBudget() {
