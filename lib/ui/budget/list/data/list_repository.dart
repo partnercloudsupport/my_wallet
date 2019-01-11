@@ -21,11 +21,17 @@ class ListBudgetsRepository extends CleanArchitectureRepository{
       for(AppCategory f in cats) {
         Budget budget = await db.findBudget(f.id, firstDay, lastDay);
 
-        if(budget == null) continue;
-        if(budget.spent == null) budget.spent = 0.0;
-        if(budget.earn == null) budget.earn = 0.0;
+        var spent = 0.0;
+        var earn = 0.0;
+        var budgetPerMonth = 0.0;
 
-        entities.add(BudgetEntity(f.id, f.name, budget.spent - budget.earn > 0 ? budget.spent - budget.earn : 0, budget == null ? 0 : budget.budgetPerMonth));
+        if(budget != null) {
+          spent = budget.spent == null ? 0.0 : budget.spent;
+          earn = budget.earn == null ? 0.0 : budget.earn;
+          budgetPerMonth = budget.budgetPerMonth == null ? 0.0 : budget.budgetPerMonth;
+        }
+
+        entities.add(BudgetEntity(f.id, f.name, spent - earn > 0 ? spent - earn : 0, budgetPerMonth));
       }
     }
     return entities;

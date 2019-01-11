@@ -21,11 +21,15 @@ class ListCategoryUseCase extends CleanArchitectureUseCase<CategoryListRepositor
       for(AppCategory f in cats) {
         Budget budget = await repo.findBudget(f.id, firstDay, lastDay);
 
-        if(budget == null) continue;
-        if(budget.spent == null) budget.spent = 0.0;
-        if(budget.earn == null) budget.earn = 0.0;
+        var spent = 0.0;
+        var budgetPerMonth = 0.0;
 
-        entities.add(CategoryListItemEntity(f.id, f.name, budget == null || budget.spent == null ? 0.0 : budget.spent, budget == null ? 0.0 : budget.budgetPerMonth));
+        if(budget != null) {
+          spent = budget.spent == null ? 0.0 : budget.spent;
+          budgetPerMonth = budget.budgetPerMonth == null ? 0.0 : budgetPerMonth;
+        }
+
+        entities.add(CategoryListItemEntity(f.id, f.name, spent, budgetPerMonth));
       }
     }
 
@@ -37,11 +41,6 @@ class ListCategoryUseCase extends CleanArchitectureUseCase<CategoryListRepositor
 
     if(cat != null) await repo.deleteCategory(cat);
 
-    // do this in background so that user do not need to wait too long
-    _cleanupAfterDeleteCategory(catId);
-  }
-
-  Future<void> _cleanupAfterDeleteCategory(int catId) async {
     // delete all budgets for this category
     List<Budget> budgets = await repo.findAllBudgets(catId);
 

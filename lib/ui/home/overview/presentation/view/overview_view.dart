@@ -27,7 +27,7 @@ class _HomeOverviewState extends CleanArchitectureView<HomeOverview, HomeOvervie
   var _total = 0.0;
 
   void onDatabaseUpdate(String table) {
-    if (table == observer.tableAccount) presenter.loadTotal();
+    presenter.loadTotal();
   }
 
   void init() {

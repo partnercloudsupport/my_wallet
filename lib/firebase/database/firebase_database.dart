@@ -175,27 +175,24 @@ class Query {
                 var dataValue = map['data'];
 
                 if(dataValue is List) {
-                  type = DocumentChangeType.added;
                   List list = dataValue;
 
                   for (int i = 0; i < list.length; i++) {
                     id = "$i";
                     change = list[i];
-                    snapshot._documentChanges.add(DocumentChange(document: DocumentSnapshot(documentID: id, data: change), type: type));
+                    snapshot._documentChanges.add(DocumentChange(document: DocumentSnapshot(documentID: id, data: change), type: change == null ? DocumentChangeType.removed : DocumentChangeType.added));
                   }
                 } else if(dataValue is Map) {
-                  type = DocumentChangeType.added;
-
                   if(dataPath == "/") {
                     dataValue.forEach((key, value) {
                       id = key;
                       change = value;
-                      snapshot._documentChanges.add(DocumentChange(document: DocumentSnapshot(documentID: id, data: change), type: type));
+                      snapshot._documentChanges.add(DocumentChange(document: DocumentSnapshot(documentID: id, data: change), type: change == null ? DocumentChangeType.removed : DocumentChangeType.added));
                     });
                   } else {
                     id = dataPath.replaceFirst("/", "").split("/")[0];
                     change = dataValue;
-                    snapshot._documentChanges.add(DocumentChange(document: DocumentSnapshot(documentID: id, data: change), type: type));
+                    snapshot._documentChanges.add(DocumentChange(document: DocumentSnapshot(documentID: id, data: change), type: change == null ? DocumentChangeType.removed : DocumentChangeType.added));
                   }
                 } else {
                   type = DocumentChangeType.modified;
@@ -205,7 +202,7 @@ class Query {
                   change = {
                     split[1] : dataValue
                   };
-                  snapshot._documentChanges.add(DocumentChange(document: DocumentSnapshot(documentID: id, data: change), type: type));
+                  snapshot._documentChanges.add(DocumentChange(document: DocumentSnapshot(documentID: id, data: change), type: change == null ? DocumentChangeType.removed : DocumentChangeType.modified));
                 }
 
               }

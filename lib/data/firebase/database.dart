@@ -165,7 +165,6 @@ void _onAccountChanged(DocumentSnapshot document) {
 }
 
 void _onAccountRemoved(DocumentSnapshot document) {
-  if(document.data == null) return;
   db.deleteAccount(_toId(document));
 }
 
@@ -180,7 +179,6 @@ void _onCategoryChanged(DocumentSnapshot document) {
 }
 
 void _onCategoryRemoved(DocumentSnapshot document) {
-  if(document.data == null) return;
   db.deleteCategory(_toId(document));
 }
 
@@ -195,7 +193,6 @@ void _onTransactionChanged(DocumentSnapshot document) {
 }
 
 void _onTransactionRemoved(DocumentSnapshot document) {
-  if(document.data == null) return;
   db.deleteTransaction(_toId(document));
 }
 
@@ -210,7 +207,6 @@ void _onUserChanged(DocumentSnapshot document) {
 }
 
 void _onUserRemoved(DocumentSnapshot document) {
-  if(document.data == null) return;
   db.deleteUser(document.data[fldUuid]);
 }
 
@@ -225,7 +221,6 @@ void _onBudgetChanged(DocumentSnapshot document) {
 }
 
 void _onBudgetRemoved(DocumentSnapshot document) {
-  if(document.data == null) return;
   db.deleteBudget(_toId(document));
 }
 // ####################################################################################################

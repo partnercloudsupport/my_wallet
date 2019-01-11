@@ -78,7 +78,9 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
                   title: _categories[index].name,
                   trailing: isEditMode ? IconButton(
                     icon: Icon(Icons.close, color: AppTheme.pinkAccent,),
-                    onPressed: () => presenter.deleteCategory(_categories[index].categoryId),) :
+                    onPressed: () {
+                      presenter.deleteCategory(_categories[index].categoryId);
+                    }) :
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
