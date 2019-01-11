@@ -15,7 +15,6 @@ final _id = "_id";
 
 // table Account
 final _tableAccounts = tableAccount;
-final _accID = _id;
 final _accName = "_name";
 final _accBalance = "_balance";
 final _accType = "_type";
@@ -23,7 +22,6 @@ final _accCurrency = "_currency";
 
 // table transaction
 final _tableTransactions = tableTransactions;
-final _transID = _id;
 final _transDateTime = "_dateTime";
 final _transAcc = "_accountId";
 final _transCategory = "_categoryId";
@@ -34,13 +32,11 @@ final _transUid = "_transactionUserUid";
 
 // table category
 final _tableCategory = tableCategory;
-final _catId = _id;
 final _catName = "_name";
 final _catColorHex = "_colorHex";
 
 // table budget
 final _tableBudget = tableBudget;
-final _budgetId = _id;
 final _budgetCategoryId = "_catId";
 final _budgetPerMonth = "_budgetPerMonth";
 final _budgetStart = "_budgetStart";
@@ -49,7 +45,6 @@ final _budgetSpent = "_budgetSpent";
 final _budgetEarn = "_budgetEarn";
 
 final _tableUser = tableUser;
-final _userUid = _id;
 final _userDisplayName = "_displayName";
 final _userEmail = "_email";
 final _userPhotoUrl = "_photoUrl";
@@ -123,7 +118,7 @@ Future<List<Account>> queryAccounts({int id, AccountType type}) async {
     where = "$_accType = ?";
     whereArgs = [type.id];
   } else if (id != null) {
-    where = "$_accID = ?";
+    where = "$_id = ?";
     whereArgs = [id];
   } else {
     where = null;
@@ -142,7 +137,7 @@ Future<List<Account>> queryAccounts({int id, AccountType type}) async {
 Future<List<AppTransaction>> queryTransactions({int id}) async {
   String where;
 
-  if(id != null) where = "$_transID = $id";
+  if(id != null) where = "$_id = $id";
 
   List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: where));
 
@@ -170,11 +165,24 @@ Future<List<AppTransaction>> queryTransactionForCategory(int categoryId, DateTim
   return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
 }
 
+Future<List<AppTransaction>> queryAllTransactionForCategory(int categoryId) async {
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: "$_transCategory = $categoryId"));
+
+  return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
+}
+
 Future<List<AppTransaction>> queryTransactionForAccount(int accountId, DateTime day) async {
   var startOfDay = Utils.startOfDay(day == null ? DateTime.now() : day);
   var endOfDay = Utils.endOfDay(day == null ? DateTime.now() : day);
 
   List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: "$_transAcc = $accountId AND ($_transDateTime BETWEEN ${startOfDay.millisecondsSinceEpoch} AND ${endOfDay.millisecondsSinceEpoch})"));
+
+  return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
+}
+
+Future<List<AppTransaction>> queryAllTransactionForAccount(int accountId) async {
+
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: "$_transAcc = $accountId"));
 
   return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
 }
@@ -258,14 +266,14 @@ Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime 
       : catMaps.map((f) {
           var income = 0.0;
           var expense = 0.0;
-          var catId = f[_catId];
+          var catId = f[_id];
           trans.forEach((trans) {
             income += trans.categoryId == catId && TransactionType.isIncome(trans.type) ? trans.amount : 0.0;
             expense += trans.categoryId == catId && TransactionType.isExpense(trans.type)? trans.amount : 0.0;
           });
 
           return AppCategory(
-            f[_catId],
+            f[_id],
             f[_catName],
             f[_catColorHex],
             income,
@@ -291,7 +299,7 @@ Future<List<User>> queryUser({String uuid}) async {
   List whereArgs;
 
   if(uuid != null) {
-    where = "$_userUid = ?";
+    where = "$_id = ?";
     whereArgs = [uuid];
   }
   List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableUser, where: where, whereArgs: whereArgs));
@@ -409,43 +417,43 @@ Future<int> insertBudgets(List<Budget> budgets) {
 // ------------------------------------------------------------------------------------------------------------------------
 // delete
 Future<int> deleteAccount(int id) {
-  return _lock.synchronized(() => db._delete(_tableAccounts, "$_accID = ?", [id]));
+  return _lock.synchronized(() => db._delete(_tableAccounts, "$_id = ?", [id]));
 }
 
 Future<int> deleteAccounts(List<int> ids) {
-  return _lock.synchronized(() => db._delete(_tableAccounts, "$_accID = ?", ids));
+  return _lock.synchronized(() => db._delete(_tableAccounts, "$_id = ?", ids));
 }
 
 Future<int> deleteTransaction(int id) {
-  return _lock.synchronized(() => db._delete(_tableTransactions, "$_transID = ?", [id]));
+  return _lock.synchronized(() => db._delete(_tableTransactions, "$_id = ?", [id]));
 }
 
 Future<int> deleteTransactions(List<int> ids) {
-  return _lock.synchronized(() => db._delete(_tableTransactions, "$_transID = ?", ids));
+  return _lock.synchronized(() => db._delete(_tableTransactions, "$_id = ?", ids));
 }
 
 Future<int> deleteCategory(int id) {
-  return _lock.synchronized(() => db._delete(_tableCategory, "$_catId = ?", [id]));
+  return _lock.synchronized(() => db._delete(_tableCategory, "$_id = ?", [id]));
 }
 
 Future<int> deleteCategories(List<int> ids) {
-  return _lock.synchronized(() => db._delete(_tableCategory, "$_catId = ?", ids));
+  return _lock.synchronized(() => db._delete(_tableCategory, "$_id = ?", ids));
 }
 
 Future<int> deleteUser(String uid) {
-  return _lock.synchronized(() => db._delete(tableUser, "$_userUid = ?", [uid]));
+  return _lock.synchronized(() => db._delete(tableUser, "$_id = ?", [uid]));
 }
 
 Future<int> deleteUsers(List<String> uids) {
-  return _lock.synchronized(() => db._delete(tableUser, "$_userUid = ?", uids));
+  return _lock.synchronized(() => db._delete(tableUser, "$_id = ?", uids));
 }
 
 Future<int> deleteBudget(int id) {
-  return _lock.synchronized(() => db._delete(tableBudget, "$_budgetId = ?", [id]));
+  return _lock.synchronized(() => db._delete(tableBudget, "$_id = ?", [id]));
 }
 
 Future<int> deleteBudgets(List<int> ids) {
-  return _lock.synchronized(() => db._delete(tableBudget, "$_budgetId = ?", ids));
+  return _lock.synchronized(() => db._delete(tableBudget, "$_id = ?", ids));
 }
 
 Future<void> dropAllTables() {
@@ -459,40 +467,40 @@ Future<void> deleteTable(String table) {
 // ------------------------------------------------------------------------------------------------------------------------
 // update
 Future<int> updateAccount(Account acc) {
-  return _lock.synchronized(() => db._update(_tableAccounts, _accountToMap(acc), "$_accID = ?", [acc.id]));
+  return _lock.synchronized(() => db._update(_tableAccounts, _accountToMap(acc), "$_id = ?", [acc.id]));
 }
 
 Future<int> updateTransaction(AppTransaction transaction) {
-  return _lock.synchronized(() => db._update(_tableTransactions, _transactionToMap(transaction), "$_transID = ?", [transaction.id]));
+  return _lock.synchronized(() => db._update(_tableTransactions, _transactionToMap(transaction), "$_id = ?", [transaction.id]));
 }
 
 Future<int> updateCategory(AppCategory cat) {
   // search for category's parent
-  return _lock.synchronized(() => db._update(_tableCategory, _categoryToMap(cat), "$_catId = ?", [cat.id]));
+  return _lock.synchronized(() => db._update(_tableCategory, _categoryToMap(cat), "$_id = ?", [cat.id]));
 }
 
 Future<int> updateUser(User user) {
-  return _lock.synchronized(() => db._update(tableUser, _userToMap(user), "$_userUid = ?", [user.uuid]));
+  return _lock.synchronized(() => db._update(tableUser, _userToMap(user), "$_id = ?", [user.uuid]));
 }
 
 Future<int> updateBudget(Budget budget) {
-  return _lock.synchronized(() => db._update(tableBudget, _budgetToMap(budget), "$_budgetId = ?", [budget.id]));
+  return _lock.synchronized(() => db._update(tableBudget, _budgetToMap(budget), "$_id = ?", [budget.id]));
 }
 
 // ################################################################################################################
 // private helper
 // ################################################################################################################
 AppTransaction _toTransaction(Map<String, dynamic> map) {
-  return AppTransaction(map[_transID], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], map[_transAmount] * 1.0, map[_transDesc], TransactionType.all[map[_transType]], map[_transUid]);
+  return AppTransaction(map[_id], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], map[_transAmount] * 1.0, map[_transDesc], TransactionType.all[map[_transType]], map[_transUid]);
 }
 
 Account _toAccount(Map<String, dynamic> map) {
-  return new Account(map[_accID], map[_accName], map[_accBalance] * 1.0, AccountType.all[map[_accType]], map[_accCurrency]);
+  return new Account(map[_id], map[_accName], map[_accBalance] * 1.0, AccountType.all[map[_accType]], map[_accCurrency]);
 }
 
 AppCategory _toCategory(Map<String, dynamic> map) {
   return AppCategory(
-    map[_catId],
+    map[_id],
     map[_catName],
     map[_catColorHex],
     0.0,
@@ -502,7 +510,7 @@ AppCategory _toCategory(Map<String, dynamic> map) {
 
 Budget _toBudget(Map<String, dynamic> map) {
   return Budget(
-      map[_budgetId],
+      map[_id],
       map[_budgetCategoryId],
       map[_budgetPerMonth] * 1.0,
       DateTime.fromMillisecondsSinceEpoch(map[_budgetStart]),
@@ -513,7 +521,7 @@ Budget _toBudget(Map<String, dynamic> map) {
 
 User _toUser(Map<String, dynamic> map) {
   return User(
-    map[_userUid],
+    map[_id],
     map[_userEmail],
     map[_userDisplayName],
     map[_userPhotoUrl],
@@ -534,7 +542,7 @@ Map<String, dynamic> _transactionToMap(AppTransaction transaction) {
   if(transaction.type != null) map.putIfAbsent(_transType, () => transaction.type.id);
   if(transaction.userUid != null) map.putIfAbsent(_transUid, () => transaction.userUid);
 
-  map.putIfAbsent(_transID, () => transaction.id);
+  map.putIfAbsent(_id, () => transaction.id);
 
   return map;
 }
@@ -549,7 +557,7 @@ Map<String, dynamic> _accountToMap(Account acc) {
   if(acc.type != null) map.putIfAbsent(_accType, () => acc.type.id);
   if(acc.currency != null) map.putIfAbsent(_accCurrency, () => acc.currency);
 
-  map.putIfAbsent(_accID, () => acc.id);
+  map.putIfAbsent(_id, () => acc.id);
 
   return map;
 }
@@ -562,7 +570,7 @@ Map<String, dynamic> _categoryToMap(AppCategory cat) {
   if(cat.name != null) map.putIfAbsent(_catName, () => cat.name);
   if(cat.colorHex != null) map.putIfAbsent(_catColorHex, () => cat.colorHex);
 
-  map.putIfAbsent(_catId, () => cat.id);
+  map.putIfAbsent(_id, () => cat.id);
 
   return map;
 }
@@ -579,7 +587,7 @@ Map<String, dynamic> _budgetToMap(Budget budget) {
   if(budget.spent != null) map.putIfAbsent(_budgetSpent, () => budget.spent);
   if(budget.earn != null) map.putIfAbsent(_budgetEarn, () => budget.earn);
 
-  map.putIfAbsent(_budgetId, () => budget.id);
+  map.putIfAbsent(_id, () => budget.id);
 
   return map;
 }
@@ -594,7 +602,7 @@ Map<String, dynamic> _userToMap(User user) {
   if(user.photoUrl != null) map.putIfAbsent(_userPhotoUrl, () => user.photoUrl);
   if(user.color != null) map.putIfAbsent(_userColor, () => user.color);
 
-  map.putIfAbsent(_userUid, () => user.uuid);
+  map.putIfAbsent(_id, () => user.uuid);
 
   return map;
 }
@@ -641,7 +649,7 @@ class _Database {
   Future<void> _executeCreateDatabase(Database db) async {
     await db.execute("""
             CREATE TABLE $_tableAccounts (
-              $_accID INTEGER PRIMARY KEY,
+              $_id INTEGER PRIMARY KEY,
               $_accName TEXT NOT NULL,
               $_accBalance DOUBLE NOT NULL,
               $_accType INTEGER NOT NULL,
@@ -650,7 +658,7 @@ class _Database {
 
     await db.execute("""
           CREATE TABLE $_tableTransactions (
-          $_transID INTEGER PRIMARY KEY,
+          $_id INTEGER PRIMARY KEY,
           $_transDateTime LONG NOT NULL,
           $_transAcc INTEGER NOT NULL,
           $_transCategory INTEGER NOT NULL,
@@ -662,7 +670,7 @@ class _Database {
 
     await db.execute("""
         CREATE TABLE $_tableCategory (
-        $_catId INTEGER PRIMARY KEY,
+        $_id INTEGER PRIMARY KEY,
         $_catName TEXT NOT NULL,
         $_catColorHex TEXT NOT NULL
         )
@@ -670,7 +678,7 @@ class _Database {
 
     await db.execute("""
         CREATE TABLE $_tableBudget (
-        $_budgetId INTEGER PRIMARY KEY,
+        $_id INTEGER PRIMARY KEY,
         $_budgetCategoryId INTEGER NOT NULL,
         $_budgetPerMonth DOUBLE NOT NULL,
         $_budgetStart INTEGER NOT NULL,
@@ -682,7 +690,7 @@ class _Database {
 
     await db.execute("""
         CREATE TABLE $_tableUser (
-        $_userUid TEXT NOT NULL PRIMARY KEY,
+        $_id TEXT NOT NULL PRIMARY KEY,
         $_userDisplayName TEXT NOT NULL,
         $_userEmail TEXT NOT NULL,
         $_userPhotoUrl TEXT,
@@ -847,7 +855,7 @@ class _Database {
       // and end date
       var endDate = budget[_budgetEnd];
       // get budget ID
-      var id = budget[_budgetId];
+      var id = budget[_id];
       // get budget per month
       var amount = budget[_budgetPerMonth];
 
@@ -865,7 +873,7 @@ class _Database {
       var earn = sum[0].values.first ?? 0.0;
 
       var newBudget = <String, dynamic>{
-        _budgetId: id,
+        _id: id,
         _budgetCategoryId: catId,
         _budgetStart: startDate,
         _budgetEnd: endDate,
@@ -875,7 +883,7 @@ class _Database {
       };
 
       // update this budget
-      await db.update(_tableBudget, newBudget, where: "$_budgetId = ?", whereArgs: [id]);
+      await db.update(_tableBudget, newBudget, where: "$_id = ?", whereArgs: [id]);
     } while(false);
   }
 
@@ -886,9 +894,9 @@ class _Database {
       if(tran.isEmpty) break;
 
       // get full transaction info
-      var transactionId = tran[_transID];
+      var transactionId = tran[_id];
 
-      var listTransactions = await db.query(_tableTransactions,where: "$_transID = ?", whereArgs: [transactionId]);
+      var listTransactions = await db.query(_tableTransactions,where: "$_id = ?", whereArgs: [transactionId]);
 
       if(listTransactions == null) break;
       if(listTransactions.isEmpty) break;

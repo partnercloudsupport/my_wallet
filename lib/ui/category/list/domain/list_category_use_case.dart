@@ -37,11 +37,21 @@ class ListCategoryUseCase extends CleanArchitectureUseCase<CategoryListRepositor
 
     if(cat != null) await repo.deleteCategory(cat);
 
+    // do this in background so that user do not need to wait too long
+    _cleanupAfterDeleteCategory(catId);
+  }
+
+  Future<void> _cleanupAfterDeleteCategory(int catId) async {
     // delete all budgets for this category
     List<Budget> budgets = await repo.findAllBudgets(catId);
 
     if(budgets != null && budgets.isNotEmpty) {
       await repo.deleteAllBudgets(budgets);
+    }
+
+    List<AppTransaction> transactions = await repo.findAllTransaction(catId);
+    if(transactions != null && transactions.isNotEmpty) {
+      await repo.deleteAllTransactions(transactions);
     }
   }
 }

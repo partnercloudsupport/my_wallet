@@ -124,6 +124,7 @@ Budget _snapshotToBudget(DocumentSnapshot snapshot) {
 
 
 AppCategory _snapshotToCategory(DocumentSnapshot snapshot) {
+  print("to category ${snapshot.data}");
   return AppCategory(
       _toId(snapshot),
       snapshot.data[fldName],
@@ -154,62 +155,77 @@ int _toId(DocumentSnapshot snapshot) {
 }
 
 void _onAccountAdded(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.insertAccount(_snapshotToAccount(document)).catchError((e) => _onAccountChanged(document));
 }
 
 void _onAccountChanged(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.updateAccount(_snapshotToAccount(document));
 }
 
 void _onAccountRemoved(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.deleteAccount(_toId(document));
 }
 
 void _onCategoryAdded(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.insertCagetory(_snapshotToCategory(document)).catchError((e) => _onCategoryChanged(document));
 }
 
 void _onCategoryChanged(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.updateCategory(_snapshotToCategory(document));
 }
 
 void _onCategoryRemoved(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.deleteCategory(_toId(document));
 }
 
 void _onTransactionAdded(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.insertTransaction(_snapshotToTransaction(document)).catchError((e) => _onTransactionChanged(document));
 }
 
 void _onTransactionChanged(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.updateTransaction(_snapshotToTransaction(document));
 }
 
 void _onTransactionRemoved(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.deleteTransaction(_toId(document));
 }
 
 void _onUserAdded(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.insertUser(snapshotToUser(document)).catchError((e) => _onUserChanged(document));
 }
 
 void _onUserChanged(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.updateUser(snapshotToUser(document));
 }
 
 void _onUserRemoved(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.deleteUser(document.data[fldUuid]);
 }
 
 void _onBudgetAdded(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.insertBudget(_snapshotToBudget(document)).catchError((e) => _onBudgetChanged(document));
 }
 
 void _onBudgetChanged(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.updateBudget(_snapshotToBudget(document));
 }
 
 void _onBudgetRemoved(DocumentSnapshot document) {
+  if(document.data == null) return;
   db.deleteBudget(_toId(document));
 }
 // ####################################################################################################

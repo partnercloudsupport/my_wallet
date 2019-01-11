@@ -3,7 +3,6 @@ import 'package:my_wallet/data/firebase/database.dart' as fb;
 import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/ca/data/ca_repository.dart';
 
-import 'package:my_wallet/ui/category/list/data/list_category_entity.dart';
 export 'package:my_wallet/ui/category/list/data/list_category_entity.dart';
 
 class CategoryListRepository extends CleanArchitectureRepository{
@@ -34,6 +33,14 @@ class CategoryListRepository extends CleanArchitectureRepository{
   Future<void> deleteAllBudgets(List<Budget> budgets) {
     return _fbRepo.deleteAllBudgets(budgets);
   }
+
+  Future<List<AppTransaction>> findAllTransaction(int catId) {
+    return _dbRepo.findAllTransaction(catId);
+  }
+
+  Future<void> deleteAllTransactions(List<AppTransaction> transactions) {
+    return _fbRepo.deleteAllTransactions(transactions);
+  }
 }
 
 class _CategoryListDatabaseRepository {
@@ -54,6 +61,10 @@ class _CategoryListDatabaseRepository {
   Future<List<Budget>> findAllBudgets(int catId) {
     return db.findAllBudgetForCategory(catId);
   }
+
+  Future<List<AppTransaction>> findAllTransaction(int catId) {
+    return db.queryAllTransactionForCategory(catId);
+  }
 }
 
 class _CategoryListFirebaseRepository {
@@ -65,6 +76,14 @@ class _CategoryListFirebaseRepository {
     if(budgets != null && budgets.isNotEmpty) {
       for(int i = 0; i < budgets.length; i++) {
         await fb.deleteBudget(budgets[i]);
+      }
+    }
+  }
+
+  Future<void> deleteAllTransactions(List<AppTransaction> transactions) async {
+    if(transactions != null && transactions.isNotEmpty) {
+      for(int i = 0; i < transactions.length; i++) {
+        await fb.deleteTransaction(transactions[i]);
       }
     }
   }

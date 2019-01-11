@@ -10,6 +10,16 @@ class ListAccountsUseCase extends CleanArchitectureUseCase<ListAccountsRepositor
   }
 
   void deleteAccount(Account acc, onNext<bool> next) async {
-    return repo.deleteAccount(acc).then((result) => next(result));
+    if(acc != null && acc.id != null) {
+      await repo.deleteAccount(acc).then((result) => next(result));
+
+      List<AppTransaction> transactions = await repo.loadAllTransaction(acc.id);
+
+      if (transactions != null && transactions.isNotEmpty) {
+        for (int i = 0; i < transactions.length; i++) {
+          await repo.deleteTransaction(transactions[i]);
+        }
+      }
+    }
   }
 }

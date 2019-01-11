@@ -14,16 +14,32 @@ class ListAccountsRepository extends CleanArchitectureRepository {
   Future<bool> deleteAccount(Account acc) {
     return _fbRepo.deleteAccount(acc);
   }
+
+  Future<List<AppTransaction>> loadAllTransaction(int accountId) {
+    return _dbRepo.loadAllTransaction(accountId);
+  }
+
+  Future<void> deleteTransaction(AppTransaction transaction) {
+    return _fbRepo.deleteTransaction(transaction);
+  }
 }
 
 class _ListAccountsDatabaseRepository {
   Future<List<Account>> loadAllAccounts() async {
     return await db.queryAccounts();
   }
+
+  Future<List<AppTransaction>> loadAllTransaction(int accountId) {
+    return db.queryAllTransactionForAccount(accountId);
+  }
 }
 
 class _ListAccountsFirebaseRepository {
   Future<bool> deleteAccount(Account acc) async {
     return await fb.deleteAccount(acc);
+  }
+
+  Future<void> deleteTransaction(AppTransaction transaction) {
+    return fb.deleteTransaction(transaction);
   }
 }

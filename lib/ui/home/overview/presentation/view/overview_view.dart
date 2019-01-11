@@ -20,7 +20,7 @@ class HomeOverview extends StatefulWidget {
 class _HomeOverviewState extends CleanArchitectureView<HomeOverview, HomeOverviewPresenter> implements observer.DatabaseObservable, OverviewDataView {
   _HomeOverviewState() : super(HomeOverviewPresenter());
 
-  final databaseWatch = [observer.tableAccount];
+  final databaseWatch = [observer.tableTransactions];
 
   final NumberFormat nf = NumberFormat("\$#,##0.00");
 
