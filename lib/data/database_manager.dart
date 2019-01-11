@@ -301,6 +301,12 @@ Future<Budget> findBudget(int catId, DateTime start, DateTime end) async {
   return listMap == null || listMap.isEmpty ? null : _toBudget(listMap[0]);
 }
 
+Future<List<Budget>> findAllBudgetForCategory(int catId) async {
+  var listMap = await _lock.synchronized(() => db._query(_tableBudget, where: "$_budgetCategoryId = $catId"));
+
+  return listMap == null || listMap.isEmpty ? null : listMap.map((f) => _toBudget(f)).toList();
+}
+
 Future<int> generateAccountId() {
   return _lock.synchronized(() => db._generateId(_tableAccounts));
 }

@@ -6,6 +6,7 @@ import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/category/list/presentation/view/list_category_data_view.dart';
 
 import 'package:my_wallet/data/data_observer.dart' as observer;
+import 'package:intl/intl.dart';
 
 class CategoryList extends StatefulWidget {
   final String _title;
@@ -22,9 +23,10 @@ class CategoryList extends StatefulWidget {
 class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategoryPresenter> implements CategoryListDataView, observer.DatabaseObservable {
   _CategoryListState() : super(ListCategoryPresenter());
 
-  var tables = [observer.tableCategory];
+  final tables = [observer.tableCategory];
+  final _nf = NumberFormat("\$#,###.##");
 
-  List<AppCategory> _categories = [];
+  List<CategoryListItemEntity> _categories = [];
 
   var isEditMode = false;
 
@@ -76,12 +78,28 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
                   title: _categories[index].name,
                   trailing: isEditMode ? IconButton(
                     icon: Icon(Icons.close, color: AppTheme.pinkAccent,),
-                    onPressed: () => presenter.deleteCategory(_categories[index]),) : null,
+                    onPressed: () => presenter.deleteCategory(_categories[index].categoryId),) :
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Text("${_nf.format(_categories[index].spent)}"),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppTheme.darkBlue,
+                      borderRadius: BorderRadius.circular(3.0),
+                      border: Border.all(color: AppTheme.lightBlue, width: 1.0)
+                    ),
+                    margin: EdgeInsets.only(top: 5.0),
+                    padding: EdgeInsets.only(left: 4.0, right: 4.0),
+                    child: Text("${_nf.format(_categories[index].budget)}"),
+                  )
+                ],
+              ),
                   onTap: () => widget.returnValue
                       ? Navigator.pop(context, _categories[index])
                       : Navigator.pushNamed(
                           context,
-                          routes.TransactionList(_categories[index].name, categoryId: _categories[index].id)
+                          routes.TransactionList(_categories[index].name, categoryId: _categories[index].categoryId)
                         ),
                 ),
           )),
@@ -104,7 +122,7 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
     presenter.loadCategories();
   }
 
-  void onCategoriesLoaded(List<AppCategory> value) {
+  void onCategoriesLoaded(List<CategoryListItemEntity> value) {
     if (value != null)
       setState(() {
         _categories = value;

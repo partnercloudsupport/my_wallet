@@ -10,7 +10,7 @@ class ListCategoryPresenter extends CleanArchitecturePresenter<ListCategoryUseCa
     return useCase.loadCategories(dataView.onCategoriesLoaded);
   }
 
-  void deleteCategory(AppCategory cat) {
-    useCase.deleteCategory(cat);
+  void deleteCategory(int id) {
+    useCase.deleteCategory(id);
   }
 }
