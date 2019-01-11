@@ -9,7 +9,7 @@ class TransactionListUseCase extends CleanArchitectureUseCase<TransactionListRep
       int accountId,
       int categoryId,
       DateTime day,
-      onNext<List<TransactionEntity>> next
+      onNext<TransactionListEntity> next
       ) {
     repo.loadDataFor(accountId, categoryId, day).then((value) => next(value));
   }

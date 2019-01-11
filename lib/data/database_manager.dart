@@ -161,16 +161,51 @@ Future<List<AppTransaction>> queryTransactionsBetweenDates(DateTime from, DateTi
   return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
 }
 
-Future<List<AppTransaction>> queryTransactionForCategory(int categoryId) async {
-  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: "$_transCategory = ?", whereArgs: [categoryId]));
+Future<List<AppTransaction>> queryTransactionForCategory(int categoryId, DateTime day) async {
+  var startOfDay = Utils.startOfDay(day == null ? DateTime.now() : day);
+  var endOfDay = Utils.endOfDay(day == null ? DateTime.now() : day);
+
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: "$_transCategory = $categoryId AND ($_transDateTime BETWEEN ${startOfDay.millisecondsSinceEpoch} AND ${endOfDay.millisecondsSinceEpoch})"));
 
   return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
 }
 
-Future<List<AppTransaction>> queryTransactionForAccount(int accountId) async {
-  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: "$_transAcc = ?", whereArgs: [ accountId]));
+Future<List<AppTransaction>> queryTransactionForAccount(int accountId, DateTime day) async {
+  var startOfDay = Utils.startOfDay(day == null ? DateTime.now() : day);
+  var endOfDay = Utils.endOfDay(day == null ? DateTime.now() : day);
+
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: "$_transAcc = $accountId AND ($_transDateTime BETWEEN ${startOfDay.millisecondsSinceEpoch} AND ${endOfDay.millisecondsSinceEpoch})"));
 
   return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
+}
+
+Future<List<DateTime>> findTransactionsDates(DateTime day, {int accountId, int categoryId}) async {
+  Map<DateTime, DateTime> dates = {};
+  String where;
+
+  DateTime start = Utils.firstMomentOfMonth(day == null ? DateTime.now() : day);
+  DateTime end = Utils.lastDayOfMonth(day == null ? DateTime.now() : day);
+
+  String dateWhere = "$_transDateTime BETWEEN ${start.millisecondsSinceEpoch} AND ${end.millisecondsSinceEpoch}";
+
+  if(accountId != null) where = "$_transAcc = $accountId";
+  if(categoryId != null) where = "${where != null ? "$where AND " : ""}$_transCategory = $categoryId";
+
+  where = "${where != null && where.isNotEmpty ? "$where AND ($dateWhere)" : "$dateWhere"}";
+
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: where));
+
+  if(map != null && map.isNotEmpty) {
+    for(int i = 0; i < map.length; i++) {
+      if(map[i][_transDateTime] != null) {
+        var date = Utils.startOfDay(DateTime.fromMillisecondsSinceEpoch(map[i][_transDateTime]));
+
+        dates.putIfAbsent(date, () => date);
+      }
+    }
+  }
+
+  return dates.keys.toList();
 }
 
 Future<List<AppCategory>> queryCategory({int id}) async {

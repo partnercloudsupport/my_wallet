@@ -17,3 +17,10 @@ class TransactionEntity {
       this.transactionColor
       );
 }
+
+class TransactionListEntity {
+  final List<TransactionEntity> entities;
+  final List<DateTime> dates;
+
+  TransactionListEntity(this.entities, this.dates);
+}

@@ -4,6 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:my_wallet/ca/presentation/view/ca_state.dart';
 import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list_data_view.dart';
 import 'package:my_wallet/data/data_observer.dart' as observer;
+import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
+import 'package:flutter_calendar_carousel/classes/event_list.dart';
+import 'package:flutter_calendar_carousel/classes/event.dart';
 
 class TransactionList extends StatefulWidget {
   final String title;
@@ -22,12 +25,14 @@ class TransactionList extends StatefulWidget {
 class _TransactionListState extends CleanArchitectureView<TransactionList, TransactionListPresenter> implements TransactionListDataView, observer.DatabaseObservable {
   _TransactionListState() : super(TransactionListPresenter());
 
-  final tables = [observer.tableTransactions, observer.tableUser];
+  final _tables = [observer.tableTransactions, observer.tableUser];
 
-  List<TransactionEntity> entities = [];
+  List<TransactionEntity> _entities = [];
+  EventList _markedDates;
+  DateTime _day;
 
-  NumberFormat nf = NumberFormat("#,##0.00");
-  DateFormat df = DateFormat("dd MMM, yyyy HH:mm:ss");
+  NumberFormat _nf = NumberFormat("#,##0.00");
+  DateFormat _df = DateFormat("dd MMM, yyyy HH:mm:ss");
 
   @override
   void init() {
@@ -38,7 +43,11 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
   void initState() {
     super.initState();
 
-    observer.registerDatabaseObservable(tables, this);
+    _day = widget.day;
+
+    if(_day == null) _day = DateTime.now();
+
+    observer.registerDatabaseObservable(_tables, this);
 
     _loadData();
   }
@@ -47,7 +56,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
   void dispose() {
     super.dispose();
 
-    observer.unregisterDatabaseObservable(tables, this);
+    observer.unregisterDatabaseObservable(_tables, this);
   }
 
   @override
@@ -57,28 +66,56 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
         title: widget.title,
       ),
       body: ListView.builder(
-          itemCount: entities.length,
-          itemBuilder: (context, index) => Container(
-            child: ListTile(
-              title: Text(entities[index].transactionDesc, style: Theme.of(context).textTheme.body2.apply(color: AppTheme.darkBlue),),
-              leading: CircleAvatar(
-                child: Text(entities[index].userInitial, style: Theme.of(context).textTheme.title.apply(color: AppTheme.white),),
-                backgroundColor: Color(entities[index].userColor),
+          itemCount: _entities.length + 1,
+          itemBuilder: (context, index) {
+            if(index == 0) return Container(
+              child: CalendarCarousel(
+                onDayPressed: (day, events) {
+                  print("onDayPress $day");
+                  setState(() => _day = day);
+                  _loadData();
+                },
+                selectedDateTime: _day,
+                markedDatesMap: _markedDates,
+                weekendTextStyle: Theme.of(context).textTheme.title.apply(color: AppTheme.pinkAccent),
+                height: 420.0,
               ),
-              subtitle: Text(df.format(entities[index].dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
-              trailing: Text("\$${nf.format(entities[index].amount)}", style: Theme.of(context).textTheme.title.apply(color: Color(entities[index].transactionColor)),),
-            onTap: () => Navigator.pushNamed(context, routes.EditTransaction(entities[index].id)),
-            ),
-            color: index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.2),
-          )
+            );
+
+            var item = _entities[index - 1];
+
+            return Container(
+              child: ListTile(
+                title: Text(item.transactionDesc, style: Theme.of(context).textTheme.body2.apply(color: AppTheme.darkBlue),),
+                leading: CircleAvatar(
+                  child: Text(item.userInitial, style: Theme.of(context).textTheme.title.apply(color: AppTheme.white),),
+                  backgroundColor: Color(item.userColor),
+                ),
+                subtitle: Text(_df.format(item.dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
+                trailing: Text("\$${_nf.format(item.amount)}", style: Theme.of(context).textTheme.title.apply(color: Color(item.transactionColor)),),
+                onTap: () => Navigator.pushNamed(context, routes.EditTransaction(item.id)),
+              ),
+              color: index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.2),
+            );
+          }
       ),
     );
   }
 
   @override
-  void onTransactionListLoaded(List<TransactionEntity> value) {
+  void onTransactionListLoaded(TransactionListEntity list) {
     setState(() {
-      this.entities = value;
+      this._entities = list.entities;
+
+      if(list.dates != null || list.dates.isNotEmpty) {
+        Map<DateTime, List<Event>> events = {};
+        list.dates.forEach((f) => events.putIfAbsent(f, () => [Event(date: f)]));
+        this._markedDates = EventList(
+            events: events
+        );
+      } else {
+        this._markedDates = null;
+      }
     });
   }
 
@@ -88,6 +125,6 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
   }
 
   void _loadData() {
-    presenter.loadDataFor(widget.accountId, widget.categoryId, widget.day);
+    presenter.loadDataFor(widget.accountId, widget.categoryId, _day);
   }
 }

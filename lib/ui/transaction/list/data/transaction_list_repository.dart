@@ -8,7 +8,7 @@ import 'package:my_wallet/style/app_theme.dart';
 class TransactionListRepository extends CleanArchitectureRepository {
   final _TransactionListDatabaseRepository _dbRepo = _TransactionListDatabaseRepository();
 
-  Future<List<TransactionEntity>> loadDataFor(
+  Future<TransactionListEntity> loadDataFor(
       int accountId,
       int categoryId,
       DateTime day
@@ -18,24 +18,29 @@ class TransactionListRepository extends CleanArchitectureRepository {
 }
 
 class _TransactionListDatabaseRepository {
-  Future<List<TransactionEntity>> loadDataFor(
+  Future<TransactionListEntity> loadDataFor(
       int accountId,
       int categoryId,
       DateTime day
       ) async {
     List<TransactionEntity> entities = [];
+    List<DateTime> dates = [];
 
     List<AppTransaction> transactions = [];
     if(accountId != null) {
-      transactions = await db.queryTransactionForAccount(accountId);
+      transactions = await db.queryTransactionForAccount(accountId, day);
+      dates = await db.findTransactionsDates(day, accountId : accountId, categoryId : categoryId, );
     }
 
     if(categoryId != null) {
-      transactions = await db.queryTransactionForCategory(categoryId);
+      transactions = await db.queryTransactionForCategory(categoryId, day);
+      dates = await db.findTransactionsDates(day, accountId : accountId, categoryId : categoryId, );
     }
 
-    if(day != null) {
+    if(accountId == null && categoryId == null && day != null) {
+      // only load for days when there's no account or category required
       transactions = await db.queryTransactionsBetweenDates(Utils.startOfDay(day), Utils.endOfDay(day));
+      dates = await db.findTransactionsDates(day, accountId : accountId, categoryId : categoryId, );
     }
 
     if (transactions != null) {
@@ -95,6 +100,6 @@ class _TransactionListDatabaseRepository {
       }
     }
 
-    return entities;
+    return TransactionListEntity(entities, dates);
   }
 }
