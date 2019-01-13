@@ -100,6 +100,9 @@ class _MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePre
 
     list.add(SliverAppBar(
       expandedHeight: screenHeight * (_overviewRatio + _chartRatio) + _titleHeight,
+      actions: <Widget>[
+        IconButton(icon: Icon(Icons.calendar_today), onPressed: () => Navigator.pushNamed(context, routes.TransactionList("This month", datetime: DateTime.now())))
+      ],
       pinned: true,
       flexibleSpace: Container(
         alignment: Alignment.center,
