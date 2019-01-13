@@ -1,16 +1,17 @@
-import 'package:my_wallet/ui/home/expenseslist/data/expense_list_entity.dart';
+import 'package:my_wallet/ca/data/ca_repository.dart';
+import 'package:my_wallet/ui/home/homemain/data/homemain_expenses_entity.dart';
 import 'package:my_wallet/data/database_manager.dart' as _db;
 import 'package:my_wallet/utils.dart' as Utils;
-import 'package:my_wallet/ca/data/ca_repository.dart';
+export 'package:my_wallet/ui/home/homemain/data/homemain_expenses_entity.dart';
 
-class ExpenseRepository extends CleanArchitectureRepository {
-  final _ExpenseDatabaseRepository _dbRepo = _ExpenseDatabaseRepository();
+class MyWalletHomeRepository extends CleanArchitectureRepository {
+  final _MyWalletHomeDatabaseRepository _dbRepo = _MyWalletHomeDatabaseRepository();
   Future<List<ExpenseEntity>> loadExpense() {
     return _dbRepo.loadExpense();
   }
 }
 
-class _ExpenseDatabaseRepository {
+class _MyWalletHomeDatabaseRepository {
   Future<List<ExpenseEntity>> loadExpense() async {
     var start = Utils.firstMomentOfMonth(DateTime.now());
     var end = Utils.lastDayOfMonth(DateTime.now());

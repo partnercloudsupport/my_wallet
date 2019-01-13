@@ -1,6 +1,6 @@
 import 'package:my_wallet/app_material.dart';
 
-import 'package:my_wallet/ui/home/home_view.dart';
+import 'package:my_wallet/ui/home/homemain/presentation/view/homemain_view.dart';
 import 'package:my_wallet/widget/my_wallet_app_bar.dart';
 
 import 'package:my_wallet/ui/transaction/add/presentation/view/add_transaction_view.dart';
@@ -99,10 +99,28 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var home;
+
+    do {
+      if(!hasUser) {
+        home = Login();
+        break;
+      }
+
+      if(!hasProfile) {
+        home = HomeProfile();
+        break;
+      }
+
+      home=MyWalletHome();
+    } while (false);
+
+    WidgetsBinding.instance.addObserver(LifecycleEventHandler());
+
     return MaterialApp(
       title: 'My Wallet',
       theme: AppTheme.appTheme,
-      home: hasUser && hasProfile ? MyWalletHome() : hasUser && !hasProfile ? HomeProfile() : Login(),
+      home: home, //hasUser && hasProfile ? MyWalletHome() : hasUser && !hasProfile ? HomeProfile() : Login(),
       debugShowCheckedModeBanner: false,
       showPerformanceOverlay: false,
       showSemanticsDebugger: false,
@@ -142,8 +160,8 @@ class MyApp extends StatelessWidget {
               return HomeProfile();
             case routes.ListBudgets:
               return ListBudgets();
-            case routes.AddBudget:
-              return BudgetDetail("Create budget");
+//            case routes.AddBudget:
+//              return BudgetDetail("Create budget");
             default:
               Widget paramRoute = _getParamRoute(settings.name);
 
@@ -261,6 +279,7 @@ class MyApp extends StatelessWidget {
 
     return null;
   }
+
 }
 
 class LifecycleEventHandler extends WidgetsBindingObserver {
@@ -277,14 +296,15 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
 
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    print("onLifCycle change $state");
     switch (state) {
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.suspending:
-//        fm.dispose();
+        fdb.dispose();
         break;
       case AppLifecycleState.resumed:
-//        fm.resume();
+        fdb.resume();
         break;
     }
   }
@@ -300,4 +320,10 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
 
 //  @override
 //  Future<bool> didPushRoute(String route)
+
+@override
+  Future<bool> didPopRoute() {
+    print("did pop route");
+    return super.didPopRoute();
+  }
 }

@@ -23,6 +23,18 @@ Future<void> init(FirebaseApp app, {String homeProfile}) async {
   if (homeProfile != null && homeProfile.isNotEmpty) await setupDatabase(homeProfile);
 }
 
+Future<void> dispose() {
+  return _lock.synchronized(() {
+    if(subs != null && subs.isNotEmpty) {
+      subs.forEach((f) => f.cancel());
+    }
+  });
+}
+
+Future<void> resume() {
+  return _addSubscriptions();
+}
+
 Future<void> setupDatabase(final String homeKey) async {
   return _lock.synchronized(() async {
     if (_isDbSetup) return;
@@ -44,46 +56,52 @@ Future<void> setupDatabase(final String homeKey) async {
       await db.dropAllTables();
     }
 
-    _firestore.collection(tblAccount).snapshots().listen((f) => f.documentChanges.forEach((change) {
-      switch(change.type) {
-        case DocumentChangeType.added: _onAccountAdded(change.document); break;
-        case DocumentChangeType.modified: _onAccountChanged(change.document); break;
-        case DocumentChangeType.removed: _onAccountRemoved(change.document); break;
-      }
-    }));
-
-    _firestore.collection(tblBudget).snapshots().listen((f) => f.documentChanges.forEach((change) {
-      switch(change.type) {
-        case DocumentChangeType.added: _onBudgetAdded(change.document); break;
-        case DocumentChangeType.modified: _onBudgetChanged(change.document); break;
-        case DocumentChangeType.removed: _onBudgetRemoved(change.document); break;
-      }
-    }));
-
-    _firestore.collection(tblCategory).snapshots().listen((f) => f.documentChanges.forEach((change) {
-      switch(change.type) {
-        case DocumentChangeType.added: _onCategoryAdded(change.document); break;
-        case DocumentChangeType.modified: _onCategoryChanged(change.document); break;
-        case DocumentChangeType.removed: _onCategoryRemoved(change.document); break;
-      }
-    }));
-
-    _firestore.collection(tblTransaction).snapshots().listen((f) => f.documentChanges.forEach((change) {
-      switch(change.type) {
-        case DocumentChangeType.added: _onTransactionAdded(change.document); break;
-        case DocumentChangeType.modified: _onTransactionChanged(change.document); break;
-        case DocumentChangeType.removed: _onTransactionRemoved(change.document); break;
-      }
-    }));
-
-    _firestore.collection(tblUser).snapshots().listen((f) => f.documentChanges.forEach((change) {
-      switch(change.type) {
-        case DocumentChangeType.added: _onUserAdded(change.document); break;
-        case DocumentChangeType.modified: _onUserChanged(change.document); break;
-        case DocumentChangeType.removed: _onUserRemoved(change.document); break;
-      }
-    }));
+    await _addSubscriptions();
   });
+}
+
+Future<void> _addSubscriptions() async {
+  subs.add(_firestore.collection(tblAccount).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    switch(change.type) {
+      case DocumentChangeType.added: _onAccountAdded(change.document); break;
+      case DocumentChangeType.modified: _onAccountChanged(change.document); break;
+      case DocumentChangeType.removed: _onAccountRemoved(change.document); break;
+    }
+  })));
+
+  subs.add(_firestore.collection(tblBudget).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    switch(change.type) {
+      case DocumentChangeType.added: _onBudgetAdded(change.document); break;
+      case DocumentChangeType.modified: _onBudgetChanged(change.document); break;
+      case DocumentChangeType.removed: _onBudgetRemoved(change.document); break;
+    }
+  })));
+
+  subs.add(_firestore.collection(tblCategory).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    switch(change.type) {
+      case DocumentChangeType.added: _onCategoryAdded(change.document); break;
+      case DocumentChangeType.modified: _onCategoryChanged(change.document); break;
+      case DocumentChangeType.removed: _onCategoryRemoved(change.document); break;
+    }
+  })));
+
+  subs.add(_firestore.collection(tblTransaction).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    switch(change.type) {
+      case DocumentChangeType.added: _onTransactionAdded(change.document); break;
+      case DocumentChangeType.modified: _onTransactionChanged(change.document); break;
+      case DocumentChangeType.removed: _onTransactionRemoved(change.document); break;
+    }
+  })));
+
+  subs.add(_firestore.collection(tblUser).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    switch(change.type) {
+      case DocumentChangeType.added: _onUserAdded(change.document); break;
+      case DocumentChangeType.modified: _onUserChanged(change.document); break;
+      case DocumentChangeType.removed: _onUserRemoved(change.document); break;
+    }
+  })));
+
+  await Future.delayed(Duration(seconds: 5));
 }
 
 // ####################################################################################################
@@ -124,7 +142,6 @@ Budget _snapshotToBudget(DocumentSnapshot snapshot) {
 
 
 AppCategory _snapshotToCategory(DocumentSnapshot snapshot) {
-  print("to category ${snapshot.data}");
   return AppCategory(
       _toId(snapshot),
       snapshot.data[fldName],

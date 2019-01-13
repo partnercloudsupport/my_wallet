@@ -139,7 +139,7 @@ class Budget {
       );
 
   DateTime get budgetStart => Utils.firstMomentOfMonth(_start);
-  DateTime get budgetEnd => Utils.lastDayOfMonth(_end);
+  DateTime get budgetEnd => _end == null ? null : Utils.lastDayOfMonth(_end);
 }
 
 class User {
