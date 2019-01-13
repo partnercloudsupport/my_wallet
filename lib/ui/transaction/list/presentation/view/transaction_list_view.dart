@@ -30,6 +30,8 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
   List<TransactionEntity> _entities = [];
   EventList _markedDates;
   DateTime _day;
+  var _total = 0.0;
+  var _fraction = 1.0;
 
   NumberFormat _nf = NumberFormat("#,##0.00");
   DateFormat _df = DateFormat("dd MMM, yyyy HH:mm:ss");
@@ -66,7 +68,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
         title: widget.title,
       ),
       body: ListView.builder(
-          itemCount: _entities.length + 1,
+          itemCount: _entities.length + 2,
           itemBuilder: (context, index) {
             if(index == 0) return Container(
               child: CalendarCarousel(
@@ -82,7 +84,14 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
               ),
             );
 
-            var item = _entities[index - 1];
+            if(index == 1) return Container(
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.all(8.0),
+              child: Text("TOTAL EXPENSES \$${_nf.format(_total)}", style: TextStyle(color: AppTheme.darkBlue),),
+              color: AppTheme.blueGrey.withOpacity(0.2),
+            );
+
+            var item = _entities[index - 2];
 
             return Container(
               child: ListTile(
@@ -92,7 +101,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
                   backgroundColor: Color(item.userColor),
                 ),
                 subtitle: Text(_df.format(item.dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
-                trailing: Text("\$${_nf.format(item.amount)}", style: Theme.of(context).textTheme.title.apply(color: Color(item.transactionColor)),),
+                trailing: Text("\$${_nf.format(item.amount)}", style: TextStyle(color: Color(item.transactionColor)),),
                 onTap: () => Navigator.pushNamed(context, routes.EditTransaction(item.id)),
               ),
               color: index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.2),
@@ -106,6 +115,8 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
   void onTransactionListLoaded(TransactionListEntity list) {
     setState(() {
       this._entities = list.entities;
+      this._total = list.total;
+      this._fraction = list.fraction;
 
       if(list.dates != null || list.dates.isNotEmpty) {
         Map<DateTime, List<Event>> events = {};

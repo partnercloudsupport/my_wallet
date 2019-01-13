@@ -25,6 +25,7 @@ class _TransactionListDatabaseRepository {
       ) async {
     List<TransactionEntity> entities = [];
     List<DateTime> dates = [];
+    var total = 0.0;
 
     List<AppTransaction> transactions = [];
     if(accountId != null) {
@@ -35,6 +36,7 @@ class _TransactionListDatabaseRepository {
     if(categoryId != null) {
       transactions = await db.queryTransactionForCategory(categoryId, day);
       dates = await db.findTransactionsDates(day, accountId : accountId, categoryId : categoryId, );
+      var budgetAmount = await db.queryBudgetAmount(start: Utils.firstMomentOfMonth(day == null ? DateTime.now() : day), end: Utils.lastDayOfMonth(day == null ? DateTime.now() : day), catId: categoryId);
     }
 
     if(accountId == null && categoryId == null && day != null) {
@@ -95,11 +97,14 @@ class _TransactionListDatabaseRepository {
           var initial = splits.map((f) => f.substring(0, 1).toUpperCase()).join();
           initial = initial.substring(0, initial.length < 2 ? initial.length : 2);
 
+          total += TransactionType.isExpense(trans.type) ? trans.amount : 0.0;
           entities.add(TransactionEntity(trans.id, initial, trans.desc, trans.amount, trans.dateTime, user.color, TransactionType.isIncome(trans.type) ? AppTheme.tealAccent.value : AppTheme.pinkAccent.value));
         }
       }
     }
 
-    return TransactionListEntity(entities, dates);
+    var budget = await db.queryBudgetAmount(start: Utils.firstMomentOfMonth(day == null ? DateTime.now() : day), end: Utils.lastDayOfMonth(day == null ? DateTime.now() : day), catId: categoryId);
+    var fraction = budget == null || budget.budgetPerMonth == 0 ? 1.0 : total/budget.budgetPerMonth;
+    return TransactionListEntity(entities, dates, total, fraction);
   }
 }

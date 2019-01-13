@@ -1,3 +1,5 @@
+import 'package:my_wallet/data/data.dart';
+export 'package:my_wallet/data/data.dart';
 class TransactionEntity {
   final int id;
   final String userInitial;
@@ -14,13 +16,15 @@ class TransactionEntity {
       this.amount,
       this.dateTime,
       this.userColor,
-      this.transactionColor
+      this.transactionColor,
       );
 }
 
 class TransactionListEntity {
   final List<TransactionEntity> entities;
   final List<DateTime> dates;
+  final double total;
+  final double fraction;
 
-  TransactionListEntity(this.entities, this.dates);
+  TransactionListEntity(this.entities, this.dates, this.total, this.fraction);
 }
