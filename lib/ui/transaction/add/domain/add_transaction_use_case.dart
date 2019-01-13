@@ -49,7 +49,8 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
               _category,
               _amount,
               _date,
-              _category.name);
+              _category.name,
+              _id == null);
         }
 
         if (!result) break;

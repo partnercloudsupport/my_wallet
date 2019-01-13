@@ -32,6 +32,9 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   var _type = TransactionType.expenses;
   var _date = DateTime.now();
 
+  GlobalKey _alertDialog = GlobalKey();
+  bool _isSaving = false;
+
   Account _account;
   AppCategory _category;
 
@@ -235,6 +238,28 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   }
 
   void _saveTransaction() {
+    if(_isSaving) return;
+
+    _isSaving = true;
+
+    showDialog(context: context, builder: (_) => AlertDialog(
+      key: _alertDialog,
+      content: SizedBox(
+        width: 300.0,
+        height: 300.0,
+        child: Stack(
+          children: <Widget>[
+            Center(child: SizedBox(
+              width: 200.0,
+              height: 200.0,
+              child: CircularProgressIndicator(),
+            ),),
+            Center(child: Text("Saving...", style: Theme.of(context).textTheme.title,),)
+          ],
+        ),
+      ),
+    ));
+
     presenter.saveTransaction(
       widget.transactionId,
         _type,
@@ -257,11 +282,14 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   @override
   void onSaveTransactionSuccess(bool result) {
-    Navigator.pop(context, result);
+    _dismissDialog();
+    Navigator.pop(context);
   }
 
   @override
   void onSaveTransactionFailed(Exception e) {
+    _dismissDialog();
+
     print(e.toString());
     showDialog(context: context, builder: (context) => AlertDialog(
       title: Text("Error"),
@@ -298,5 +326,12 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   @override
   void onUserDetailLoaded(UserDetail user) {
     setState(() => _user = user);
+  }
+
+  void _dismissDialog() {
+    if(_alertDialog.currentContext != null) {
+      // alert dialog is showing
+      Navigator.pop(context);
+    }
   }
 }

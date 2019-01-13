@@ -33,10 +33,11 @@ class AddTransactionRepository extends CleanArchitectureRepository {
       AppCategory _category,
       double _amount,
       DateTime _date,
-      String _desc) {
+      String _desc,
+      bool newTransaction) {
     _fbRepo.saveTransaction(id, _type, _account, _category, _amount, _date, _desc);
 
-    return _dbRepo.saveTransaction(id, _type, _account, _category, _amount, _date, _desc);
+    return _dbRepo.saveTransaction(id, _type, _account, _category, _amount, _date, _desc, newTransaction);
   }
 
   Future<bool> deleteTransaction(int id) {
@@ -167,12 +168,33 @@ class _AddTransactionDatabaseRepository {
       AppCategory _category,
       double _amount,
       DateTime _date,
-      String _desc) async {
+      String _desc,
+      bool newTransaction) async {
     SharedPreferences sharedPref = await SharedPreferences.getInstance();
 
     var uuid = sharedPref.getString(UserUUID);
 
-    return (await _db.insertTransaction(AppTransaction(id, _date, _account.id, _category.id, _amount, _desc, _type, uuid))) >= 0;
+    if(newTransaction) {
+      return (await _db.insertTransaction(AppTransaction(
+          id,
+          _date,
+          _account.id,
+          _category.id,
+          _amount,
+          _desc,
+          _type,
+          uuid))) >= 0;
+    } else {
+      return (await _db.updateTransaction(AppTransaction(
+          id,
+          _date,
+          _account.id,
+          _category.id,
+          _amount,
+          _desc,
+          _type,
+          uuid))) >= 0;
+    }
   }
 }
 
