@@ -18,10 +18,12 @@ class _ChartTransactionDatabaseRepository {
     var from = Utils.firstMomentOfMonth(DateTime.now());
     var to = Utils.lastDayOfMonth(DateTime.now());
 
-    var transactions = await db.queryCategoryWithTransaction(from: from, to: to, type: type, filterZero: true);
+    var transactions = await db.queryCategoryWithTransaction(from: from, to: to, type: type, filterZero: true, orderByType: true);
     var total = await db.sumAllTransactionBetweenDateByType(from, to, type);
-    var list = transactions == null ? [] : transactions.map((f) => TransactionEntity(f.name, f.income > 0 ? f.income : f.expense > 0 ? f.expense : 0.0, f.colorHex)).toList().sublist(0, transactions.length > 3 ? 3 : transactions.length);
+    List<TransactionEntity> list = transactions == null ? [] : transactions.map((f) => TransactionEntity(f.name, f.income > 0 ? f.income : f.expense > 0 ? f.expense : 0.0, f.colorHex)).toList().sublist(0, transactions.length > 3 ? 3 : transactions.length);
     var balance = list.fold(0.0, (pre, next) => pre + next.amount);
+
+    list.sort((a, b) => b.amount.floor() - a.amount.floor());
 
     if(total - balance > 0) list.add(TransactionEntity("Others", total - balance, "#1B5E20"));
 

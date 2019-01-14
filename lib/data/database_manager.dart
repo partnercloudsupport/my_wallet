@@ -234,7 +234,7 @@ Future<List<AppCategory>> queryCategory({int id}) async {
   return null;
 }
 
-Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime to, List<TransactionType> type, bool filterZero}) async {
+Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime to, List<TransactionType> type, bool filterZero = false, bool orderByType = false}) async {
   String where;
   int _from = 0;
   int _to = DateTime.now().millisecondsSinceEpoch;
@@ -255,7 +255,9 @@ Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime 
 
   List<Map<String, dynamic>> catMaps = await _lock.synchronized(() => db._query(_tableCategory));
 
-  List<Map<String, dynamic>> transMap = await _lock.synchronized(() => db._query(_tableTransactions, where: where));
+  List<Map<String, dynamic>> transMap = await _lock.synchronized(() => db._query(
+      _tableTransactions,
+      where: where));
 
   List<AppTransaction> trans = transMap == null ? [] : transMap.map((f) => _toTransaction(f)).toList();
 
@@ -283,6 +285,15 @@ Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime 
 
   if (filterZero) appCats.removeWhere((f) => f.income == 0 && f.expense == 0);
 
+  if(orderByType && type != null) {
+    if(type == TransactionType.typeExpense) {
+      // sort by expenses
+      appCats.sort((a, b) => b.expense.floor() - a.expense.floor());
+    } else if(type == TransactionType.typeIncome) {
+      // sort by income
+      appCats.sort((a, b) => b.income.floor() - a.income.floor());
+    }
+  }
   return appCats;
 }
 
@@ -725,10 +736,10 @@ class _Database {
     return result;
   }
 
-  Future<List<Map<String, dynamic>>> _query(String table, {String where, List whereArgs}) async {
+  Future<List<Map<String, dynamic>>> _query(String table, {String where, List whereArgs, String orderBy}) async {
     Database db = await _openDatabase();
 
-    List<Map<String, dynamic>> map = await db.query(table, where: where, whereArgs: whereArgs);
+    List<Map<String, dynamic>> map = await db.query(table, where: where, whereArgs: whereArgs, orderBy: orderBy);
 
     await db.close();
 

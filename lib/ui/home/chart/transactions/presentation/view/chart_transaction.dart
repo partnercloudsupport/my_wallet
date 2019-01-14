@@ -64,7 +64,7 @@ class _TransactionChartState extends CleanArchitectureView<TransactionChart, Tra
       animate: false,
       defaultRenderer: ArcRendererConfig(
           arcRendererDecorators: [ ArcLabelDecorator(
-            labelPosition: ArcLabelPosition.outside,
+            labelPosition: ArcLabelPosition.auto,
             outsideLabelStyleSpec: TextStyleSpec(
                 color: Color.fromHex(code: "#FFFFFF"),
                 fontSize: 14
