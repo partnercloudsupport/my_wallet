@@ -9,8 +9,9 @@ class TransactionDetail {
   final double amount;
   final TransactionType type;
   final UserDetail user;
+  final String desc;
 
-  TransactionDetail(this.id, this.dateTime, this.account, this.category, this.amount, this.type, this.user);
+  TransactionDetail(this.id, this.dateTime, this.account, this.category, this.amount, this.type, this.user, this.desc);
 
 }
 

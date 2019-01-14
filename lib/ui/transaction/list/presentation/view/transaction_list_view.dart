@@ -73,7 +73,6 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
             if(index == 0) return Container(
               child: CalendarCarousel(
                 onDayPressed: (day, events) {
-                  print("onDayPress $day");
                   setState(() => _day = day);
                   _loadData();
                 },
@@ -95,7 +94,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
 
             return Container(
               child: ListTile(
-                title: Text(item.transactionDesc, style: Theme.of(context).textTheme.body2.apply(color: AppTheme.darkBlue),),
+                title: Text("${item.categoryName}${item.transactionDesc != null && item.transactionDesc.isNotEmpty ? " (${item.transactionDesc})" : ""}", style: Theme.of(context).textTheme.body2.apply(color: AppTheme.darkBlue),),
                 leading: CircleAvatar(
                   child: Text(item.userInitial, style: Theme.of(context).textTheme.title.apply(color: AppTheme.white),),
                   backgroundColor: Color(item.userColor),

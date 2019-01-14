@@ -40,9 +40,10 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   UserDetail _user;
 
+  String _note;
+
   List<Account> _accountList = [];
   List<AppCategory> _categoryList = [];
-
 
   @override
   void init() {
@@ -143,6 +144,14 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                       _category == null ? "Select Category" : _category.name,
                       AppTheme.brightPink,
                       onPressed: _showSelectCategory,
+                    trail: IconButton(
+                      icon: Icon(_note == null || _note.isEmpty ? Icons.note_add : Icons.note, color: _note == null || _note.isEmpty ? AppTheme.darkGreen : AppTheme.pinkAccent,),
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => InputName(
+                            "Enter Note",
+                                (name) =>_note = name,
+                            hintText: _note == null || _note.isEmpty ? "Add your Note" : _note,))),
+                    )
                   ),
                   DateTimeRow(_date, _showDatePicker, _showTimePicker,),
                 ],),
@@ -267,6 +276,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
         _category,
         _toNumber(_number, _decimal),
         _date,
+        _note
     );
   }
 
@@ -313,6 +323,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
       _account = detail.account;
       _category = detail.category;
       _user = detail.user;
+      _note = detail.desc;
 
       _number = "${_nf.format(detail.amount)}";
       _decimal = "${_nf.format((detail.amount - detail.amount.floor()) * 100)}";

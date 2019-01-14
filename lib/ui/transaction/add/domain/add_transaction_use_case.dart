@@ -21,7 +21,7 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
     repo.loadCurrentUserName().then((value) => next(value));
   }
 
-  void saveTransaction(int _id,TransactionType _type, Account _account, AppCategory _category, double _amount, DateTime _date, onNext<bool> next, onError error) async {
+  void saveTransaction(int _id,TransactionType _type, Account _account, AppCategory _category, double _amount, DateTime _date, String _desc, onNext<bool> next, onError error) async {
     var result = false;
     try {
       do {
@@ -49,7 +49,7 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
               _category,
               _amount,
               _date,
-              _category.name,
+              _desc,
               _id == null);
         }
 

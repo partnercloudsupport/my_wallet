@@ -245,7 +245,6 @@ Lock _lock = Lock();
 
 Future<bool> addAccount(Account acc) async {
   return _lock.synchronized(() async {
-    print("add account ${acc.name} ${_firestore.path}");
     await _firestore.collection(tblAccount).document("${acc.id}").setData(_AccountToMap(acc));
     return true;
   });

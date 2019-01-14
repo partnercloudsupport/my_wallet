@@ -9,18 +9,25 @@ class ConversationRow extends StatelessWidget {
   final Color dataColor;
   final Function onPressed;
   final TextStyle style;
+  final Widget trail;
 
-  ConversationRow(this.description, this.dataText, this.dataColor, {this.onPressed, this.style});
+  ConversationRow(this.description, this.dataText, this.dataColor, {this.onPressed, this.style, this.trail});
 
   @override
   Widget build(BuildContext context) {
+    var children = trail == null
+        ? <Widget>[
+      _Description(description, ),
+      _Data(dataText, dataColor, onPressed: onPressed, style: style, )
+    ] :  <Widget>[
+      _Description(description, ),
+      _Data(dataText, dataColor, onPressed: onPressed, style: style, ),
+      trail
+    ];
     return Center(
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            _Description(description, ),
-            _Data(dataText, dataColor, onPressed: onPressed, style: style, )
-          ],
+          children: children,
         ),
     );
   }

@@ -115,7 +115,8 @@ class _AddTransactionDatabaseRepository {
         category,
         transaction.amount,
         transaction.type,
-        user
+        user,
+        transaction.desc
     );
   }
 

@@ -36,7 +36,6 @@ class _TransactionListDatabaseRepository {
     if(categoryId != null) {
       transactions = await db.queryTransactionForCategory(categoryId, day);
       dates = await db.findTransactionsDates(day, accountId : accountId, categoryId : categoryId, );
-      var budgetAmount = await db.queryBudgetAmount(start: Utils.firstMomentOfMonth(day == null ? DateTime.now() : day), end: Utils.lastDayOfMonth(day == null ? DateTime.now() : day), catId: categoryId);
     }
 
     if(accountId == null && categoryId == null && day != null) {
@@ -46,49 +45,26 @@ class _TransactionListDatabaseRepository {
     }
 
     if (transactions != null) {
-      // update category names to transactions which does not have description
-      List<AppTransaction> noDesc = transactions.where((f) => f.desc == null || f.desc.isEmpty).toList();
-
-      if (noDesc != null && noDesc.isNotEmpty) {
-        transactions.removeWhere((f) => f.desc == null || f.desc.isEmpty);
-
-        if (categoryId != null) {
-          var cat = await db.queryCategory(id: categoryId);
-
-          noDesc.forEach((f) =>
-              transactions.add(AppTransaction(
-                  f.id,
-                  f.dateTime,
-                  f.accountId,
-                  f.categoryId,
-                  f.amount,
-                  cat[0].name,
-                  f.type,
-                  f.userUid)));
-        } else {
-          for (int i = 0; i < noDesc.length; i++) {
-            var cat = await db.queryCategory(id: noDesc[i].categoryId);
-
-            transactions.add(AppTransaction(
-                noDesc[i].id,
-                noDesc[i].dateTime,
-                noDesc[i].accountId,
-                noDesc[i].categoryId,
-                noDesc[i].amount,
-                cat[0].name,
-                noDesc[i].type,
-                noDesc[i].userUid));
-          }
-        }
-      }
-
       // sort transactions by date
       transactions.sort((a, b) => a.dateTime.millisecondsSinceEpoch - b.dateTime.millisecondsSinceEpoch);
 
-      // get user initial
+      Map<int, String> categoryNames = {};
+
       for(AppTransaction trans in transactions) {
         if(trans.userUid == null || trans.userUid.isEmpty) continue;
 
+        // get category name
+        var catName = categoryNames[trans.categoryId];
+
+        if(catName == null) {
+          var category = await db.queryCategory(id: trans.categoryId);
+          if(category != null && category.isNotEmpty) catName = category[0].name;
+
+          // put category name for this ID into map, to be reused later
+          categoryNames.putIfAbsent(trans.categoryId, () => catName);
+        }
+
+        // get user initial
         List<User> users = await db.queryUser(uuid: trans.userUid);
 
         if(users != null && users.isNotEmpty) {
@@ -98,7 +74,7 @@ class _TransactionListDatabaseRepository {
           initial = initial.substring(0, initial.length < 2 ? initial.length : 2);
 
           total += TransactionType.isExpense(trans.type) ? trans.amount : 0.0;
-          entities.add(TransactionEntity(trans.id, initial, trans.desc, trans.amount, trans.dateTime, user.color, TransactionType.isIncome(trans.type) ? AppTheme.tealAccent.value : AppTheme.pinkAccent.value));
+          entities.add(TransactionEntity(trans.id, initial, catName, trans.desc, trans.amount, trans.dateTime, user.color, TransactionType.isIncome(trans.type) ? AppTheme.tealAccent.value : AppTheme.pinkAccent.value));
         }
       }
     }

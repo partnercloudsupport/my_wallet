@@ -28,7 +28,8 @@ class AddTransactionPresenter extends CleanArchitecturePresenter<AddTransactionU
       Account _account,
       AppCategory _category,
       double _amount,
-      DateTime _date) {
+      DateTime _date,
+      String _desc) {
     useCase.saveTransaction(
       id,
         _type,
@@ -36,6 +37,7 @@ class AddTransactionPresenter extends CleanArchitecturePresenter<AddTransactionU
         _category,
         _amount,
         _date,
+        _desc,
       dataView.onSaveTransactionSuccess,
       dataView.onSaveTransactionFailed
     );

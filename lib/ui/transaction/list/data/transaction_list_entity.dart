@@ -3,6 +3,7 @@ export 'package:my_wallet/data/data.dart';
 class TransactionEntity {
   final int id;
   final String userInitial;
+  final String categoryName;
   final String transactionDesc;
   final double amount;
   final DateTime dateTime;
@@ -12,6 +13,7 @@ class TransactionEntity {
   TransactionEntity(
       this.id,
       this.userInitial,
+      this.categoryName,
       this.transactionDesc,
       this.amount,
       this.dateTime,
