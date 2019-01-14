@@ -31,7 +31,7 @@ Future<void> dispose() {
 }
 
 Future<void> resume() {
-  return _addSubscriptions();
+  return _lock.synchronized(() => _addSubscriptions());
 }
 
 Future<void> setupDatabase(final String homeKey) async {

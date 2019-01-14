@@ -625,10 +625,6 @@ Map<String, dynamic> _userToMap(User user) {
 class _Database {
   Database db;
   Map<String, List<DatabaseObservable>> _watchers = {};
-//  List<DatabaseObservable> _accountWatchers = [];
-//  List<DatabaseObservable> _categoryWatchers = [];
-//  List<DatabaseObservable> _transactionWatchers = [];
-//  List<DatabaseObservable> _budgetWatchers  = [];
 
   Future<Database> _openDatabase() async {
     String dbPath = join((await getApplicationDocumentsDirectory()).path, "MyWalletDb");
@@ -647,8 +643,8 @@ class _Database {
         _tableAccounts
       ];
 
-      for(int i = 0; i < allTables.length; i++) {
-        await db.execute("DROP TABLE ${allTables[i]}");
+      for(String tbl in allTables) {
+        await db.execute("DROP TABLE $tbl");
       }
 
       await _executeCreateDatabase(db);

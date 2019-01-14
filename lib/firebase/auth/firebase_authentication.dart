@@ -157,9 +157,9 @@ class FirebaseAuthentication {
 
     List<String> keys = map.keys.toList();
 
-    for(int i = 0; i < key.length; i++) {
-      if(keys[i] == key) value = map[key];
-      if(map[keys[i]] is Map) value = _searchValueForKey(map[keys[i]], key);
+    for(String k in keys) {
+      if(k == key) value = map[key];
+      if(map[k] is Map) value = _searchValueForKey(map[k], key);
 
       if(value != null && value.isNotEmpty) break;
     }

@@ -92,16 +92,16 @@ class _CategoryListFirebaseRepository {
 
   Future<void> deleteAllBudgets(List<Budget> budgets) async {
     if(budgets != null && budgets.isNotEmpty) {
-      for(int i = 0; i < budgets.length; i++) {
-        await fb.deleteBudget(budgets[i]);
+      for(Budget budget in budgets) {
+        await fb.deleteBudget(budget);
       }
     }
   }
 
   Future<void> deleteAllTransactions(List<AppTransaction> transactions) async {
     if(transactions != null && transactions.isNotEmpty) {
-      for(int i = 0; i < transactions.length; i++) {
-        await fb.deleteTransaction(transactions[i]);
+      for(AppTransaction trans in transactions) {
+        await fb.deleteTransaction(trans);
       }
     }
   }
