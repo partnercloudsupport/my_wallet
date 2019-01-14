@@ -61,6 +61,18 @@ void unregisterDatabaseObservable(List<String> tables, DatabaseObservable observ
   _lock.synchronized(() => db.unregisterDatabaseObservable(tables, observable));
 }
 
+Future<void> init() {
+  return db.init();
+}
+
+Future<void> resume() {
+  return init();
+}
+
+Future<void> dispose() {
+  return db.dispose();
+}
+
 // ------------------------------------------------------------------------------------------------------------------------
 // other SQL helper methods
 Future<double> sumAllTransactionBetweenDateByType(DateTime from, DateTime to, List<TransactionType> type) async {
@@ -652,6 +664,14 @@ class _Database {
 
     return db;
   }
+
+  Future<void> init() async {
+    db = await _openDatabase();
+  }
+
+  Future<void> dispose() async {
+    await db.close();
+  }
   
   Future<void> _executeCreateDatabase(Database db) async {
     await db.execute("""
@@ -707,8 +727,7 @@ class _Database {
   }
 
   Future<int> _generateId(String table) async {
-    Database db = await _openDatabase();
-
+    if(!db.isOpen) db = await _openDatabase();
     int id = 0;
 
     var ids = await db.rawQuery("SELECT MAX($_id) FROM $table");
@@ -717,34 +736,27 @@ class _Database {
       id = ids[0].values.first;
     }
 
-    await db.close();
-
     return id == null ? 0 : id + 1;
   }
 
   Future<List<Map<String, dynamic>>> _executeSql(String sql) async {
-    Database db = await _openDatabase();
+    if(!db.isOpen) db = await _openDatabase();
 
     var result = await db.rawQuery(sql);
-
-    await db.close();
 
     return result;
   }
 
   Future<List<Map<String, dynamic>>> _query(String table, {String where, List whereArgs, String orderBy}) async {
-    Database db = await _openDatabase();
+    if(!db.isOpen) db = await _openDatabase();
 
     List<Map<String, dynamic>> map = await db.query(table, where: where, whereArgs: whereArgs, orderBy: orderBy);
-
-    await db.close();
 
     return map;
   }
 
   Future<int> _insert(String table, {Map<String, dynamic> item, List<Map<String, dynamic>> items}) async {
-    Database db = await _openDatabase();
-
+    if(!db.isOpen) db = await _openDatabase();
     var result = -1;
 
     if (item != null) {
@@ -796,19 +808,14 @@ class _Database {
       }
     }
 
-    await db.close();
-
     _notifyObservers(table);
 
     return result;
   }
 
   Future<int> _delete(String table, String where, List whereArgs) async {
-    Database db = await _openDatabase();
-
+    if(!db.isOpen) db = await _openDatabase();
     var result = await db.delete(table, where: where, whereArgs: whereArgs);
-
-    await db.close();
 
     _notifyObservers(table);
 
@@ -816,11 +823,8 @@ class _Database {
   }
 
   Future<int> _update(String table, Map<String, dynamic> item, String where, List whereArgs) async {
-    Database db = await _openDatabase();
-
+    if(!db.isOpen) db = await _openDatabase();
     var result = await db.update(table, item, where: where, whereArgs: whereArgs);
-
-    await db.close();
 
     _notifyObservers(table);
 
@@ -828,22 +832,17 @@ class _Database {
   }
 
   Future<void> _deleteDb() async {
-
-    Database db = await _openDatabase();
+    if(!db.isOpen) db = await _openDatabase();
 
     String path = db.path;
 
-    // close database before deleting it
-    await db.close();
-
+    db.close();
     await deleteDatabase(path);
   }
 
   Future<void> deleteTable(String name) async {
-    Database db = await _openDatabase();
-
+    if(!db.isOpen) db = await _openDatabase();
     await db.delete(name);
-    await db.close();
   }
 
   void _notifyObservers(String table) async {

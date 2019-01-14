@@ -15,6 +15,8 @@ import 'package:my_wallet/ui/category/create/presentation/view/create_category_v
 import 'package:my_wallet/data/firebase/database.dart' as fdb;
 import 'package:my_wallet/data/firebase/authentication.dart' as auth;
 
+import 'package:my_wallet/data/database_manager.dart' as db;
+
 import 'package:my_wallet/ui/user/login/presentation/view/login_view.dart';
 import 'package:my_wallet/ui/user/register/presentation/view/register_view.dart';
 import 'package:my_wallet/ui/user/homeprofile/main/presentation/view/homeprofile_view.dart';
@@ -53,6 +55,8 @@ void main() async {
         projectID: fbConfig.firebase_project_id,
         databaseURL: fbConfig.firebase_database_url,
       ));
+
+  await db.init();
 
   await auth.init(_app);
 
@@ -302,9 +306,11 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
       case AppLifecycleState.paused:
       case AppLifecycleState.suspending:
         fdb.dispose();
+        db.dispose();
         break;
       case AppLifecycleState.resumed:
         fdb.resume();
+        db.resume();
         break;
     }
   }
