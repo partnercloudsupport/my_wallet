@@ -133,8 +133,38 @@ class FirebaseAuthentication {
   }
 
   AuthenticationException _parseError(Response response) {
-    var error = json.decode(response.body);
-    return AuthenticationException(code: response.statusCode, message: error['message'], detailMessage: error['errors'][0]['reason']);
+    final keyMessage = "message";
+
+    Map<String, dynamic> error = json.decode(response.body);
+    print(error);
+
+    if(error['error'] != null) {
+      error = error['error'];
+    }
+
+    String message = response.body;
+
+    try {
+      message = _searchValueForKey(error, keyMessage);
+    } catch(e) {}
+
+    return AuthenticationException(code: response.statusCode, message: message);
+  }
+
+  String _searchValueForKey(Map<String, dynamic> map, String key) {
+    if(map == null || map.isEmpty) return "";
+    String value = "";
+
+    List<String> keys = map.keys.toList();
+
+    for(int i = 0; i < key.length; i++) {
+      if(keys[i] == key) value = map[key];
+      if(map[keys[i]] is Map) value = _searchValueForKey(map[keys[i]], key);
+
+      if(value != null && value.isNotEmpty) break;
+    }
+
+    return value;
   }
 
   Future<String> _exchangeForIdToken(String refreshToken) async {
@@ -203,12 +233,11 @@ class UserUpdateInfo {
 class AuthenticationException implements Exception {
   final int code;
   final String message;
-  final String detailMessage;
 
-  AuthenticationException({this.code = 0, this.message = "Unknown exception", this.detailMessage});
+  AuthenticationException({this.code = 0, this.message = "Unknown exception"});
 
   @override
   String toString() {
-    return "Firebase Authentication exception with code $code - $message; Detail message: $detailMessage";
+    return "Firebase Authentication exception with code $code - $message";
   }
 }

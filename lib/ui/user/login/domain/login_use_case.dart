@@ -5,7 +5,7 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
   LoginUseCase() : super(LoginRepository());
 
   void signIn(email, password, onNext<bool> onNext, onError onError) async {
-//    try {
+    try {
       do {
         await repo.validateEmail(email);
         await repo.validatePassword(password);
@@ -18,9 +18,9 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         onNext(user.displayName != null && user.displayName.isNotEmpty);
       } while (false);
-//    } catch (e) {
-//      handleError(onError, e);
-//    }
+    } catch (e) {
+      handleError(onError, e);
+    }
   }
 
   void checkUserHome(onNext<bool> next, onError onError) async{
