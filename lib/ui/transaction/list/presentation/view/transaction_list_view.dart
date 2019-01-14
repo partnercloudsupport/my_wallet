@@ -80,7 +80,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
                 selectedDateTime: _day,
                 markedDatesMap: _markedDates,
                 weekendTextStyle: Theme.of(context).textTheme.title.apply(color: AppTheme.pinkAccent),
-                height: 420.0,
+                height: 450.0,
               ),
             );
 
