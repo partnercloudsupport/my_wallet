@@ -41,15 +41,16 @@ class AddTransactionRepository extends CleanArchitectureRepository {
   }
 
   Future<bool> deleteTransaction(int id) {
-    return _fbRepo.deleteTransaction(id);
+    _fbRepo.deleteTransaction(id);
+
+    return _dbRepo.deleteTransaction(id);
   }
 
   Future<bool> updateAccount(
-      TransactionDetail currentTransaction,
-      Account acc,
-      TransactionType type,
-      double amount) {
-    return _fbRepo.updateAccount(currentTransaction, acc, type, amount);
+      Account acc) {
+    _fbRepo.updateAccount(acc);
+
+    return _dbRepo.updateAccount(acc);
   }
 
   Future<bool> checkTransactionType(TransactionType type) {
@@ -196,6 +197,15 @@ class _AddTransactionDatabaseRepository {
           uuid))) >= 0;
     }
   }
+
+  Future<bool> deleteTransaction(int id) async {
+    return (await _db.deleteTransaction(id)) >= 0;
+  }
+
+  Future<bool> updateAccount(Account acc) async {
+
+    return (await _db.updateAccount(acc)) >= 0;
+  }
 }
 
 class _AddTransactionFirebaseRepository {
@@ -218,20 +228,7 @@ class _AddTransactionFirebaseRepository {
     return _fm.deleteTransaction(AppTransaction(id, null, null, null, null, null, null, null));
   }
 
-  Future<bool> updateAccount(
-      TransactionDetail currentTransaction,
-      Account acc,
-      TransactionType type,
-      double amount) {
-    var revertBalance = 0.0;
-
-    if(currentTransaction != null) {
-      // revert to amount before this transaction happened
-      revertBalance = (TransactionType.isExpense(currentTransaction.type) ? 1 : -1) * currentTransaction.amount;
-    }
-
-    var newBalance = acc.balance + (TransactionType.isExpense(type) ? -1 : 1) * amount + revertBalance;
-
-    return _fm.updateAccount(Account(acc.id, acc.name, newBalance, acc.type, acc.currency));
+  Future<bool> updateAccount(Account acc) {
+    return _fm.updateAccount(acc);
   }
 }

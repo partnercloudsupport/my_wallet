@@ -12,7 +12,9 @@ class ListAccountsRepository extends CleanArchitectureRepository {
   }
 
   Future<bool> deleteAccount(Account acc) {
-    return _fbRepo.deleteAccount(acc);
+    _fbRepo.deleteAccount(acc);
+
+    return _dbRepo.deleteAccount(acc);
   }
 
   Future<List<AppTransaction>> loadAllTransaction(int accountId) {
@@ -20,7 +22,9 @@ class ListAccountsRepository extends CleanArchitectureRepository {
   }
 
   Future<void> deleteTransaction(AppTransaction transaction) {
-    return _fbRepo.deleteTransaction(transaction);
+    _fbRepo.deleteTransaction(transaction);
+
+    return _dbRepo.deleteTransaction(transaction);
   }
 }
 
@@ -31,6 +35,14 @@ class _ListAccountsDatabaseRepository {
 
   Future<List<AppTransaction>> loadAllTransaction(int accountId) {
     return db.queryAllTransactionForAccount(accountId);
+  }
+
+  Future<bool> deleteAccount(Account acc) async {
+    return (await db.deleteAccount(acc.id)) >= 0;
+  }
+
+  Future<void> deleteTransaction(AppTransaction transaction) {
+    return db.deleteTransaction(transaction.id);
   }
 }
 

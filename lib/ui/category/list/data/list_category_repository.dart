@@ -23,7 +23,9 @@ class CategoryListRepository extends CleanArchitectureRepository{
   }
 
   Future<bool> deleteCategory(AppCategory cat) {
-    return _fbRepo.deleteCategory(cat);
+    _fbRepo.deleteCategory(cat);
+
+    return _dbRepo.deleteCategory(cat);
   }
 
   Future<List<Budget>> findAllBudgets(int catId) {
@@ -31,7 +33,9 @@ class CategoryListRepository extends CleanArchitectureRepository{
   }
 
   Future<void> deleteAllBudgets(List<Budget> budgets) {
-    return _fbRepo.deleteAllBudgets(budgets);
+    _fbRepo.deleteAllBudgets(budgets);
+
+    return _dbRepo.deleteAllBudgets(budgets);
   }
 
   Future<List<AppTransaction>> findAllTransaction(int catId) {
@@ -39,7 +43,9 @@ class CategoryListRepository extends CleanArchitectureRepository{
   }
 
   Future<void> deleteAllTransactions(List<AppTransaction> transactions) {
-    return _fbRepo.deleteAllTransactions(transactions);
+    _fbRepo.deleteAllTransactions(transactions);
+
+    return _dbRepo.deleteAllTransactions(transactions);
   }
 }
 
@@ -64,6 +70,18 @@ class _CategoryListDatabaseRepository {
 
   Future<List<AppTransaction>> findAllTransaction(int catId) {
     return db.queryAllTransactionForCategory(catId);
+  }
+
+  Future<bool> deleteCategory(AppCategory cat) async {
+    return (await db.deleteCategory(cat.id)) >= 0;
+  }
+
+  Future<void> deleteAllBudgets(List<Budget> budgets) async {
+    return db.deleteBudgets(budgets.map((f) => f.id).toList());
+  }
+
+  Future<void> deleteAllTransactions(List<AppTransaction> transactions) {
+    return db.deleteTransactions(transactions.map((f) => f.id).toList());
   }
 }
 

@@ -12,13 +12,16 @@ class CreateAccountRepository extends CleanArchitectureRepository {
     return _dbRepo.generateAccountId();
   }
 
-  Future<bool> saveAccountToFirebase(
+  Future<bool> saveAccount(
       int id,
       String name,
       double balance,
-      AccountType type
+      AccountType type,
       ) {
-    return _fbRepo.createAccountToFirebase(Account(id, name, balance, type, "\$"));
+    var account = Account(id, name, balance, type, "\$");
+    _fbRepo.createAccountToFirebase(account);
+
+    return _dbRepo.createAccount(account);
   }
 
   Future<bool> verifyType(AccountType type) {
@@ -41,6 +44,10 @@ class _CreateAccountDatabaseRepository {
 
   Future<bool> verifyName(String name) async {
     return name == null || name.isEmpty ? throw CreateAccountException("Please enter account name") : true;
+  }
+
+  Future<bool> createAccount(Account account) async {
+    return (await db.insertAccount(account)) >= 0;
   }
 }
 

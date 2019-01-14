@@ -18,7 +18,9 @@ class CreateCategoryRepository extends CleanArchitectureRepository {
   }
 
   Future<bool> saveCategory(int id, String name, String color) {
-    return _fbRepo.saveCategory(id, name, color);
+    _fbRepo.saveCategory(id, name, color);
+
+    return _dbRepo.saveCategory(id, name, color);
   }
 
   Future<bool> validateName(String name) async {
@@ -46,6 +48,10 @@ class _CreateCategoryDatabaseRepository {
     }
 
     return color;
+  }
+
+  Future<bool> saveCategory(int id, String name, String color) async {
+    return (await db.insertCagetory(AppCategory(id, name, color, 0, 0))) >= 0;
   }
 }
 

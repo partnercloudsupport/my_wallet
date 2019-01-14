@@ -23,7 +23,7 @@ class CreateAccountUseCase extends CleanArchitectureUseCase<CreateAccountReposit
 
       if (id < 0) break;
 
-      result = await repo.saveAccountToFirebase(id, name, amount, type);
+      result = await repo.saveAccount(id, name, amount, type);
 
     } while (false);
 

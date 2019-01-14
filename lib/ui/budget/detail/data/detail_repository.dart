@@ -23,7 +23,7 @@ class BudgetDetailRepository extends CleanArchitectureRepository {
   }
 
   Future<bool> saveBudget(Budget budget) async {
-    await _fbRepo.saveBudget(budget);
+    _fbRepo.saveBudget(budget);
     await _dbRepo.saveBudget(budget);
 
     return true;
