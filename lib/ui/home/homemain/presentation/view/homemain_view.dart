@@ -101,7 +101,7 @@ class _MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePre
     list.add(SliverAppBar(
       expandedHeight: screenHeight * (_overviewRatio + _chartRatio) + _titleHeight,
       actions: <Widget>[
-        IconButton(icon: Icon(Icons.calendar_today), onPressed: () => Navigator.pushNamed(context, routes.TransactionList("This month", datetime: DateTime.now())))
+        IconButton(icon: Icon(Icons.calendar_today), onPressed: () => Navigator.pushNamed(context, routes.TransactionList("Transactions", datetime: DateTime.now())))
       ],
       pinned: true,
       flexibleSpace: Container(
@@ -134,8 +134,10 @@ class _MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePre
     list.add(SliverList(delegate: SliverChildBuilderDelegate(
         (context, index) {
           return Container(
-            color: index % 2 == 0 ? AppTheme.white : AppTheme.blueGrey.withOpacity(0.2),
-            child: ListTile(
+            color: index % 2 != 0 && index < _homeEntities.length ? AppTheme.blueGrey.withOpacity(0.2) : AppTheme.white ,
+            child: index >= _homeEntities.length ? ListTile(
+              title: Text(""),
+            ) : ListTile(
               leading: Container(
                 width: _iconSize,
                 height: _iconSize,
@@ -172,7 +174,7 @@ class _MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePre
             ),
           );
         },
-      childCount: _homeEntities.length,
+      childCount: _homeEntities.length + 1,
     )));
 
     return CustomScrollView(
