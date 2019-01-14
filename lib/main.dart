@@ -300,7 +300,6 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
 
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    print("onLifCycle change $state");
     switch (state) {
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:

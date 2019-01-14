@@ -18,7 +18,7 @@ class CreateAccountRepository extends CleanArchitectureRepository {
       double balance,
       AccountType type,
       ) {
-    var account = Account(id, name, balance, type, "\$");
+    var account = Account(id, name, balance, type, "\$", created: DateTime.now());
     _fbRepo.createAccountToFirebase(account);
 
     return _dbRepo.createAccount(account);

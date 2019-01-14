@@ -102,7 +102,7 @@ class Query {
   Future<QuerySnapshot> getDocuments() async {
     var headers = _headers;
 
-    print("path ${_url(path, isEqualTo: isEqualTo, startAt: startAt, endAt: endAt, orderBy: orderBy)}");
+    debugPrint("path ${_url(path, isEqualTo: isEqualTo, startAt: startAt, endAt: endAt, orderBy: orderBy)}");
     var response = await http.get(_url(path, isEqualTo: isEqualTo, startAt: startAt, endAt: endAt, orderBy: orderBy), headers: headers);
 
     if(response.statusCode != 200) {
@@ -167,7 +167,7 @@ class Query {
                   type = DocumentChangeType.removed;
                   change = null;
                   id = dataPath.substring(dataPath.lastIndexOf("/")).replaceAll("/", "");
-                  print("delete $id");
+                  debugPrint("data at $dataPath with ID $id is deleted");
 
                   snapshot._documentChanges.add(DocumentChange(document: DocumentSnapshot(documentID: id, data: change), type: type));
                 }

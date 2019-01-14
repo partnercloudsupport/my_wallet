@@ -69,16 +69,27 @@ class TransactionType {
 class Account {
   final int id;
   final String name;
-  final double balance;
+  final double initialBalance;
+  final DateTime created;
   final AccountType type;
   final String currency;
+  // internal use
+  double balance;
+  double spent;
+  double earn;
 
   Account(
       this.id,
       this.name,
-      this.balance,
+      this.initialBalance,
       this.type,
-      this.currency
+      this.currency,
+  {
+    this.created,
+    this.balance,
+    this.spent,
+    this.earn
+  }
       );
 }
 

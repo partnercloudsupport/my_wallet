@@ -53,24 +53,16 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
               _id == null);
         }
 
-        if (!result) break;
-
-        var revertBalance = 0.0;
-
-        if(currentTransaction != null) {
-          // revert to amount before this transaction happened
-          revertBalance = (TransactionType.isExpense(currentTransaction.type) ? 1 : -1) * currentTransaction.amount;
+        if(result) {
+          //
         }
-
-        var newBalance = _account.balance + (TransactionType.isExpense(_type) ? -1 : 1) * _amount + revertBalance;
-
-        var account = Account(_account.id, _account.name, newBalance, _account.type, _account.currency);
-
-        result = await repo.updateAccount(account);
-
-        next(result);
+        result = true;
       } while(false);
+
+      next(result);
     } catch (e) {
+      print(e);
+
       error(e);
     }
   }

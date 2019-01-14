@@ -18,8 +18,12 @@ const tblBudget = "Budget";
 
 const fldName = "name";
 const fldType = "type";
-const fldBalance = "balance";
+const fldInitlaBalance = "initialBalance";
+const fldCreated = "created";
 const fldCurrency = "currency";
+const fldBalance = "balance";
+const fldSpent = "spent";
+const fldEarn = "earn";
 const fldTransactionType = "transactionType";
 const fldColorHex = "colorHex";
 const fldDateTime = "dateTime";

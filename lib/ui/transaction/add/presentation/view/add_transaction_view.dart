@@ -301,7 +301,9 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
     _dismissDialog();
 
     print(e.toString());
-    showDialog(context: context, builder: (context) => AlertDialog(
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
       title: Text("Error"),
       content: Text(e.toString()),
       actions: <Widget>[

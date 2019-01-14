@@ -106,16 +106,28 @@ Future<void> _addSubscriptions() async {
 // ####################################################################################################
 // private helper
 Map<String, dynamic> _AccountToMap(Account acc) {
-  return {fldName: acc.name, fldType: acc.type.id, fldBalance: acc.balance, fldCurrency: acc.currency};
+  return {
+    fldName: acc.name,
+    fldType: acc.type.id,
+    fldInitlaBalance: acc.initialBalance,
+    fldCreated: acc.created.millisecondsSinceEpoch,
+    fldCurrency: acc.currency,
+    fldBalance: acc.balance,
+    fldSpent: acc.spent,
+    fldEarn: acc.earn};
 }
 
 Account _snapshotToAccount(DocumentSnapshot snapshot) {
+  var initialBalance = snapshot.data[fldInitlaBalance];
+  var created = snapshot.data[fldCreated];
+
   return Account
     (_toId(snapshot),
-      snapshot.data[fldName],
-      double.parse("${snapshot.data[fldBalance]}"),
-      snapshot.data[fldType] == null ? null : AccountType.all[snapshot.data[fldType]],
-      snapshot.data[fldCurrency]);
+    snapshot.data[fldName],
+    double.parse("${initialBalance == null ? '0' : initialBalance}"),
+    snapshot.data[fldType] == null ? null : AccountType.all[snapshot.data[fldType]],
+    snapshot.data[fldCurrency],
+    created: created == null ? null : DateTime.fromMillisecondsSinceEpoch(created),);
 }
 
 Map<String, dynamic> _CategoryToMap(AppCategory cat) {

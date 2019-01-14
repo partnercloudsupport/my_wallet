@@ -16,9 +16,13 @@ final _id = "_id";
 // table Account
 final _tableAccounts = tableAccount;
 final _accName = "_name";
-final _accBalance = "_balance";
+final _accInitialBalance = "_initialBalance";
+final _accCreated = "_created";
 final _accType = "_type";
 final _accCurrency = "_currency";
+final _accBalance = "_balance";
+final _accSpent = "_spent";
+final _accEarned = "_earned";
 
 // table transaction
 final _tableTransactions = tableTransactions;
@@ -514,11 +518,17 @@ Future<int> updateBudget(Budget budget) {
 // private helper
 // ################################################################################################################
 AppTransaction _toTransaction(Map<String, dynamic> map) {
-  return AppTransaction(map[_id], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], map[_transAmount] * 1.0, map[_transDesc], TransactionType.all[map[_transType]], map[_transUid]);
+  return AppTransaction(map[_id], DateTime.fromMillisecondsSinceEpoch(map[_transDateTime]), map[_transAcc], map[_transCategory], (map[_transAmount] == null ? 0 : map[_transAmount]) * 1.0, map[_transDesc], map[_transType] == null ? null : TransactionType.all[map[_transType]], map[_transUid]);
 }
 
 Account _toAccount(Map<String, dynamic> map) {
-  return new Account(map[_id], map[_accName], map[_accBalance] * 1.0, AccountType.all[map[_accType]], map[_accCurrency]);
+  Account acc = new Account(map[_id], map[_accName], (map[_accInitialBalance] == null ? 0 : map[_accInitialBalance]) * 1.0, map[_accType] == null ? null : AccountType.all[map[_accType]], map[_accCurrency], created: map[_accCreated] == null ? null : DateTime.fromMillisecondsSinceEpoch(map[_accCreated]));
+
+  if(map[_accBalance] != null) acc.balance = map[_accBalance];
+  if(map[_accSpent] != null) acc.spent = map[_accSpent];
+  if(map[_accEarned] != null) acc.earn = map[_accEarned];
+
+  return acc;
 }
 
 AppCategory _toCategory(Map<String, dynamic> map) {
@@ -576,7 +586,8 @@ Map<String, dynamic> _accountToMap(Account acc) {
   var map = <String, dynamic>{};
 
   if(acc.name != null) map.putIfAbsent(_accName, () => acc.name);
-  if(acc.balance != null) map.putIfAbsent(_accBalance, () => acc.balance);
+  if(acc.initialBalance != null) map.putIfAbsent(_accInitialBalance, () => acc.initialBalance);
+  if(acc.created != null) map.putIfAbsent(_accCreated, () => acc.created.millisecondsSinceEpoch);
   if(acc.type != null) map.putIfAbsent(_accType, () => acc.type.id);
   if(acc.currency != null) map.putIfAbsent(_accCurrency, () => acc.currency);
 
@@ -642,7 +653,7 @@ class _Database {
     String dbPath = join((await getApplicationDocumentsDirectory()).path, "MyWalletDb");
     db = await openDatabase(
         dbPath,
-        version: 3, onCreate: (Database db, int version) async {
+        version: 4, onCreate: (Database db, int version) async {
       await _executeCreateDatabase(db);
     },
     onUpgrade: (Database db, int oldVersion, int newVersion) async {
@@ -678,9 +689,13 @@ class _Database {
             CREATE TABLE $_tableAccounts (
               $_id INTEGER PRIMARY KEY,
               $_accName TEXT NOT NULL,
-              $_accBalance DOUBLE NOT NULL,
+              $_accInitialBalance DOUBLE NOT NULL,
+              $_accCreated INTEGER NOT NULL,
               $_accType INTEGER NOT NULL,
-              $_accCurrency TEXT NOT NULL
+              $_accCurrency TEXT NOT NULL,
+              $_accBalance DOUBLE,
+              $_accSpent DOUBLE,
+              $_accEarned DOUBLE
             )""");
 
     await db.execute("""
@@ -776,6 +791,12 @@ class _Database {
         if (table == _tableTransactions) {
           // recalculate budget for transaction
           await _recalculateBudgetForTransaction(db, item);
+          // recalculate account balance for transaction
+          await _recalculateAccountForTransaction(db, item);
+        }
+
+        if (table == _tableAccounts) {
+          await _recalculateAccount(db, item[_id]);
         }
       }
     }
@@ -803,6 +824,12 @@ class _Database {
           if (table == _tableTransactions) {
             // recalculate budget for transaction
             await _recalculateBudgetForTransaction(db, item);
+            // recalculate account balance for transaction
+            await _recalculateAccountForTransaction(db, item);
+          }
+
+          if(table == _tableAccounts) {
+            await _recalculateAccount(db, item[_id]);
           }
         }
       }
@@ -817,6 +844,18 @@ class _Database {
     if(!db.isOpen) db = await _openDatabase();
     var result = await db.delete(table, where: where, whereArgs: whereArgs);
 
+    if(table == _tableBudget) {
+      // recalculate budgets table
+      _recalculateBudgets(db, whereArgs);
+    }
+
+    if(table == _tableTransactions) {
+      // recalculate budget table
+      _recalculateAllBudgets(db);
+      // recalculate account table
+      _recalculateAllAccounts(db);
+    }
+
     _notifyObservers(table);
 
     return result;
@@ -825,6 +864,34 @@ class _Database {
   Future<int> _update(String table, Map<String, dynamic> item, String where, List whereArgs) async {
     if(!db.isOpen) db = await _openDatabase();
     var result = await db.update(table, item, where: where, whereArgs: whereArgs);
+
+    if (table == _tableBudget) {
+      var budgets = await db.query(_tableBudget, where: where, whereArgs: whereArgs);
+
+      for(Map<String, dynamic> budget in budgets) {
+        // recalculate budget
+        await _recalculateBudget(db, budget);
+      }
+    }
+
+    if (table == _tableTransactions) {
+      var transactions = await db.query(_tableTransactions, where: where, whereArgs: whereArgs);
+
+      for(Map<String, dynamic> transaction in transactions) {
+        // recalculate budget for transaction
+        await _recalculateBudgetForTransaction(db, transaction);
+        // recalculate account balance for transaction
+        await _recalculateAccountForTransaction(db, transaction);
+      }
+    }
+
+    if (table == _tableAccounts) {
+      var accounts = await db.query(_tableAccounts, where: where, whereArgs: whereArgs, columns: [_id]);
+
+      for(Map<String, dynamic> account in accounts) {
+        await _recalculateAccount(db, account[_id]);
+      }
+    }
 
     _notifyObservers(table);
 
@@ -847,6 +914,14 @@ class _Database {
 
   void _notifyObservers(String table) async {
     if(_watchers[table] != null) _watchers[table].forEach((f) => f.onDatabaseUpdate(table));
+  }
+
+  Future<void> _recalculateBudgets(Database db, List<dynamic> ids) async {
+    var budgets = await db.rawQuery("SELECT $_id, $_budgetCategoryId, $_budgetStart, $_budgetEnd, $_budgetPerMonth FROM $_tableBudget WHERE $_id IN ${ids.map((f) => "$f").toString()}");
+
+    for(Map<String, dynamic> budget in budgets) {
+      await _recalculateBudget(db, budget);
+    }
   }
 
   Future<void> _recalculateBudget(Database db, Map<String, dynamic> budget) async {
@@ -893,6 +968,14 @@ class _Database {
     } while(false);
   }
 
+  Future<void> _recalculateAllBudgets(Database db) async {
+    var budgets = await db.rawQuery("SELECT  $_id from $_tableBudget");
+
+    for(dynamic budget in budgets) {
+      await _recalculateBudget(db, budget);
+    }
+  }
+
   Future<void> _recalculateBudgetForTransaction(Database db, Map<String, dynamic> tran) async {
     do {
 
@@ -923,6 +1006,72 @@ class _Database {
       // update budget now
       await _recalculateBudget(db, budgets[0]);
     } while(false);
+  }
+
+  Future<void> _recalculateAllAccounts(Database db) async {
+    var accounts = await db.rawQuery("SELECT $_id FROM $_tableAccounts");
+
+    for(Map<String, dynamic> account in accounts) {
+      await _recalculateAccount(db, account.values.first);
+    }
+  }
+
+  Future<void> _recalculateAccountForTransaction(Database db, Map<String, dynamic> tran) async {
+    do {
+      if(tran == null) break;
+      if(tran.isEmpty) break;
+
+      var transactionId = tran[_id];
+
+      if(transactionId == null) break;
+
+      var accountId = tran[_transAcc];
+      if(accountId == null) {
+        // query from database
+        accountId = await db.rawQuery("SELECT $_transAcc from $_tableTransactions WHERE $_id = $transactionId");
+      }
+
+      await _recalculateAccount(db, accountId);
+    } while(false);
+  }
+
+  Future<void> _recalculateAccount(Database db, int accountId) async {
+    var initialBalance = 0.0;
+    var rawInitialBalance = await db.rawQuery("SELECT $_accInitialBalance FROM $_tableAccounts WHERE $_id = $accountId");
+    if(rawInitialBalance != null
+        && rawInitialBalance.isNotEmpty
+        && rawInitialBalance.first != null
+        && rawInitialBalance.first.values != null
+        && rawInitialBalance.first.values.isNotEmpty
+        && rawInitialBalance.first.values.first != null) initialBalance = rawInitialBalance.first.values.first;
+
+    String type = TransactionType.typeExpense.map((f) => "${f.id}").toString();
+    var spent = 0.0;
+    var rawSpend = await db.rawQuery("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE $_transAcc = $accountId AND $_transType in $type");
+    if(rawSpend != null
+        && rawSpend.isNotEmpty
+        && rawSpend.first != null
+        && rawSpend.first.values != null
+        && rawSpend.first.values.isNotEmpty
+        && rawSpend.first.values.first != null) spent = rawSpend.first.values.first;
+
+    type = TransactionType.typeIncome.map((f) => "${f.id}").toString();
+    var earn = 0.0;
+    var rawEarn = await db.rawQuery("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE $_transAcc = $accountId AND $_transType in $type");
+    if(rawEarn != null
+        && rawEarn.isNotEmpty
+        && rawEarn.first != null
+        && rawEarn.first.values != null
+        && rawEarn.first.values.isNotEmpty
+        && rawEarn.first.values.first != null) earn = rawEarn.first.values.first;
+
+    var balance = initialBalance + earn - spent;
+
+    db.update(_tableAccounts, {
+      _accBalance: balance,
+      _accSpent: spent,
+      _accEarned: earn
+    }, where: "$_id = ?", whereArgs: [accountId]);
   }
 
   void registerDatabaseObservable(List<String> tables, DatabaseObservable observable) {
