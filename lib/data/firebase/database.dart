@@ -1,7 +1,8 @@
-import 'package:my_wallet/data/firebase/common.dart';
-import 'package:my_wallet/data/database_manager.dart' as db;
-import 'package:my_wallet/firebase/database/firebase_database.dart';
 import 'dart:async';
+
+import 'package:my_wallet/data/database_manager.dart' as db;
+import 'package:my_wallet/data/firebase/common.dart';
+import 'package:my_wallet/firebase/database/firebase_database.dart';
 
 const _data = "data";
 
@@ -12,7 +13,7 @@ bool _isDbSetup = false;
 
 FirebaseApp _app;
 
-List<StreamSubscription> subs = [];
+Map<String, StreamSubscription> subs = {};
 
 Future<void> init(FirebaseApp app, {String homeProfile}) async {
   if (_isInit) return;
@@ -25,9 +26,7 @@ Future<void> init(FirebaseApp app, {String homeProfile}) async {
 
 Future<void> dispose() {
   return _lock.synchronized(() {
-    if(subs != null && subs.isNotEmpty) {
-      subs.forEach((f) => f.cancel());
-    }
+    _unsubscribe();
   });
 }
 
@@ -61,7 +60,7 @@ Future<void> setupDatabase(final String homeKey) async {
 }
 
 Future<void> _addSubscriptions() async {
-  subs.add(_firestore.collection(tblAccount).snapshots().listen((f) => f.documentChanges.forEach((change) {
+  subs.putIfAbsent(tblAccount, () => _firestore.collection(tblAccount).snapshots().listen((f) => f.documentChanges.forEach((change) {
     switch(change.type) {
       case DocumentChangeType.added: _onAccountAdded(change.document); break;
       case DocumentChangeType.modified: _onAccountChanged(change.document); break;
@@ -69,7 +68,7 @@ Future<void> _addSubscriptions() async {
     }
   })));
 
-  subs.add(_firestore.collection(tblBudget).snapshots().listen((f) => f.documentChanges.forEach((change) {
+  subs.putIfAbsent(tblBudget, () =>_firestore.collection(tblBudget).snapshots().listen((f) => f.documentChanges.forEach((change) {
     switch(change.type) {
       case DocumentChangeType.added: _onBudgetAdded(change.document); break;
       case DocumentChangeType.modified: _onBudgetChanged(change.document); break;
@@ -77,7 +76,7 @@ Future<void> _addSubscriptions() async {
     }
   })));
 
-  subs.add(_firestore.collection(tblCategory).snapshots().listen((f) => f.documentChanges.forEach((change) {
+  subs.putIfAbsent(tblCategory, () => _firestore.collection(tblCategory).snapshots().listen((f) => f.documentChanges.forEach((change) {
     switch(change.type) {
       case DocumentChangeType.added: _onCategoryAdded(change.document); break;
       case DocumentChangeType.modified: _onCategoryChanged(change.document); break;
@@ -85,7 +84,7 @@ Future<void> _addSubscriptions() async {
     }
   })));
 
-  subs.add(_firestore.collection(tblTransaction).snapshots().listen((f) => f.documentChanges.forEach((change) {
+  subs.putIfAbsent(tblTransaction, () => _firestore.collection(tblTransaction).snapshots().listen((f) => f.documentChanges.forEach((change) {
     switch(change.type) {
       case DocumentChangeType.added: _onTransactionAdded(change.document); break;
       case DocumentChangeType.modified: _onTransactionChanged(change.document); break;
@@ -93,7 +92,7 @@ Future<void> _addSubscriptions() async {
     }
   })));
 
-  subs.add(_firestore.collection(tblUser).snapshots().listen((f) => f.documentChanges.forEach((change) {
+  subs.putIfAbsent(tblUser, () => _firestore.collection(tblUser).snapshots().listen((f) => f.documentChanges.forEach((change) {
     switch(change.type) {
       case DocumentChangeType.added: _onUserAdded(change.document); break;
       case DocumentChangeType.modified: _onUserChanged(change.document); break;
@@ -348,10 +347,17 @@ Future<bool> deleteBudget(Budget budget) async {
 
 Future<bool> removeRefenrence() async {
   return _lock.synchronized(() async {
-    if(subs != null) subs.forEach((f) async => await f.cancel());
-
+    _unsubscribe();
     _isDbSetup = false;
   });
+}
+
+void _unsubscribe() {
+  if(subs != null) subs.forEach((key, value) async {
+    await value.cancel();
+  });
+
+  subs = {};
 }
 
 
