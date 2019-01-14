@@ -76,6 +76,15 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
                   setState(() => _day = day);
                   _loadData();
                 },
+                onCalendarChanged: (day) {
+                  if(day.month == _day.month && day.year == day.year) {
+                    // same month? load current selected day
+                    _loadData();
+                  } else {
+                    // different, just load generic all data for the month 
+                    _loadData(day: day);
+                  }
+                },
                 selectedDateTime: _day,
                 markedDatesMap: _markedDates,
                 weekendTextStyle: Theme.of(context).textTheme.title.apply(color: AppTheme.pinkAccent),
@@ -134,7 +143,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
     _loadData();
   }
 
-  void _loadData() {
-    presenter.loadDataFor(widget.accountId, widget.categoryId, _day);
+  void _loadData({DateTime day}) {
+    presenter.loadDataFor(widget.accountId, widget.categoryId, day == null ? _day : day);
   }
 }
