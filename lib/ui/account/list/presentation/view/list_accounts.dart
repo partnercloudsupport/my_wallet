@@ -7,9 +7,8 @@ import 'package:my_wallet/data/data_observer.dart' as observer;
 
 class ListAccounts extends StatefulWidget {
   final String _title;
-  final bool selectionMode;
 
-  ListAccounts(this._title, {this.selectionMode = false});
+  ListAccounts(this._title);
 
   @override
   State<StatefulWidget> createState() {
@@ -74,8 +73,10 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
             itemCount: _accounts.length,
             itemBuilder: (context, index) => CardListTile(
               title: _accounts[index].name,
-                onTap: () => widget.selectionMode ? Navigator.pop(context, _accounts[index]) : Navigator.pushNamed(context,
-                    routes.TransactionList(_accounts[index].name, accountId: _accounts[index].id)),
+                onTap: () {
+                  if(!isEditMode) Navigator.pushNamed(context,
+                    routes.AccountDetail(accountId: _accounts[index].id, accountName: _accounts[index].name), );
+                },
               subTitle: "${_nf.format(_accounts[index].balance)}",
               trailing: isEditMode ? IconButton(
                 onPressed: () {

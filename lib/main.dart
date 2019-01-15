@@ -8,6 +8,7 @@ import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list
 
 import 'package:my_wallet/ui/account/list/presentation/view/list_accounts.dart';
 import 'package:my_wallet/ui/account/create/presentation/view/create_account_view.dart';
+import 'package:my_wallet/ui/account/detail/presentation/view/detail_view.dart';
 
 import 'package:my_wallet/ui/category/list/presentation/view/list_category.dart';
 import 'package:my_wallet/ui/category/create/presentation/view/create_category_view.dart';
@@ -20,8 +21,8 @@ import 'package:my_wallet/data/database_manager.dart' as db;
 import 'package:my_wallet/ui/user/login/presentation/view/login_view.dart';
 import 'package:my_wallet/ui/user/register/presentation/view/register_view.dart';
 import 'package:my_wallet/ui/user/homeprofile/main/presentation/view/homeprofile_view.dart';
-
 import 'package:my_wallet/ui/user/detail/presentation/view/detail_view.dart';
+
 import 'package:my_wallet/ui/budget/list/presentation/view/list_view.dart';
 import 'package:my_wallet/ui/budget/detail/presentation/view/detail_view.dart';
 
@@ -136,12 +137,6 @@ class MyApp extends StatelessWidget {
               break;
             case routes.AddAccount:
               return CreateAccount();
-              break;
-            case routes.SelectAccount:
-              return ListAccounts(
-                "SelectAccount",
-                selectionMode: true,
-              );
               break;
             case routes.ListAccounts:
               return ListAccounts("Accounts");
@@ -279,6 +274,25 @@ class MyApp extends StatelessWidget {
           return BudgetDetail("Budget", categoryId: int.parse(title.replaceFirst("${routes.AddBudget}/", "")), month: day,);
         } catch(e) {}
       } while (false);
+    }
+
+    if(name.startsWith(routes.Accounts)) {
+      do {
+        String data = name.replaceFirst("${routes.Accounts}/", "");
+
+        if(data == null) break;
+        if(data.isEmpty) break;
+
+        List<String> splits = data.split(":");
+
+        String strAccId = splits[0];
+        String accName = splits[1];
+
+        try {
+          int _accountId = int.parse(strAccId);
+          return AccountDetail(_accountId, accName);
+        } catch(e) {}
+      } while(false);
     }
 
     return null;

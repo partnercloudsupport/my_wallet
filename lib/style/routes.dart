@@ -12,6 +12,7 @@ class routes {
 
   static const SelectAccount = "SelectAccountEx";
   static const ListAccounts = "ListAccounts";
+  static const Accounts = "_AccountDetail";
   static const AddAccount = "AddAccount";
 
   static const UserProfile = "UserProfile";
@@ -38,5 +39,9 @@ class routes {
 
   static String EditBudget({@required int categoryId, @required DateTime month}) {
     return "$AddBudget/$categoryId:${month.millisecondsSinceEpoch}";
+  }
+
+  static String AccountDetail({@required int accountId, @required String accountName}) {
+    return "$Accounts/$accountId:$accountName";
   }
 }
