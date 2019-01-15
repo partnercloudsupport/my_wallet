@@ -46,37 +46,19 @@ class _UserDetailState extends CleanArchitectureView<UserDetail, UserDetailPrese
                 width: iconSize,
                 child: CircleAvatar(
                   backgroundColor: _user == null || _user.color == null ? AppTheme.white : Color(_user.color),
-                  child: _user != null
-                      ? _user.photoUrl == null || _user.photoUrl.isEmpty ? IconButton(icon: Icon(Icons.camera_alt, color: AppTheme.blueGrey,), onPressed: _openCameraOptionSelection,) : Icon(Icons.face, color: AppTheme.darkBlue,)
-                      : Text(""),
+//                  child: _user != null
+//                      ? _user.photoUrl == null || _user.photoUrl.isEmpty ? IconButton(icon: Icon(Icons.camera_alt, color: AppTheme.blueGrey,), onPressed: _openCameraOptionSelection,) : Icon(Icons.face, color: AppTheme.darkBlue,)
+//                      : Text(""),
+                child: Image.asset("assets/nartus.png"),
                 ),
               ),
             ),
           ),
           Center(child: Text(_user != null ? _user.displayName : "", style: Theme.of(context).textTheme.headline,),),
           Center(child: Text(_user != null ? _user.email : "", style: Theme.of(context).textTheme.title,),),
-          Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text("Home", style: Theme.of(context).textTheme.title,),
-                Text(_user != null && _user.homeName != null ? _user.homeName : "", style: Theme.of(context).textTheme.title.apply(fontSizeFactor: 0.9),)
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text("Host", style: Theme.of(context).textTheme.title,),
-                Text(_user != null && _user.hostEmail != null ? _user.hostEmail : "", style: Theme.of(context).textTheme.title.apply(fontSizeFactor: 0.9),)
-              ],
-            ),
-          )
+          DataRowView("Home", _user != null && _user.homeName != null ? _user.homeName : "", color: AppTheme.white,),
+          DataRowView("Host", _user != null && _user.hostDisplayName != null ? _user.hostDisplayName : "", color: AppTheme.white,),
+          DataRowView("Host Email", _user != null && _user.hostEmail != null ? _user.hostEmail : "", color: AppTheme.white,)
         ],
       ),
     );

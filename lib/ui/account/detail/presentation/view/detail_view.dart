@@ -59,12 +59,12 @@ class _AccountDetailState extends CleanArchitectureView<AccountDetail, AccountDe
         padding: EdgeInsets.only(left: 8.0, right: 8.0),
         child: ListView(
           children: <Widget>[
-            _DataRow("Account", _account == null ? "" : _account.name),
-            _DataRow("Created", _account == null ? "" : _df.format(_account.created)),
-            _DataRow("Type", _account == null ? "" : _account.type.name),
-            _DataRow("Balance", _account == null ? "" : _nf.format(_account.balance)),
-            _DataRow("Spent", _account == null ? "" : _nf.format(_account.spent)),
-            _DataRow("Earned", _account == null ? "" : _nf.format(_account.earn)),
+            DataRowView("Account", _account == null ? "" : _account.name),
+            DataRowView("Created", _account == null ? "" : _df.format(_account.created)),
+            DataRowView("Type", _account == null ? "" : _account.type.name),
+            DataRowView("Balance", _account == null ? "" : _nf.format(_account.balance)),
+            DataRowView("Spent", _account == null ? "" : _nf.format(_account.spent)),
+            DataRowView("Earned", _account == null ? "" : _nf.format(_account.earn)),
             RoundedButton(
               onPressed: () {
                 if(_account != null) Navigator.pushNamed(context, routes.TransactionList(_account.name, accountId: _account.id));
@@ -94,20 +94,5 @@ class _AccountDetailState extends CleanArchitectureView<AccountDetail, AccountDe
   @override
   void failedToLoadAccount(Exception ex) {
     print("Error $ex");
-  }
-}
-
-class _DataRow extends StatelessWidget {
-  final String title;
-  final String data;
-
-  _DataRow(this.title, this.data);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title, style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),),
-      trailing: Text(data, style: Theme.of(context).textTheme.body1.apply(color: AppTheme.darkBlue, fontSizeFactor: 1.2)),
-    );
   }
 }

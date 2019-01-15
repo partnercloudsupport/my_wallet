@@ -17,8 +17,23 @@ class UserDetailRepository extends CleanArchitectureRepository {
 
     SharedPreferences sharedPref = await SharedPreferences.getInstance();
     String homeName = sharedPref.getString(prefHomeName);
-    String hostEmail = sharedPref.getString(prefHostEmail);
+    String homeKey = sharedPref.getString(prefHomeProfile);
 
-    return UserDetailEntity(user.displayName, user.email, user.color, user.photoUrl, homeName, hostEmail);
+    String hostDisplayName = "";
+    String hostEmail = "";
+
+    if(homeKey ==  uuid) {
+      hostEmail = user.email;
+      hostDisplayName = user.displayName;
+    } else {
+      List<User> hostsDetail = await db.queryUser(uuid: homeKey);
+
+      User host = hostsDetail == null || hostsDetail.isEmpty ? null : hostsDetail.first;
+
+      hostEmail = host != null ? host.email : "";
+      hostDisplayName = host != null ? host.displayName : "";
+    }
+
+    return UserDetailEntity(user.displayName, user.email, user.color, user.photoUrl, homeName, hostEmail, hostDisplayName);
   }
 }

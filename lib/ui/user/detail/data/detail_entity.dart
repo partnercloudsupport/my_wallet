@@ -5,6 +5,7 @@ class UserDetailEntity {
   final String photoUrl;
   final String homeName;
   final String hostEmail;
+  final String hostDisplayName;
 
-  UserDetailEntity(this.displayName, this.email, this.color, this.photoUrl, this.homeName, this.hostEmail);
+  UserDetailEntity(this.displayName, this.email, this.color, this.photoUrl, this.homeName, this.hostEmail, this.hostDisplayName);
 }
