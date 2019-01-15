@@ -14,19 +14,16 @@ class ListCategoryUseCase extends CleanArchitectureUseCase<CategoryListRepositor
 
     var month = DateTime.now();
 
-    DateTime firstDay = Utils.firstMomentOfMonth(month);
-    DateTime lastDay = Utils.lastDayOfMonth(month);
-
     if(cats != null) {
       for(AppCategory f in cats) {
-        Budget budget = await repo.findBudget(f.id, firstDay, lastDay);
+        Budget budget = await repo.findBudget(f.id, month, month);
 
         var spent = 0.0;
         var budgetPerMonth = 0.0;
 
         if(budget != null) {
           spent = budget.spent == null ? 0.0 : budget.spent;
-          budgetPerMonth = budget.budgetPerMonth == null ? 0.0 : budgetPerMonth;
+          budgetPerMonth = budget.budgetPerMonth == null ? 0.0 : budget.budgetPerMonth;
         }
 
         entities.add(CategoryListItemEntity(f.id, f.name, spent, budgetPerMonth));
