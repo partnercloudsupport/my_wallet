@@ -683,7 +683,7 @@ class _Database {
   Future<void> dispose() async {
     await db.close();
   }
-  
+
   Future<void> _executeCreateDatabase(Database db) async {
     await db.execute("""
             CREATE TABLE $_tableAccounts (
