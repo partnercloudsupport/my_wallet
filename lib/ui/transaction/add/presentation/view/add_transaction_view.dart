@@ -146,7 +146,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                       onPressed: _showSelectCategory,
                     trail: IconButton(
                       icon: Icon(_note == null || _note.isEmpty ? Icons.note_add : Icons.note, color: _note == null || _note.isEmpty ? AppTheme.darkGreen : AppTheme.pinkAccent,),
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(
+                      onPressed: () => Navigator.push(context, SlidePageRoute(
                           builder: (context) => InputName(
                             "Enter Note",
                                 (name) =>_note = name,
