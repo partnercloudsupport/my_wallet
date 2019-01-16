@@ -269,47 +269,84 @@ Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime 
     where = "($where) AND ($_transType IN $types)";
   }
 
-  List<Map<String, dynamic>> catMaps = await _lock.synchronized(() => db._query(_tableCategory));
+  List<AppCategory> appCats = await _lock.synchronized(() async {
+    String sqlCategory = "SELECT * FROM $_tableCategory";
+    List<AppCategory> appCat = [];
 
-  List<Map<String, dynamic>> transMap = await _lock.synchronized(() => db._query(
-      _tableTransactions,
-      where: where));
+    List<Map<String, dynamic>> catMaps = await db._executeSql(sqlCategory);
 
-  List<AppTransaction> trans = transMap == null ? [] : transMap.map((f) => _toTransaction(f)).toList();
+    if(catMaps != null && catMaps.isNotEmpty) {
+      for(Map<String, dynamic> category in catMaps) {
+        int categoryId = category[_id];
 
-  List<AppCategory> appCats = [];
+        if(categoryId != null) {
+          String sqlIncome = "SELECT SUM($_transAmount) as income FROM $_tableTransactions WHERE $_transCategory = $categoryId AND $where AND ($_transType IN ${TransactionType.typeIncome.map((f) => "${f.id}").toString()})";
+          String sqlExpense = "SELECT SUM($_transAmount) as expense FROM $_tableTransactions WHERE $_transCategory = $categoryId AND $where AND ($_transType IN ${TransactionType.typeExpense.map((f) => "${f.id}").toString()})";
 
-  appCats = catMaps == null
-      ? []
-      : catMaps.map((f) {
+          var incomeMap = await db._executeSql(sqlIncome);
+          var expenseMap = await db._executeSql(sqlExpense);
+
           var income = 0.0;
           var expense = 0.0;
-          var catId = f[_id];
-          trans.forEach((trans) {
-            income += trans.categoryId == catId && TransactionType.isIncome(trans.type) ? trans.amount : 0.0;
-            expense += trans.categoryId == catId && TransactionType.isExpense(trans.type)? trans.amount : 0.0;
-          });
 
-          return AppCategory(
-            f[_id],
-            f[_catName],
-            f[_catColorHex],
-            income,
-            expense
-          );
-        }).toList();
+          if(incomeMap != null && incomeMap.isNotEmpty && incomeMap.first != null && incomeMap.first.values != null && incomeMap.first.values.first != null) income = incomeMap.first.values.first;
+          if(expenseMap != null && expenseMap.isNotEmpty && expenseMap.first != null && expenseMap.first.values != null && expenseMap.first.values.first != null) expense = expenseMap.first.values.first;
 
-  if (filterZero) appCats.removeWhere((f) => f.income == 0 && f.expense == 0);
+          var appCategory = _toCategory(category);
+          appCategory.income = income == null ? 0.0 : income;
+          appCategory.expense = expense == null ? 0.0 : expense;
 
-  if(orderByType && type != null) {
-    if(type == TransactionType.typeExpense) {
-      // sort by expenses
-      appCats.sort((a, b) => b.expense.floor() - a.expense.floor());
-    } else if(type == TransactionType.typeIncome) {
-      // sort by income
-      appCats.sort((a, b) => b.income.floor() - a.income.floor());
+          if(!filterZero) appCat.add(appCategory);
+          else if(income > 0 || expense > 0) appCat.add(appCategory);
+        }
+      }
     }
-  }
+
+    // no category found, return empty list;
+    return appCat;
+  });
+
+//  List<Map<String, dynamic>> catMaps = await _lock.synchronized(() => db._query(_tableCategory));
+//
+//  List<Map<String, dynamic>> transMap = await _lock.synchronized(() => db._query(
+//      _tableTransactions,
+//      where: where));
+//
+//  List<AppTransaction> trans = transMap == null ? [] : transMap.map((f) => _toTransaction(f)).toList();
+//
+//  List<AppCategory> appCats = [];
+//
+//  appCats = catMaps == null
+//      ? []
+//      : catMaps.map((f) {
+//          var income = 0.0;
+//          var expense = 0.0;
+//          var catId = f[_id];
+//          trans.forEach((trans) {
+//            income += trans.categoryId == catId && TransactionType.isIncome(trans.type) ? trans.amount : 0.0;
+//            expense += trans.categoryId == catId && TransactionType.isExpense(trans.type)? trans.amount : 0.0;
+//          });
+//
+//          return AppCategory(
+//            f[_id],
+//            f[_catName],
+//            f[_catColorHex],
+//            income,
+//            expense
+//          );
+//        }).toList();
+//
+//  if (filterZero) appCats.removeWhere((f) => f.income == 0 && f.expense == 0);
+//
+//  if(orderByType && type != null) {
+//    if(type == TransactionType.typeExpense) {
+//      // sort by expenses
+//      appCats.sort((a, b) => b.expense.floor() - a.expense.floor());
+//    } else if(type == TransactionType.typeIncome) {
+//      // sort by income
+//      appCats.sort((a, b) => b.income.floor() - a.income.floor());
+//    }
+//  }
   return appCats;
 }
 
@@ -536,8 +573,6 @@ AppCategory _toCategory(Map<String, dynamic> map) {
     map[_id],
     map[_catName],
     map[_catColorHex],
-    0.0,
-    0.0
   );
 }
 

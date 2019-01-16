@@ -131,7 +131,7 @@ Account _snapshotToAccount(DocumentSnapshot snapshot) {
 }
 
 Map<String, dynamic> _CategoryToMap(AppCategory cat) {
-  return {fldName: cat.name, fldColorHex: cat.colorHex, /* fldBalance: cat.balance */ };
+  return {fldName: cat.name, fldColorHex: cat.colorHex, };
 }
 
 Map<String, dynamic> _UserToMap(User user, {int color}) {
@@ -157,8 +157,7 @@ AppCategory _snapshotToCategory(DocumentSnapshot snapshot) {
       _toId(snapshot),
       snapshot.data[fldName],
       snapshot.data[fldColorHex],
-      null,
-      null);
+  );
 //      snapshot.data[fldBalance] != null ? double.parse("${snapshot.data[fldBalance]}") : null);
 }
 

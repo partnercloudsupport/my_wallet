@@ -51,12 +51,12 @@ class _CreateCategoryDatabaseRepository {
   }
 
   Future<bool> saveCategory(int id, String name, String color) async {
-    return (await db.insertCagetory(AppCategory(id, name, color, 0, 0))) >= 0;
+    return (await db.insertCagetory(AppCategory(id, name, color))) >= 0;
   }
 }
 
 class _CreateCategoryFirebaseRepository {
   Future<bool> saveCategory(int id, String name, String color) {
-    return fm.addCategory(AppCategory(id, name, color, 0.0, 0.0));
+    return fm.addCategory(AppCategory(id, name, color));
   }
 }

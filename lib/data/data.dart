@@ -119,15 +119,16 @@ class AppCategory {
   final int id;
   final String name;
   final String colorHex;
-  final double income;
-  final double expense;
+  double income;
+  double expense;
 
-  const AppCategory(
+  AppCategory(
       this.id,
       this.name,
       this.colorHex,
-      this.income,
-      this.expense
+      {
+        this.income = 0.0,
+        this.expense = 0.0}
       );
 }
 
