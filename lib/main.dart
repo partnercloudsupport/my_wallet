@@ -26,6 +26,8 @@ import 'package:my_wallet/ui/user/detail/presentation/view/detail_view.dart';
 import 'package:my_wallet/ui/budget/list/presentation/view/list_view.dart';
 import 'package:my_wallet/ui/budget/detail/presentation/view/detail_view.dart';
 
+import 'package:my_wallet/ui/about/presentation/view/about_view.dart';
+
 import 'package:flutter/services.dart';
 
 import 'package:my_wallet/firebase_config.dart' as fbConfig;
@@ -159,6 +161,8 @@ class MyApp extends StatelessWidget {
               return HomeProfile();
             case routes.ListBudgets:
               return ListBudgets();
+            case routes.AboutUs:
+              return AboutUs();
             default:
               Widget paramRoute = _getParamRoute(settings.name);
 
@@ -307,12 +311,6 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
 
   final MaterialApp app;
   final GlobalKey<MyWalletState> homeKey;
-
-//  @override
-//  Future<bool> didPopRoute()
-
-//  @override
-//  void didHaveMemoryPressure()
 
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {

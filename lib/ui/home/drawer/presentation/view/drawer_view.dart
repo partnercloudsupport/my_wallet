@@ -20,7 +20,9 @@ class _LeftDrawerState extends CleanArchitectureView<LeftDrawer, LeftDrawerPrese
     _DrawerItem("Accounts", routes.ListAccounts),
     _DrawerItem("Budgets", routes.ListBudgets),
     _DrawerTitle("Profile"),
-    _DrawerItem("Your profile", routes.UserProfile)
+    _DrawerItem("Your profile", routes.UserProfile),
+    _DrawerTitle("About"),
+    _DrawerItem("About Us", routes.AboutUs)
   ];
 
   @override

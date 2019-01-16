@@ -25,6 +25,8 @@ class routes {
   static const ListBudgets = "ListBudgets";
   static const AddBudget = "AddBudget";
 
+  static const AboutUs = "AboutUs";
+
   static String EditTransaction(int id) {
     return "$AddTransaction/$id";
   }

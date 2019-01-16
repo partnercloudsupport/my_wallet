@@ -7,7 +7,7 @@ description: My Wallet base on https:&#x2F;&#x2F;www.behance.net&#x2F;gallery&#x
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 1.0.0+1
+version: 0.0.1+2
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
@@ -33,6 +33,7 @@ dependencies:
 #  image_picker: any
 #  flutter_facebook_login: '^1.1.1'
   http: any
+  package_info: any
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +52,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/nartus.png
+    - assets/about/About.txt
 
   # To add assets to your application, add an assets section, like this:
   # assets:
