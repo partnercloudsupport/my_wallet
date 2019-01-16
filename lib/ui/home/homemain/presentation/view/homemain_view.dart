@@ -13,14 +13,15 @@ import 'package:my_wallet/data/data_observer.dart' as observer;
 import 'package:intl/intl.dart';
 
 class MyWalletHome extends StatefulWidget {
+  MyWalletHome({GlobalKey<MyWalletState> key}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
-    return _MyWalletState();
+    return MyWalletState();
   }
 }
 
-class _MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePresenter> implements MyWalletHomeDataView, observer.DatabaseObservable {
-  _MyWalletState() : super(MyWalletHomePresenter());
+class MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePresenter> implements MyWalletHomeDataView, observer.DatabaseObservable {
+  MyWalletState() : super(MyWalletHomePresenter());
   final _titleStyle = TextStyle(color: AppTheme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
   DateFormat _df = DateFormat("MMM, yyyy");
 
@@ -30,6 +31,8 @@ class _MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePre
 
   final _tables = [observer.tableTransactions, observer.tableCategory];
   final _iconSize = 45.0;
+
+  GlobalKey _resumeDialogKey;
 
   List<ExpenseEntity> _homeEntities = [];
 
@@ -68,7 +71,6 @@ class _MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePre
   void onDatabaseUpdate(String table) {
     _loadDetails();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -179,5 +181,33 @@ class _MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePre
 
     return CustomScrollView(
         slivers: list);
+  }
+
+  void onResumeStart() {
+    if(_resumeDialogKey != null) return;
+
+    _resumeDialogKey = new GlobalKey();
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        key: _resumeDialogKey,
+        title: Row(
+          children: <Widget>[
+            CircularProgressIndicator(),
+            Padding(
+              padding: const EdgeInsets.only(left: 12.0),
+              child: Text("Syncing..."),
+            )
+          ],
+        ),
+      )
+    );
+  }
+
+  void onResumeEnd() {
+    if(_resumeDialogKey != null && _resumeDialogKey.currentContext != null) Navigator.of(context).pop();
+
+    _resumeDialogKey = null;
   }
 }

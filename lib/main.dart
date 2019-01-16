@@ -100,6 +100,8 @@ class MyApp extends StatelessWidget {
   final bool hasUser;
   final bool hasProfile;
 
+  final GlobalKey<MyWalletState> homeKey = GlobalKey();
+
   MyApp(this.hasUser, this.hasProfile) : super();
 
   @override
@@ -117,12 +119,10 @@ class MyApp extends StatelessWidget {
         break;
       }
 
-      home=MyWalletHome();
+      home=MyWalletHome(key: homeKey);
     } while (false);
 
-    WidgetsBinding.instance.addObserver(LifecycleEventHandler());
-
-    return MaterialApp(
+    var app = MaterialApp(
       title: 'My Wallet',
       theme: AppTheme.appTheme,
       home: home, //hasUser && hasProfile ? MyWalletHome() : hasUser && !hasProfile ? HomeProfile() : Login(),
@@ -152,15 +152,13 @@ class MyApp extends StatelessWidget {
             case routes.Login:
               return Login();
             case routes.MyHome:
-              return MyWalletHome();
+              return MyWalletHome(key: homeKey,);
             case routes.Register:
               return Register();
             case routes.HomeProfile:
               return HomeProfile();
             case routes.ListBudgets:
               return ListBudgets();
-//            case routes.AddBudget:
-//              return BudgetDetail("Create budget");
             default:
               Widget paramRoute = _getParamRoute(settings.name);
 
@@ -181,6 +179,10 @@ class MyApp extends StatelessWidget {
         });
       },
     );
+
+    WidgetsBinding.instance.addObserver(LifecycleEventHandler(app, homeKey));
+
+    return app;
   }
 
   Widget _getParamRoute(String name) {
@@ -301,10 +303,10 @@ class MyApp extends StatelessWidget {
 }
 
 class LifecycleEventHandler extends WidgetsBindingObserver {
-  LifecycleEventHandler({this.resumeCallBack, this.suspendingCallBack});
+  LifecycleEventHandler(this.app, this.homeKey);
 
-  final Future<void> resumeCallBack;
-  final Future<void> suspendingCallBack;
+  final MaterialApp app;
+  final GlobalKey<MyWalletState> homeKey;
 
 //  @override
 //  Future<bool> didPopRoute()
@@ -322,27 +324,15 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
         db.dispose();
         break;
       case AppLifecycleState.resumed:
-        fdb.resume();
-        db.resume();
+        if(app.home is MyWalletHome) {
+          homeKey.currentState.onResumeStart();
+        }
+        await fdb.resume();
+        await db.resume();
+        if(app.home is MyWalletHome) {
+          homeKey.currentState.onResumeEnd();
+        }
         break;
     }
-  }
-
-//  @override
-//  void didChangeLocale(Locale locale)
-
-//  @override
-//  void didChangeTextScaleFactor()
-
-//  @override
-//  void didChangeMetrics();
-
-//  @override
-//  Future<bool> didPushRoute(String route)
-
-@override
-  Future<bool> didPopRoute() {
-    print("did pop route");
-    return super.didPopRoute();
   }
 }
