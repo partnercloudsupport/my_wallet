@@ -38,9 +38,10 @@ const fldUuid = "uuid";
 const fldColor = "color";
 const fldStart = "start";
 const fldEnd = "end";
+const fldEmailVerified = "emailVerified";
 
 User snapshotToUser(DocumentSnapshot snapshot) {
-  return User(snapshot.data[fldUuid], snapshot.data[fldEmail], snapshot.data[fldDisplayName], snapshot.data[fldPhotoUrl], snapshot.data[fldColor]);
+  return User(snapshot.data[fldUuid], snapshot.data[fldEmail], snapshot.data[fldDisplayName], snapshot.data[fldPhotoUrl], snapshot.data[fldColor], snapshot.data[fldEmailVerified]);
 }
 
 FirebaseDatabase _firestore;

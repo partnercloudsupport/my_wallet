@@ -34,7 +34,7 @@ Future<User> login(String email, String password) async {
     FirebaseUser user = await _auth.signInWithEmailAndPassword(email: email, password: password);
 
     if (user != null) {
-      return User(user.uid, user.email, user.displayName, user.photoUrl, null);
+      return User(user.uid, user.email, user.displayName, user.photoUrl, null, user.isEmailVerified);
     }
 
     throw Exception("Failed to signin to firebase");
@@ -132,7 +132,8 @@ Future<User> getCurrentUser() async {
             user.email,
             user.displayName,
             photoUrlList != null && photoUrlList.isNotEmpty ? photoUrlList[0] : null,
-            null
+            null,
+            user.isEmailVerified
         );
       }
     } on PlatformException catch (e) {
@@ -257,5 +258,5 @@ Future<Home> searchUserHome(User user) {
 
 
 User _snapshotToUser(DocumentSnapshot snapshot) {
-  return User(snapshot.documentID, snapshot.data[fldEmail], snapshot.data[fldDisplayName], snapshot.data[fldPhotoUrl], snapshot.data[fldColor]);
+  return User(snapshot.documentID, snapshot.data[fldEmail], snapshot.data[fldDisplayName], snapshot.data[fldPhotoUrl], snapshot.data[fldColor], snapshot.data[fldEmailVerified]);
 }

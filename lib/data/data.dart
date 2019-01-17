@@ -150,8 +150,13 @@ class Budget {
       {this.spent, this.earn}
       );
 
-  DateTime get budgetStart => Utils.firstMomentOfMonth(_start);
+  DateTime get budgetStart => _start == null ? null : Utils.firstMomentOfMonth(_start);
   DateTime get budgetEnd => _end == null ? null : Utils.lastDayOfMonth(_end);
+
+  @override
+  String toString() {
+    return "Budget $id for category $categoryId amount $budgetPerMonth from $budgetStart until $budgetEnd";
+  }
 }
 
 class User {
@@ -160,8 +165,9 @@ class User {
   final String displayName;
   final String photoUrl;
   final int color;
+  final bool isVerified;
 
-  User(this.uuid, this.email, this.displayName, this.photoUrl, this.color);
+  User(this.uuid, this.email, this.displayName, this.photoUrl, this.color, this.isVerified);
 
   @override
   String toString() {

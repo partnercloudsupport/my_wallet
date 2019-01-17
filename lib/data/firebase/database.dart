@@ -139,7 +139,11 @@ Map<String, dynamic> _UserToMap(User user, {int color}) {
 }
 
 Map<String, dynamic> _BudgetToMap(Budget budget) {
-  return {fldCategoryId: budget.categoryId, fldAmount: budget.budgetPerMonth, fldStart: budget.budgetStart.millisecondsSinceEpoch, fldEnd: budget.budgetEnd != null ? budget.budgetEnd.millisecondsSinceEpoch : null};
+  return {
+    fldCategoryId: budget.categoryId,
+    fldAmount: budget.budgetPerMonth,
+    fldStart: budget.budgetStart.millisecondsSinceEpoch,
+    fldEnd: budget.budgetEnd != null ? budget.budgetEnd.millisecondsSinceEpoch : null};
 }
 
 Budget _snapshotToBudget(DocumentSnapshot snapshot) {

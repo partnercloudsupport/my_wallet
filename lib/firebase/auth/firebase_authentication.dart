@@ -210,9 +210,9 @@ class FirebaseUser {
 
   FirebaseUser._(Map<String, dynamic> map) {
     isAnonymous = map['isAnonymous'];
-    isEmailVerified = map['isEmailVerified'];
-    creationTimestamp = map['creationTimestamp'];
-    lastSignInTimestamp = map['lastSignInTimestamp'];
+    isEmailVerified = map['emailVerified'];
+    creationTimestamp = map['createdAt'] != null ? int.parse("${map['createdAt']}") : null;
+    lastSignInTimestamp = map['lastLoginAt'] != null ? int.parse("${map['lastLoginAt']}") : null;
     providerId = map['providerId'];
     uid = map['localId'];
     displayName = map['displayName'];
