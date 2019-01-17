@@ -4,6 +4,7 @@ import 'package:my_wallet/ui/budget/detail/presentation/presenter/detail_present
 import 'package:my_wallet/ui/budget/detail/presentation/view/detail_data_view.dart';
 import 'package:my_wallet/data/data_observer.dart' as observer;
 import 'package:my_wallet/ui/budget/budget_config.dart';
+import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 
 class BudgetDetail extends StatefulWidget {
   final String title;
@@ -57,7 +58,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
     observer.registerDatabaseObservable(tables, this);
 
-    _from = _to = widget.month == null ? DateTime.now() : widget.month;
+    _from = widget.month == null ? DateTime.now() : widget.month;
 
     loadData();
   }
@@ -103,9 +104,12 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
                         ),
                     ConversationRow(
                       "to",
-                      df.format(_to),
+                      _to == null ? "Forever" : df.format(_to),
                       AppTheme.darkBlue,
                       onPressed: _showToMonth,
+                      trail: _to == null ? null : IconButton(
+                          icon: Icon(Icons.close, color: AppTheme.pinkAccent,),
+                          onPressed: () => setState(() => _to = null)),
                     ),
                     ConversationRow(
                       "at max",
@@ -134,38 +138,45 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   }
 
   void _showFromMonth() {
-    showBottomSheetForMonths((date) {
-      if(date.isAfter(_to)) _to = date;
+    showBottomSheetForMonths(_from, (date) {
+      if(_to != null && date.isAfter(_to)) {
+        _to = date;
+      }
 
-      setState(() => _from = date);
-      Navigator.pop(context);
+        setState(() => _from = date);
+        Navigator.pop(context);
     });
   }
 
   void _showToMonth() {
-    showBottomSheetForMonths((date) {
+    showBottomSheetForMonths(_to, (date) {
       setState(() => _to = date);
-
       Navigator.pop(context);
     });
+
   }
 
-  void showBottomSheetForMonths(ValueChanged<DateTime> onSelected) {
+  void showBottomSheetForMonths(DateTime selectedDate, ValueChanged<DateTime> onSelected) {
     showModalBottomSheet(
         context: context,
-        builder: (_) => BottomViewContent.count(context, maxMonthSupport, (_, index) {
-          var date = monthsAfter(DateTime.now(), index);
-
-          return InkWell(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Text(df.format(date), style: Theme.of(context).textTheme.headline.apply(color: AppTheme.darkBlue),),
-              ),
-            ),
-            onTap: () => onSelected(date)
-          );
-        }));
+        builder: (_) => CalendarCarousel(
+          selectedDateTime: selectedDate,
+          height: 430,
+          onDayPressed: (date, events) => onSelected(date),
+));
+//        builder: (_) => BottomViewContent.count(context, maxMonthSupport, (_, index) {
+//          var date = monthsAfter(DateTime.now(), index);
+//
+//          return InkWell(
+//            child: Center(
+//              child: Padding(
+//                padding: const EdgeInsets.all(18.0),
+//                child: Text(df.format(date), style: Theme.of(context).textTheme.headline.apply(color: AppTheme.darkBlue),),
+//              ),
+//            ),
+//            onTap: () => onSelected(date)
+//          );
+//        }));
   }
   void _onNumberInput(String number, String decimal) {
     setState(() {
@@ -208,7 +219,9 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
   @override
   void onSaveBudgetSuccess(bool result) {
+    print("save budget success $result");
     dismissDialog();
+
     Navigator.pop(context);
   }
 

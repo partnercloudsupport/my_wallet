@@ -35,6 +35,8 @@ import 'package:my_wallet/firebase/firebase_common.dart';
 
 import 'dart:io' show Platform;
 
+import 'package:rxdart/rxdart.dart';
+
 void main() async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitDown,
@@ -42,60 +44,69 @@ void main() async {
   ]);
   await SystemChrome.setEnabledSystemUIOverlays([]);
 
-  FirebaseApp _app = await FirebaseApp.configure(
-      name: Platform.isIOS ? "MyWallet" : "My Wallet",
-      options: Platform.isIOS
-          ? const FirebaseOptions(
-        googleAppID: fbConfig.firebase_ios_app_id,
-        gcmSenderID: fbConfig.firebase_gcm_sender_id,
-        projectID: fbConfig.firebase_project_id,
-        databaseURL: fbConfig.firebase_database_url,
-        apiKey: fbConfig.firebase_api_key,
-      )
-          : const FirebaseOptions(
-        googleAppID: fbConfig.firebase_android_app_id,
-        apiKey: fbConfig.firebase_api_key,
-        projectID: fbConfig.firebase_project_id,
-        databaseURL: fbConfig.firebase_database_url,
-      ));
+  Observable.fromFuture(Future(() async {
+    FirebaseApp _app = await FirebaseApp.configure(
+        name: Platform.isIOS ? "MyWallet" : "My Wallet",
+        options: Platform.isIOS
+            ? const FirebaseOptions(
+          googleAppID: fbConfig.firebase_ios_app_id,
+          gcmSenderID: fbConfig.firebase_gcm_sender_id,
+          projectID: fbConfig.firebase_project_id,
+          databaseURL: fbConfig.firebase_database_url,
+          apiKey: fbConfig.firebase_api_key,
+        )
+            : const FirebaseOptions(
+          googleAppID: fbConfig.firebase_android_app_id,
+          apiKey: fbConfig.firebase_api_key,
+          projectID: fbConfig.firebase_project_id,
+          databaseURL: fbConfig.firebase_database_url,
+        ));
 
-  await db.init();
+    await db.init();
 
-  await auth.init(_app);
+    await auth.init(_app);
 
-  var user = await auth.getCurrentUser();
+    var user = await auth.getCurrentUser();
 
-  var profile;
+    var profile;
 
-  if(user != null) {
-    var home = await auth.searchUserHome(user);
-    if (home != null) profile = home.key;
+    if(user != null) {
+      var home = await auth.searchUserHome(user);
+      if (home != null) profile = home.key;
 
-    if(profile == null) {
-      var host = await auth.findHomeOfHost(user.email);
-      if(host != null) profile = host.key;
+      if(profile == null) {
+        var host = await auth.findHomeOfHost(user.email);
+        if(host != null) profile = host.key;
+      }
     }
-  }
 
-  await fdb.init(_app, homeProfile: profile);
+    await fdb.init(_app, homeProfile: profile);
 
-  runApp(MyApp(user != null && user.uuid != null && user.uuid.isNotEmpty, profile != null && profile.isNotEmpty));
+    return [
+      user != null && user.uuid != null && user.uuid.isNotEmpty, profile != null && profile.isNotEmpty
+    ];
+  })).listen((List<bool> result) {
+    print("run ap[ $result");
+    runApp(MyApp(result));
+  }, onError: (e, stacktrace) {
+    print("onError $e");
+  });
 }
 
-class _MaterialPageRoute<T> extends MaterialPageRoute<T> {
-  _MaterialPageRoute({@required WidgetBuilder builder}) : super(builder: builder);
-
-  @override
-  Widget buildTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
-    return SlideTransition(
-      position: new Tween<Offset>(
-        begin: const Offset(0.0, 1.0),
-        end: Offset.zero,
-      ).animate(animation),
-      child: child,
-    );
-  }
-}
+//class _MaterialPageRoute<T> extends MaterialPageRoute<T> {
+//  _MaterialPageRoute({@required WidgetBuilder builder}) : super(builder: builder);
+//
+//  @override
+//  Widget buildTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+//    return SlideTransition(
+//      position: new Tween<Offset>(
+//        begin: const Offset(0.0, 1.0),
+//        end: Offset.zero,
+//      ).animate(animation),
+//      child: child,
+//    );
+//  }
+//}
 
 class MyApp extends StatelessWidget {
 
@@ -104,7 +115,7 @@ class MyApp extends StatelessWidget {
 
   final GlobalKey<MyWalletState> homeKey = GlobalKey();
 
-  MyApp(this.hasUser, this.hasProfile) : super();
+  MyApp(List<bool> list) : assert(list != null && list.isNotEmpty), this.hasUser = list[0], this.hasProfile = list[1];
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +143,7 @@ class MyApp extends StatelessWidget {
       showPerformanceOverlay: false,
       showSemanticsDebugger: false,
       onGenerateRoute: (settings) {
-        return _MaterialPageRoute(builder: (context) {
+        return MaterialPageRoute(builder: (context) {
           switch (settings.name) {
             case routes.AddTransaction:
               return AddTransaction();
@@ -318,18 +329,25 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.suspending:
-        fdb.dispose();
-        db.dispose();
+        Observable.fromFuture(Future(() async {
+          fdb.dispose();
+          db.dispose();
+        })).listen((_) {
+          print("Disposed");
+        });
         break;
       case AppLifecycleState.resumed:
         if(app.home is MyWalletHome) {
           homeKey.currentState.onResumeStart();
         }
-        await fdb.resume();
-        await db.resume();
-        if(app.home is MyWalletHome) {
-          homeKey.currentState.onResumeEnd();
-        }
+        Observable.fromFuture(Future(() async {
+          await fdb.resume();
+          await db.resume();
+        })).listen((_) {
+          if(app.home is MyWalletHome) {
+            homeKey.currentState.onResumeEnd();
+          }
+        });
         break;
     }
   }

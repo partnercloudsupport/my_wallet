@@ -5,8 +5,8 @@ import 'package:my_wallet/ui/user/homeprofile/newhome/data/newhome_repository.da
 class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
   NewHomeUseCase() : super(NewHomeRepository());
 
-  void createHomeProfile(String name, onNext<bool> next, onError err) async {
-    try {
+  void createHomeProfile(String name, onNext<bool> next, onError err) {
+    execute(Future(() async {
       // get user to be key of the host of new home
       User host = await repo.getCurrentUser();
 
@@ -22,15 +22,12 @@ class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
 
       await repo.saveUserToHome(host);
 
-      next(true);
-    } catch (e) {
-      print(e);
-      err(e);
-    }
+      return true;
+    }), next, error: err);
   }
 
-  void joinHomeWithHost(String host, onNext<bool> onJoinSuccess, onError onJoinFailed) async {
-    try {
+  void joinHomeWithHost(String host, onNext<bool> onJoinSuccess, onError onJoinFailed) {
+    execute(Future(() async {
       Home home = await repo.findHomeOfHost(host);
 
       if(home == null) throw NewHomeException("This host $host does not have any home right now");
@@ -49,9 +46,7 @@ class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
 
       await repo.saveUserToHome(myProfile);
 
-      onJoinSuccess(true);
-    } catch(e) {
-      onJoinFailed(e);
-    }
+      return true;
+    }), onJoinSuccess, error: onJoinFailed);
   }
 }

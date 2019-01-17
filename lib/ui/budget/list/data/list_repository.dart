@@ -11,30 +11,31 @@ export 'package:my_wallet/data/data.dart';
 
 class ListBudgetsRepository extends CleanArchitectureRepository{
   Future<List<BudgetEntity>> loadThisMonthBudgetList(DateTime month) async {
-    List<BudgetEntity> entities = [];
-    
-    List<AppCategory> cats = await db.queryCategory();
-    DateTime firstDay = Utils.firstMomentOfMonth(month);
-    DateTime lastDay = Utils.lastDayOfMonth(month);
-    
-    if(cats != null) {
-      for(AppCategory f in cats) {
-        Budget budget = await db.findBudget(f.id, firstDay, lastDay);
-
-        var spent = 0.0;
-        var earn = 0.0;
-        var budgetPerMonth = 0.0;
-
-        if(budget != null) {
-          spent = budget.spent == null ? 0.0 : budget.spent;
-          earn = budget.earn == null ? 0.0 : budget.earn;
-          budgetPerMonth = budget.budgetPerMonth == null ? 0.0 : budget.budgetPerMonth;
-        }
-
-        entities.add(BudgetEntity(f.id, f.name, spent - earn > 0 ? spent - earn : 0, budgetPerMonth));
-      }
-    }
-    return entities;
+//    List<BudgetEntity> entities = [];
+//
+//    List<AppCategory> cats = await db.queryCategory();
+//    DateTime firstDay = Utils.firstMomentOfMonth(month);
+//    DateTime lastDay = Utils.lastDayOfMonth(month);
+//
+//    if(cats != null) {
+//      for(AppCategory f in cats) {
+//        Budget budget = await db.findBudget(catId: f.id, start: firstDay, end: lastDay);
+//
+//        var spent = 0.0;
+//        var earn = 0.0;
+//        var budgetPerMonth = 0.0;
+//
+//        if(budget != null) {
+//          budgetPerMonth = budget.budgetPerMonth == null ? 0.0 : budget.budgetPerMonth;
+//        }
+//
+//        spent = await db.sumTransactionsByCategory(catId: f.id, type: TransactionType.typeExpense, start: firstDay, end: lastDay);
+//        earn = await db.sumTransactionsByCategory(catId: f.id, type: TransactionType.typeIncome, start: firstDay, end: lastDay);
+//
+//        entities.add(BudgetEntity(f.id, f.name, spent - earn > 0 ? spent - earn : 0, budgetPerMonth));
+//      }
+//    }
+    return await db.queryCategoryWithBudgetAndTransactionsForMonth<BudgetEntity>(month, (cat, budgetPerMonth, spent, earn) => BudgetEntity(cat.id, cat.name, spent - earn > 0 ? spent - earn : 0, budgetPerMonth));
   }
 
   Future<DateTime> queryMinBudgetStart() {
@@ -46,7 +47,7 @@ class ListBudgetsRepository extends CleanArchitectureRepository{
   }
 
   Future<double> queryBudgetAmount(DateTime from, DateTime to) async{
-    return (await db.queryBudgetAmount(start: from, end: to)).budgetPerMonth;
+    return (await db.findBudget(start: from, end: to)).budgetPerMonth;
   }
 
   Future<double> sumAllTransactionBetweenDateByType(DateTime from, DateTime to, List<TransactionType> type) {

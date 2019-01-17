@@ -6,45 +6,47 @@ import 'package:my_wallet/utils.dart';
 class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepository> {
   BudgetDetailUseCase() : super(BudgetDetailRepository());
 
-  void loadCategoryBudget(int categoryId, DateTime from, DateTime to, onNext<BudgetDetailEntity> next) async {
-    AppCategory category = await repo.loadCategory(categoryId);
+  void loadCategoryBudget(int categoryId, DateTime from, DateTime to, onNext<BudgetDetailEntity> next) {
+    execute<BudgetDetailEntity>(Future(() async {
+      AppCategory category = await repo.loadCategory(categoryId);
 
-    Budget budget = await repo.loadBudgetThisMonth(categoryId, from, to);
+      Budget budget = await repo.loadBudgetThisMonth(categoryId, from, to);
 
-    next(BudgetDetailEntity(category, budget == null ? 0.0 : budget.budgetPerMonth, budget == null ? DateTime.now() : budget.budgetStart, budget == null ? DateTime.now() : budget.budgetEnd));
+      return BudgetDetailEntity(category, budget == null ? 0.0 : budget.budgetPerMonth, budget == null ? from : budget.budgetStart, budget == null ? to : budget.budgetEnd);
+    }), next);
   }
 
   void saveBudget(AppCategory _cat, double _amount, DateTime startMonth, DateTime endMonth, onNext<bool> next, onError error) async {
-    try {
+    execute<bool>(Future(() async {
+      var result = false;
       startMonth = firstMomentOfMonth(startMonth);
-      endMonth = lastDayOfMonth(endMonth);
+      if(endMonth != null) endMonth = lastDayOfMonth(endMonth);
 
-      var date = startMonth;
+      List<Budget> budgets = await repo.findCollapsingBudgets(_cat.id, startMonth, endMonth);
 
-      while (date.isBefore(endMonth)) {
-        var end = lastDayOfMonth(date);
+      do {
+        // insert new budget
+        var id = await repo.generateBudgetId();
+        await repo.insertBudget(Budget(id, _cat.id, _amount, startMonth, endMonth));
 
-        int id = await repo.findBudgetId(_cat.id, date, end);
+        result = true;
 
-        // save multiple budgets, 1 budget per month
-        Budget budget = Budget(id, _cat.id, _amount, date, end);
-        await repo.saveBudget(budget);
+        // no collapsing budgets, nothing else to do
+        if(budgets == null) break;
+        if(budgets.isEmpty) break;
 
-//        await Future.delayed(Duration(seconds: 2));
-
-        var month = date.month + 1;
-        var year = date.year;
-
-        if (month > 12) {
-          month -= 12;
-          year += 1;
+        // there are collapsing budget? delete them all
+        print("budgets to delete ${budgets.length}");
+        for(Budget budget in budgets) {
+          print("delete ${budget.id}");
+          await repo.deleteBudget(budget);
         }
-        date = DateTime(year, month, 1);
-      }
 
-      next(true);
-    } catch (e) {
-      error(e);
-    }
+        print("return result");
+
+      } while(false);
+
+      return result;
+    }), next, error: error);
   }
 }

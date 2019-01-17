@@ -6,6 +6,6 @@ class ChartTitleUseCase extends CleanArchitectureUseCase<ChartTitleRepository>{
   ChartTitleUseCase() : super(ChartTitleRepository());
 
   void loadTitleDetail(onNext<ChartTitleEntity> next) {
-    repo.loadTitleDetail().then((value) => next(value));
+    execute<ChartTitleEntity>(repo.loadTitleDetail(), next);
 }
 }

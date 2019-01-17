@@ -4,6 +4,7 @@ import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/ca/data/ca_repository.dart';
 
 export 'package:my_wallet/ui/category/list/data/list_category_entity.dart';
+import 'package:my_wallet/utils.dart' as Utils;
 
 class CategoryListRepository extends CleanArchitectureRepository{
 
@@ -47,6 +48,10 @@ class CategoryListRepository extends CleanArchitectureRepository{
 
     return _dbRepo.deleteAllTransactions(transactions);
   }
+
+  Future<double> sumSpentPerMonthByCategory(int catId, DateTime month) {
+    return _dbRepo.sumSpentPerMonthByCategory(catId, month);
+  }
 }
 
 class _CategoryListDatabaseRepository {
@@ -61,7 +66,7 @@ class _CategoryListDatabaseRepository {
   }
 
   Future<Budget> findBudget(int catid, DateTime start, DateTime end) {
-    return db.findBudget(catid, start, end);
+    return db.findBudget(catId: catid, start: start, end: end);
   }
 
   Future<List<Budget>> findAllBudgets(int catId) {
@@ -82,6 +87,10 @@ class _CategoryListDatabaseRepository {
 
   Future<void> deleteAllTransactions(List<AppTransaction> transactions) {
     return db.deleteTransactions(transactions.map((f) => f.id).toList());
+  }
+
+  Future<double> sumSpentPerMonthByCategory(int catId, DateTime month) {
+    return db.sumTransactionsByCategory(catId: catId, type: TransactionType.typeExpense, start: Utils.firstMomentOfMonth(month), end: Utils.lastDayOfMonth(month));
   }
 }
 

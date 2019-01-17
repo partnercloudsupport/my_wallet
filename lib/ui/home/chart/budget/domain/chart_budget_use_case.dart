@@ -6,6 +6,6 @@ class ChartBudgetUseCase extends CleanArchitectureUseCase<ChartBudgetRepository>
   ChartBudgetUseCase() : super(ChartBudgetRepository());
 
   void loadSaving(onNext<ChartBudgetEntity> next) {
-    repo.loadSaving().then((entity) => next(entity));
+    execute<ChartBudgetEntity>(repo.loadSaving(), next);
   }
 }

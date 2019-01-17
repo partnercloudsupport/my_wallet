@@ -11,6 +11,6 @@ class TransactionListUseCase extends CleanArchitectureUseCase<TransactionListRep
       DateTime day,
       onNext<TransactionListEntity> next
       ) {
-    repo.loadDataFor(accountId, categoryId, day).then((value) => next(value));
+    execute(repo.loadDataFor(accountId, categoryId, day), next);
   }
 }

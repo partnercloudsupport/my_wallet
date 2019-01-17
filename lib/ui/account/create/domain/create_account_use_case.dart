@@ -11,22 +11,24 @@ class CreateAccountUseCase extends CleanArchitectureUseCase<CreateAccountReposit
       double amount,
       onNext<bool> next,
       onError error,
-      ) async {
-    var result = false;
+      ) {
+    execute<bool>(Future(() async {
+      var result = false;
 
-    do {
-      if(!(await repo.verifyType(type))) break;
+      do {
+        if(!(await repo.verifyType(type))) break;
 
-      if (!(await repo.verifyName(name))) break;
+        if (!(await repo.verifyName(name))) break;
 
-      int id = await repo.generateAccountId();
+        int id = await repo.generateAccountId();
 
-      if (id < 0) break;
+        if (id < 0) break;
 
-      result = await repo.saveAccount(id, name, amount, type);
+        result = await repo.saveAccount(id, name, amount, type);
 
-    } while (false);
+      } while (false);
 
-    return next(result);
+      return result;
+    }), next);
   }
 }

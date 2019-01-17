@@ -7,39 +7,40 @@ import 'package:my_wallet/utils.dart' as Utils;
 class ListBudgetsUseCase extends CleanArchitectureUseCase<ListBudgetsRepository> {
   ListBudgetsUseCase() : super(ListBudgetsRepository());
 
-  void loadThisMonthBudgetList(DateTime month, onNext<List<BudgetEntity>> next) async{
-    var list = await repo.loadThisMonthBudgetList(month);
-
-    next(list);
+  void loadThisMonthBudgetList(DateTime month, onNext<List<BudgetEntity>> next) async {
+    execute<List<BudgetEntity>>(repo.loadThisMonthBudgetList(month), next);
   }
 
+  ///////////////////////////////////////////////////////////////
+  /// Summary is loaded as month by month basic
+  ///////////////////////////////////////////////////////////////
   void loadSummary(onNext<List<BudgetSummary>> next) async {
-    List<BudgetSummary> summary = [];
+    execute<List<BudgetSummary>>(Future(() async {
+      List<BudgetSummary> summary = [];
 
-    DateTime firstDay = await repo.queryMinBudgetStart();
-    DateTime lastDay = await repo.queryMaxBudgetEnd();
+      DateTime firstDay = await repo.queryMinBudgetStart();
+      DateTime lastDay = await repo.queryMaxBudgetEnd();
 
-    while(summary.length < maxMonthSupport || firstDay.isBefore(lastDay)) {
-      double budget = 0.0;
-      double spend = 0.0;
-      double earn = 0.0;
+      while(summary.length < maxMonthSupport || firstDay.isBefore(lastDay)) {
+        double budget = 0.0;
+        double spend = 0.0;
+        double earn = 0.0;
 
-      if(firstDay.isBefore(lastDay)) {
-        DateTime end = Utils.lastDayOfMonth(firstDay);
-        budget = await repo.queryBudgetAmount(firstDay, end);
+        if(firstDay.isBefore(lastDay)) {
+          DateTime end = Utils.lastDayOfMonth(firstDay);
+          budget = await repo.queryBudgetAmount(firstDay, end);
 
-        spend = await repo.sumAllTransactionBetweenDateByType(firstDay, end, TransactionType.typeExpense);
+          spend = await repo.sumAllTransactionBetweenDateByType(firstDay, end, TransactionType.typeExpense);
 
-        earn = await repo.sumAllTransactionBetweenDateByType(firstDay, end, TransactionType.typeIncome);
+          earn = await repo.sumAllTransactionBetweenDateByType(firstDay, end, TransactionType.typeIncome);
+        }
+
+        summary.add(BudgetSummary(firstDay, budget == null ? 0 : budget, spend - earn > 0 ? spend - earn : 0));
+
+        firstDay = nextMonthOf(firstDay);
       }
 
-      summary.add(BudgetSummary(firstDay, budget == null ? 0 : budget, spend - earn > 0 ? spend - earn : 0));
-
-      if(summary.length % 3 == 0) next(summary);
-
-      firstDay = nextMonthOf(firstDay);
-    }
-
-    next(summary);
+      return summary;
+    }), next);
   }
 }

@@ -4,8 +4,9 @@ import 'package:my_wallet/ca/domain/ca_use_case.dart';
 class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
   LoginUseCase() : super(LoginRepository());
 
-  void signIn(email, password, onNext<bool> onNext, onError onError) async {
-    try {
+  void signIn(email, password, onNext<bool> onNext, onError onError) {
+    execute(Future(() async {
+      var result = false;
       do {
         await repo.validateEmail(email);
         await repo.validatePassword(password);
@@ -16,15 +17,15 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         await repo.saveUserReference(user.uuid);
 
-        onNext(user.displayName != null && user.displayName.isNotEmpty);
-      } while (false);
-    } catch (e) {
-      handleError(onError, e);
-    }
+        result = (user.displayName != null && user.displayName.isNotEmpty);
+      } while(false);
+      return result;
+    }), onNext, error: (e) => handleError(onError, e));
   }
 
-  void checkUserHome(onNext<bool> next, onError onError) async{
-    try {
+  void checkUserHome(onNext<bool> next, onError onError) {
+    execute(Future(() async {
+      var result = false;
       do {
         // if this user is a host, allow him to go directly into his home. 1 host cannot host more than 1 home
         User user = await repo.getCurrentUser();
@@ -48,12 +49,11 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
           break;
         }
 
-        repo.checkUserHome().then((result) => next(result));
+        result = await repo.checkUserHome();
       } while (false);
-    } catch (e) {
-      print(e.toString());
-      handleError(onError, e);
-    }
+
+      return result;
+    }), next, error: (e) => handleError(onError, e));
   }
 
   void handleError(onError onError, dynamic e) {
@@ -64,8 +64,9 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
     }
   }
 
-  void signInWithGoogle(onNext<bool> next, onError error) async {
-    try {
+  void signInWithGoogle(onNext<bool> next, onError error) {
+    execute(Future(() async {
+      var result = false;
       do {
         User user = await repo.signInWithGoogle();
 
@@ -73,15 +74,16 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         await repo.saveUserReference(user.uuid);
 
-        next(user.displayName != null && user.displayName.isNotEmpty);
+        result = (user.displayName != null && user.displayName.isNotEmpty);
+
+        return result;
       } while (false);
-    } catch (e) {
-      handleError(error, e);
-    }
+    }), next, error: (e) => handleError(error, e));
   }
 
-  void signInWithFacebook(onNext<bool> next, onError error) async {
-    try {
+  void signInWithFacebook(onNext<bool> next, onError error) {
+    execute(Future(() async {
+      var result = false;
       do {
         User user = await repo.signInWithFacebook();
 
@@ -89,10 +91,10 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         await repo.saveUserReference(user.uuid);
 
-        next(user.displayName != null && user.displayName.isNotEmpty);
+        result = (user.displayName != null && user.displayName.isNotEmpty);
       } while(false);
-    } catch(e) {
-      handleError(error, e);
-    }
+
+      return result;
+    }), next, error: (e) => handleError(error, e));
   }
 }

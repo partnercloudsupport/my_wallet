@@ -9,12 +9,13 @@ class AppTheme {
   static const brightPink = Color(0xFFFF4081);
   static const blueGrey = Color(0xFF9A9AAC);
   static const brightGreen = Color(0xFF00FF00);
-  static const white = Color(0xFFFFFFFF);
-  static const black = Color(0xFF000000);
+  static const white = Colors.white;
+  static const black = Colors.black;
   static const facebookColor = Color(0xFF3B5998);
   static const googleColor = Color(0xFFDB4437);
-  static const transparent = Color(0x00000000);
-  static const lightBlue = Color(0xff7e7db7);
+  static const transparent = Colors.transparent;
+  static const lightBlue = Colors.lightBlue;
+  static const red = Colors.red;
 
   static ThemeData appTheme = ThemeData(
       brightness: Brightness.dark,
@@ -100,7 +101,12 @@ class AppTheme {
 //    ChipThemeData chipTheme,
 //    TargetPlatform platform,
 //    MaterialTapTargetSize materialTapTargetSize,
-//    PageTransitionsTheme pageTransitionsTheme,
+    pageTransitionsTheme: PageTransitionsTheme(
+        builders: <TargetPlatform, PageTransitionsBuilder> {
+          TargetPlatform.android : _MyWalletPageTransitionBuilder(),
+          TargetPlatform.iOS : _MyWalletPageTransitionBuilder()
+        }
+    ),
 //    ColorScheme colorScheme,
     dialogTheme: DialogTheme(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -139,5 +145,18 @@ class AppTheme {
       }
     }
     return val;
+  }
+}
+
+class _MyWalletPageTransitionBuilder extends PageTransitionsBuilder {
+  @override
+  Widget buildTransitions<T>(PageRoute<T> route, BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    return SlideTransition(
+      position: new Tween<Offset>(
+        begin: const Offset(0.0, 1.0),
+        end: Offset.zero,
+      ).animate(animation),
+      child: child,
+    );
   }
 }

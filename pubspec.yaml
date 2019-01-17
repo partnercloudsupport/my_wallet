@@ -34,6 +34,7 @@ dependencies:
 #  flutter_facebook_login: '^1.1.1'
   http: any
   package_info: any
+  rxdart: any
 
 dev_dependencies:
   flutter_test:

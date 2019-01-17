@@ -6,6 +6,6 @@ class AboutUsUseCase extends CleanArchitectureUseCase<AboutUsRepository> {
   AboutUsUseCase() : super(AboutUsRepository());
 
   void loadData(onNext<AboutEntity> next) {
-    repo.loadData().then((value) => next(value));
+    execute<AboutEntity>(repo.loadData(), next);
   }
 }

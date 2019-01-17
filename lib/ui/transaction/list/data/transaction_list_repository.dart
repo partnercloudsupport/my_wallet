@@ -79,7 +79,7 @@ class _TransactionListDatabaseRepository {
       }
     }
 
-    var budget = await db.queryBudgetAmount(start: Utils.firstMomentOfMonth(day == null ? DateTime.now() : day), end: Utils.lastDayOfMonth(day == null ? DateTime.now() : day), catId: categoryId);
+    var budget = await db.findBudget(start: Utils.firstMomentOfMonth(day == null ? DateTime.now() : day), end: Utils.lastDayOfMonth(day == null ? DateTime.now() : day), catId: categoryId);
     var fraction = budget == null || budget.budgetPerMonth == 0 ? 1.0 : total/budget.budgetPerMonth;
     return TransactionListEntity(entities, dates, total, fraction);
   }

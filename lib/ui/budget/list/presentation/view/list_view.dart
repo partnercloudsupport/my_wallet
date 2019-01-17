@@ -92,7 +92,7 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: crossAxisCount),
               itemCount: _budgetList.length + 1,
               itemBuilder: (context, index) {
-                if (index == _budgetList.length) return _btnAddCategory(padding);
+                if (index == _budgetList.length) return _btnAddBudget(padding);
 
                 return _budgetItem(index, padding);
               },
@@ -103,15 +103,19 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
     );
   }
 
-  Widget _btnAddCategory(double padding) {
+  Widget _btnAddBudget(double padding) {
     return Container(
       padding: EdgeInsets.all(padding),
       child: CircleAvatar(
         child: IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, routes.CreateCategory).then((value) {
+            Navigator.pushNamed(context, routes.SelectCategory)
+                .then((value) {
               if (value != null) Navigator.pushNamed(context, routes.EditBudget(categoryId: value, month: _month));
             });
+//            Navigator.pushNamed(context, routes.CreateCategory).then((value) {
+//              if (value != null) Navigator.pushNamed(context, routes.EditBudget(categoryId: value, month: _month));
+//            });
           },
           icon: Icon(
             Icons.add,

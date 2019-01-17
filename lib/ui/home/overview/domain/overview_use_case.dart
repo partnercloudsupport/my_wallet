@@ -5,6 +5,6 @@ class HomeOverviewUseCase extends CleanArchitectureUseCase<HomeOverviewRepositor
   HomeOverviewUseCase() : super(HomeOverviewRepository());
 
   void loadTotal(onNext<double> next) {
-    repo.loadTotal().then(next);
+    execute(repo.loadTotal(), next);
   }
 }

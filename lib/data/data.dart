@@ -138,8 +138,6 @@ class Budget {
   final double budgetPerMonth;
   final DateTime _start;
   final DateTime _end;
-  double spent;
-  double earn;
 
   Budget(
       this.id,
@@ -147,7 +145,6 @@ class Budget {
       this.budgetPerMonth,
       this._start,
       this._end,
-      {this.spent, this.earn}
       );
 
   DateTime get budgetStart => _start == null ? null : Utils.firstMomentOfMonth(_start);

@@ -6,7 +6,7 @@ import 'package:my_wallet/data/data.dart';
 class TransactionUseCase extends CleanArchitectureUseCase<TransactionRepository>{
   TransactionUseCase() : super(TransactionRepository());
 
-  void loadTransaction(List<TransactionType> type, onNext<List<TransactionEntity>> next) async {
-    return repo.loadTransaction(type).then((value) => next(value));
+  void loadTransaction(List<TransactionType> type, onNext<List<TransactionEntity>> next) {
+    execute<List<TransactionEntity>>(repo.loadTransaction(type), next);
   }
 }

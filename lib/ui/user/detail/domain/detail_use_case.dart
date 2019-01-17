@@ -8,12 +8,14 @@ class UserDetailUseCase extends CleanArchitectureUseCase<UserDetailRepository> {
   UserDetailUseCase() : super(UserDetailRepository());
 
   void loadCurrentUser(onNext<UserDetailEntity> next) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    execute(Future(() async {
+      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    String uuid = sharedPreferences.get(UserUUID);
+      String uuid = sharedPreferences.get(UserUUID);
 
-    UserDetailEntity user = await repo.loadUserWithUuid(uuid);
+      UserDetailEntity user = await repo.loadUserWithUuid(uuid);
 
-    next(user);
+      return user;
+    }), next);
   }
 }

@@ -5,8 +5,9 @@ import 'package:my_wallet/ui/user/register/data/register_repository.dart';
 class RegisterUseCase extends CleanArchitectureUseCase<RegisterRepository> {
   RegisterUseCase() : super(RegisterRepository());
 
-  void registerEmail(String displayName, String email, String password, onNext<bool> next, onError error) async {
-//    try {
+  void registerEmail(String displayName, String email, String password, onNext<bool> next, onError error) {
+    execute(Future(() async {
+      var result = false;
       do {
         if(!await repo.validateDisplayName(displayName)) break;
 
@@ -23,10 +24,10 @@ class RegisterUseCase extends CleanArchitectureUseCase<RegisterRepository> {
 
         await repo.saveUserReference(user.uuid);
 
-        next(true);
+        result = true;
       } while (false);
-//    } catch(e) {
-//      error(e);
-//    }
+
+      return result;
+    }), next, error: error);
   }
 }

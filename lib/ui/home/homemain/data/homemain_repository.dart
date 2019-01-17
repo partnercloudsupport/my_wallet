@@ -22,13 +22,13 @@ class _MyWalletHomeDatabaseRepository {
 
     if (cats != null && cats.isNotEmpty) {
       for(AppCategory cat in cats) {
-        var budget = await _db.queryBudgetAmount(start: start, end: end, catId: cat.id);
+        var budget = await _db.findBudget(start: start, end: end, catId: cat.id);
 
         var remainFactor = 1 - (budget == null || budget.budgetPerMonth == 0 ? 0.0 : cat.expense/budget.budgetPerMonth);
 
         if(remainFactor < 0) remainFactor = 0;
 
-        homeEntities.add(ExpenseEntity(cat.id, cat.name, cat.income, cat.expense, cat.colorHex, remainFactor, budget.budgetPerMonth));
+        homeEntities.add(ExpenseEntity(cat.id, cat.name, cat.income, cat.expense, cat.colorHex, remainFactor, budget != null ? budget.budgetPerMonth : 0.0));
       }
     }
 

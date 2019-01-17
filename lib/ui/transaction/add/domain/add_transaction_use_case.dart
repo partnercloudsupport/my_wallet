@@ -6,24 +6,25 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
   AddTransactionUseCase() : super(AddTransactionRepository());
 
   void loadAccounts(onNext<List<Account>> next) {
-    repo.loadAccounts().then((value) => next(value));
+    execute(repo.loadAccounts(), next);
   }
 
   void loadCategory(onNext<List<AppCategory>> next) {
-    repo.loadCategory().then((value) => next(value));
+    execute(repo.loadCategory(), next);
   }
 
   void loadTransactionDetail(int id, onNext<TransactionDetail> next, onError error) {
-    repo.loadTransactionDetail(id).then((value) => next(value)).catchError((e) => error(e));
+    execute(repo.loadTransactionDetail(id), next, error: error);
   }
 
   void loadCurrentUserName(onNext<UserDetail> next) {
-    repo.loadCurrentUserName().then((value) => next(value));
+    execute(repo.loadCurrentUserName(), next);
   }
 
   void saveTransaction(int _id,TransactionType _type, Account _account, AppCategory _category, double _amount, DateTime _date, String _desc, onNext<bool> next, onError error) async {
-    var result = false;
-    try {
+    execute(Future(() async {
+      var result = false;
+
       do {
         if (!(await repo.checkTransactionType(_type))) break;
         if (!(await repo.checkAccount(_account))) break;
@@ -59,11 +60,7 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
         result = true;
       } while(false);
 
-      next(result);
-    } catch (e) {
-      print(e);
-
-      error(e);
-    }
+      return result;
+    }), next, error: error);
   }
 }

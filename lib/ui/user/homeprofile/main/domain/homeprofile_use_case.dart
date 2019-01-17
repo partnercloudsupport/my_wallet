@@ -6,10 +6,12 @@ class HomeProfileUseCase extends CleanArchitectureUseCase<HomeProfileRepository>
   HomeProfileUseCase() : super(HomeProfileRepository());
 
   void findUserHome(onNext<HomeEntity> next) async {
-    User user = await repo.getCurrentUser();
+    execute(Future(() async {
+      User user = await repo.getCurrentUser();
 
-    HomeEntity entity = await repo.searchUserHome(user);
+      HomeEntity entity = await repo.searchUserHome(user);
 
-    next(entity);
+      return entity;
+    }), next);
   }
 }

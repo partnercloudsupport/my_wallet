@@ -45,14 +45,15 @@ final _budgetCategoryId = "_catId";
 final _budgetPerMonth = "_budgetPerMonth";
 final _budgetStart = "_budgetStart";
 final _budgetEnd = "_budgetEnd";
-final _budgetSpent = "_budgetSpent";
-final _budgetEarn = "_budgetEarn";
+//final _budgetSpent = "_budgetSpent";
+//final _budgetEarn = "_budgetEarn";
 
 final _tableUser = tableUser;
 final _userDisplayName = "_displayName";
 final _userEmail = "_email";
 final _userPhotoUrl = "_photoUrl";
 final _userColor = "_userColor";
+final _userVerified = "_userVerified";
 
 _Database db = _Database();
 Lock _lock = Lock();
@@ -99,6 +100,63 @@ Future<double> sumAllAccountBalance({List<AccountType> types}) async {
   return sum[0].values.first ?? 0.0;
 }
 
+Future<List<T>> queryCategoryWithBudgetAndTransactionsForMonth<T>(DateTime month, Function(AppCategory cat, double budgetPerMonth, double spent, double earn) conversion) {
+  return _lock.synchronized(() async {
+    List<T> result = [];
+
+    List<Map<String, dynamic>> cats = await db._query(_tableCategory);
+
+    DateTime firstDay = Utils.firstMomentOfMonth(month);
+    DateTime lastDay = Utils.lastDayOfMonth(month);
+
+    if(cats != null) {
+      for(Map<String, dynamic> f in cats) {
+        var category = _toCategory(f);
+
+        var findBudget = _compileFindBudgetSqlQuery(firstDay.millisecondsSinceEpoch, lastDay.millisecondsSinceEpoch);
+        var rawBudgetPerMonth = await db._executeSql(
+            """
+               SELECT SUM($_budgetPerMonth)
+               FROM $_tableBudget
+                WHERE $_budgetCategoryId = ${category.id} AND $findBudget
+                """);
+
+        var rawSpend = await db._executeSql(
+          """
+            SELECT SUM($_transAmount) 
+            FROM $_tableTransactions
+            WHERE $_transCategory = ${category.id}
+            AND ($_transDateTime BETWEEN ${firstDay.millisecondsSinceEpoch} AND ${lastDay.millisecondsSinceEpoch})
+            AND $_transType in ${TransactionType.typeExpense.map((f) => "${f.id}").toString()}
+          """
+        );
+        var rawEarn = await db._executeSql(
+          """
+          SELECT SUM($_transAmount) 
+            FROM $_tableTransactions
+            WHERE $_transCategory = ${category.id}
+            AND ($_transDateTime BETWEEN ${firstDay.millisecondsSinceEpoch} AND ${lastDay.millisecondsSinceEpoch})
+            AND $_transType in ${TransactionType.typeIncome.map((f) => "${f.id}").toString()}
+          """
+        );
+
+        var spent = rawSpend == null || rawSpend.first == null || rawSpend.first.values == null || rawSpend.first.values.isEmpty || rawSpend.first.values.first == null ? 0.0 : rawSpend.first.values.first;
+        var earn = rawEarn == null || rawEarn.first == null || rawEarn.first.values == null || rawEarn.first.values.isEmpty || rawEarn.first.values.first == null ? 0.0 : rawEarn.first.values.first;
+        var budgetPerMonth = rawBudgetPerMonth == null || rawBudgetPerMonth.first == null || rawBudgetPerMonth.first.values == null || rawBudgetPerMonth.first.values.isEmpty || rawBudgetPerMonth.first.values.first == null  ? 0.0 : rawBudgetPerMonth.first.values.first;
+
+        if(spent == null) spent = 0.0;
+        if(earn == null) earn = 0.0;
+        if(budgetPerMonth == null) budgetPerMonth = 0.0;
+
+        result.add(conversion(category, budgetPerMonth, spent, earn));
+      }
+    }
+
+    return result;
+  });
+
+}
+
 Future<double> sumTransactionsByDay(DateTime day, TransactionType type) async {
     var startOfDay = DateTime(day.year, day.month, day.day).millisecondsSinceEpoch;
     var endOfDay = DateTime(day.year, day.month, day.day + 1).millisecondsSinceEpoch;
@@ -116,7 +174,9 @@ Future<double> sumTransactionsByCategory({@required int catId, @required List<Tr
 }
 
 Future<double> sumAllBudget(DateTime start, DateTime end) async {
-  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE ($_budgetStart >= ${start.millisecondsSinceEpoch} and $_budgetEnd <= ${end.millisecondsSinceEpoch})"));
+  var sum = await _lock.synchronized(() {
+    return db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE ${_compileFindBudgetSqlQuery(start.millisecondsSinceEpoch, end.millisecondsSinceEpoch)}");
+  });
   return sum[0].values.first ?? 0.0;
 }
 
@@ -302,51 +362,20 @@ Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime 
       }
     }
 
+  if(orderByType && type != null) {
+    if(type == TransactionType.typeExpense) {
+      // sort by expenses
+      appCat.sort((a, b) => b.expense.floor() - a.expense.floor());
+    } else if(type == TransactionType.typeIncome) {
+      // sort by income
+      appCat.sort((a, b) => b.income.floor() - a.income.floor());
+    }
+  }
+
     // no category found, return empty list;
     return appCat;
   });
 
-//  List<Map<String, dynamic>> catMaps = await _lock.synchronized(() => db._query(_tableCategory));
-//
-//  List<Map<String, dynamic>> transMap = await _lock.synchronized(() => db._query(
-//      _tableTransactions,
-//      where: where));
-//
-//  List<AppTransaction> trans = transMap == null ? [] : transMap.map((f) => _toTransaction(f)).toList();
-//
-//  List<AppCategory> appCats = [];
-//
-//  appCats = catMaps == null
-//      ? []
-//      : catMaps.map((f) {
-//          var income = 0.0;
-//          var expense = 0.0;
-//          var catId = f[_id];
-//          trans.forEach((trans) {
-//            income += trans.categoryId == catId && TransactionType.isIncome(trans.type) ? trans.amount : 0.0;
-//            expense += trans.categoryId == catId && TransactionType.isExpense(trans.type)? trans.amount : 0.0;
-//          });
-//
-//          return AppCategory(
-//            f[_id],
-//            f[_catName],
-//            f[_catColorHex],
-//            income,
-//            expense
-//          );
-//        }).toList();
-//
-//  if (filterZero) appCats.removeWhere((f) => f.income == 0 && f.expense == 0);
-//
-//  if(orderByType && type != null) {
-//    if(type == TransactionType.typeExpense) {
-//      // sort by expenses
-//      appCats.sort((a, b) => b.expense.floor() - a.expense.floor());
-//    } else if(type == TransactionType.typeIncome) {
-//      // sort by income
-//      appCats.sort((a, b) => b.income.floor() - a.income.floor());
-//    }
-//  }
   return appCats;
 }
 
@@ -389,23 +418,61 @@ Future<DateTime> queryMaxBudgetEnd() async {
   return max == null || max[0].values == null || max[0].values.first == null ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(max[0].values.first);
 }
 
-Future<Budget> queryBudgetAmount({int catId, @required DateTime start, @required DateTime end}) async {
-  var monthStart = Utils.firstMomentOfMonth(start);
-  var monthEnd = Utils.lastDayOfMonth(end);
+Future<Budget> findBudget({int catId, DateTime start, DateTime end}) async {
+  var monthStart = Utils.firstMomentOfMonth(start).millisecondsSinceEpoch;
+  var monthEnd = end == null ? null : Utils.lastDayOfMonth(end).millisecondsSinceEpoch;
 
-  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE ${catId == null ? "" : "$_budgetCategoryId = $catId AND "}$_budgetStart <= ${monthStart.millisecondsSinceEpoch} AND $_budgetEnd >= ${monthEnd.millisecondsSinceEpoch}"));
+  var findBudget = "";
 
-  var amount = sum == null || sum.isEmpty ? 0.0 : sum[0].values.first ?? 0.0;
-  return Budget(0, catId, amount, monthStart, monthEnd);
+  // Sum all budgets into budget amount
+  var columns = [
+      _id,
+      _budgetStart,
+      _budgetEnd,
+      catId == null ? "SUM($_budgetPerMonth) as $_budgetPerMonth" : _budgetPerMonth,
+      _budgetCategoryId,
+    ];
+
+  var findCategory = "";
+  if(catId != null) findCategory = "$_budgetCategoryId = $catId AND ";
+
+  findBudget = _compileFindBudgetSqlQuery(monthStart, monthEnd);
+
+  return _lock.synchronized(() async {
+    var listMap = await db._query(_tableBudget, where: "$findCategory$findBudget", columns: columns);
+
+    if(listMap != null && listMap.isNotEmpty) {
+      var budget = _toBudget(listMap.first);
+      return budget;
+    }
+    return null;
+  });
+//  return listMap == null || listMap.isEmpty ? null : _toBudget(listMap[0]);
 }
 
-Future<Budget> findBudget(int catId, DateTime start, DateTime end) async {
-  var monthStart = Utils.firstMomentOfMonth(start);
-  var monthEnd = Utils.lastDayOfMonth(end);
+/// Find budget IDs for this category with start/end time, which means any budget with duration collapse with this duration
+/// There can be multiple ID returns, incase there are multiple budgets fall that cover the period between start and end time.
+/// Cases
+///     - 0 ID is returned: create new budget
+///     - 1 ID is returned: update this budget
+///     - more IDs are returned: Update the first budget, and delete other collapsing budgets
+Future<List<Budget>> findCollapsingBudgets({@required int catId, @required DateTime start, @required DateTime end}) {
+  return _lock.synchronized(() async {
+    int monthStart = Utils.firstMomentOfMonth(start == null ? DateTime.now() : start).millisecondsSinceEpoch;
+    int monthEnd = end == null ? null : Utils.lastDayOfMonth(end).millisecondsSinceEpoch;
+    String findBudget = _compileFindBudgetSqlQuery(monthStart, monthEnd);
 
-  var listMap = await _lock.synchronized(() => db._query(_tableBudget, where: "$_budgetCategoryId = $catId AND $_budgetStart = ${monthStart.millisecondsSinceEpoch} AND $_budgetEnd = ${monthEnd.millisecondsSinceEpoch}"));
+    // additional case when $start is before $monthStart, and endDate is null
+    // is this special case for budget coverage, not to be used in other budget query
+    findBudget += " OR ($monthStart <= $_budgetStart${monthEnd == null ? "" : " AND $_budgetEnd >= $monthEnd"})";
 
-  return listMap == null || listMap.isEmpty ? null : _toBudget(listMap[0]);
+    print("Query: $findBudget");
+    var map = await db._query(_tableBudget, where: "$_budgetCategoryId = $catId AND ($findBudget)",);
+
+    print("Map IDs $map");
+
+    return map == null ? [] : map.map((f) => _toBudget(f)).toList();
+  });
 }
 
 Future<List<Budget>> findAllBudgetForCategory(int catId) async {
@@ -580,11 +647,10 @@ Budget _toBudget(Map<String, dynamic> map) {
   return Budget(
       map[_id],
       map[_budgetCategoryId],
-      map[_budgetPerMonth] * 1.0,
+      map[_budgetPerMonth] != null ? map[_budgetPerMonth] * 1.0 : 0.0,
       DateTime.fromMillisecondsSinceEpoch(map[_budgetStart]),
-      DateTime.fromMillisecondsSinceEpoch(map[_budgetEnd]),
-      spent: map[_budgetSpent],
-      earn: map[_budgetEarn]);
+      map[_budgetEnd] == null ? null : DateTime.fromMillisecondsSinceEpoch(map[_budgetEnd]),
+      );
 }
 
 User _toUser(Map<String, dynamic> map) {
@@ -594,6 +660,7 @@ User _toUser(Map<String, dynamic> map) {
     map[_userDisplayName],
     map[_userPhotoUrl],
     map[_userColor],
+    map[_userVerified]
   );
 }
 
@@ -653,8 +720,6 @@ Map<String, dynamic> _budgetToMap(Budget budget) {
   if(budget.budgetPerMonth != null) map.putIfAbsent(_budgetPerMonth, () => budget.budgetPerMonth);
   if(budget.budgetStart != null) map.putIfAbsent(_budgetStart, () => budget.budgetStart.millisecondsSinceEpoch);
   if(budget.budgetEnd != null) map.putIfAbsent(_budgetEnd, () => budget.budgetEnd.millisecondsSinceEpoch);
-  if(budget.spent != null) map.putIfAbsent(_budgetSpent, () => budget.spent);
-  if(budget.earn != null) map.putIfAbsent(_budgetEarn, () => budget.earn);
 
   map.putIfAbsent(_id, () => budget.id);
 
@@ -676,6 +741,35 @@ Map<String, dynamic> _userToMap(User user) {
   return map;
 }
 
+String _compileFindBudgetSqlQuery(int monthStart, int monthEnd) {
+  String findBudget = "";
+
+  if(monthEnd == null) {
+    findBudget = "$_budgetStart <= $monthStart";
+  } else {
+    // case 1
+    // start to end   -----------|duration is around here|----------
+    // budget -----------------------| budget is here until forever
+    // include the case when budget starts before this period
+    // budget --------------| budget is here until forever
+    findBudget = "($_budgetEnd IS NULL AND $_budgetStart < $monthEnd)";
+    // case 2
+    // start to end   -----------|duration is around here|----------
+    // budget -----------------------| budget is here |-------------
+    findBudget += " OR ($_budgetStart >= $monthStart AND $_budgetEnd <= $monthEnd)";
+    // case 3
+    // start to end   -----------|duration is around here|----------
+    // budget ---------------| budget is here until after end|----------
+    // OR
+    // budget ---------------| budget is here|----------
+    findBudget += " OR ($_budgetStart <= $monthStart AND $_budgetEnd >= $monthStart)";
+
+    // add bracelet
+    findBudget = "($findBudget)";
+  }
+
+  return findBudget;
+}
 
 // #############################################################################################################################
 // private database handler
@@ -688,7 +782,7 @@ class _Database {
     String dbPath = join((await getApplicationDocumentsDirectory()).path, "MyWalletDb");
     db = await openDatabase(
         dbPath,
-        version: 4, onCreate: (Database db, int version) async {
+        version: 5, onCreate: (Database db, int version) async {
       await _executeCreateDatabase(db);
     },
     onUpgrade: (Database db, int oldVersion, int newVersion) async {
@@ -759,9 +853,7 @@ class _Database {
         $_budgetCategoryId INTEGER NOT NULL,
         $_budgetPerMonth DOUBLE NOT NULL,
         $_budgetStart INTEGER NOT NULL,
-        $_budgetEnd INTEGER,
-        $_budgetSpent DOUBLE,
-        $_budgetEarn DOUBLE
+        $_budgetEnd INTEGER
         )
         """);
 
@@ -797,10 +889,10 @@ class _Database {
     return result;
   }
 
-  Future<List<Map<String, dynamic>>> _query(String table, {String where, List whereArgs, String orderBy}) async {
+  Future<List<Map<String, dynamic>>> _query(String table, {String where, List whereArgs, String orderBy, List<String> columns}) async {
     if(!db.isOpen) db = await _openDatabase();
 
-    List<Map<String, dynamic>> map = await db.query(table, where: where, whereArgs: whereArgs, orderBy: orderBy);
+    List<Map<String, dynamic>> map = await db.query(table, where: where, whereArgs: whereArgs, orderBy: orderBy, columns: columns);
 
     return map;
   }
@@ -818,14 +910,14 @@ class _Database {
       result = await db.insert(table, item);
 
       if(result >= 0) {
-        if (table == _tableBudget) {
-          // recalculate budget
-          await _recalculateBudget(db, item);
-        }
+//        if (table == _tableBudget) {
+//          // recalculate budget
+//          await _recalculateBudget(db, item);
+//        }
 
         if (table == _tableTransactions) {
-          // recalculate budget for transaction
-          await _recalculateBudgetForTransaction(db, item);
+//          // recalculate budget for transaction
+//          await _recalculateBudgetForTransaction(db, item);
           // recalculate account balance for transaction
           await _recalculateAccountForTransaction(db, item);
         }
@@ -851,14 +943,14 @@ class _Database {
           result += singleResult;
 
         if(singleResult >= 0) {
-          if (table == _tableBudget) {
-            // recalculate budget
-            await _recalculateBudget(db, item);
-          }
+//          if (table == _tableBudget) {
+//            // recalculate budget
+//            await _recalculateBudget(db, item);
+//          }
 
           if (table == _tableTransactions) {
-            // recalculate budget for transaction
-            await _recalculateBudgetForTransaction(db, item);
+//            // recalculate budget for transaction
+//            await _recalculateBudgetForTransaction(db, item);
             // recalculate account balance for transaction
             await _recalculateAccountForTransaction(db, item);
           }
@@ -879,14 +971,14 @@ class _Database {
     if(!db.isOpen) db = await _openDatabase();
     var result = await db.delete(table, where: where, whereArgs: whereArgs);
 
-    if(table == _tableBudget) {
-      // recalculate budgets table
-      _recalculateBudgets(db, whereArgs);
-    }
+//    if(table == _tableBudget) {
+//      // recalculate budgets table
+//      _recalculateBudgets(db, whereArgs);
+//    }
 
     if(table == _tableTransactions) {
-      // recalculate budget table
-      _recalculateAllBudgets(db);
+//      // recalculate budget table
+//      _recalculateAllBudgets(db);
       // recalculate account table
       _recalculateAllAccounts(db);
     }
@@ -900,21 +992,21 @@ class _Database {
     if(!db.isOpen) db = await _openDatabase();
     var result = await db.update(table, item, where: where, whereArgs: whereArgs);
 
-    if (table == _tableBudget) {
-      var budgets = await db.query(_tableBudget, where: where, whereArgs: whereArgs);
-
-      for(Map<String, dynamic> budget in budgets) {
-        // recalculate budget
-        await _recalculateBudget(db, budget);
-      }
-    }
+//    if (table == _tableBudget) {
+//      var budgets = await db.query(_tableBudget, where: where, whereArgs: whereArgs);
+//
+//      for(Map<String, dynamic> budget in budgets) {
+//        // recalculate budget
+//        await _recalculateBudget(db, budget);
+//      }
+//    }
 
     if (table == _tableTransactions) {
       var transactions = await db.query(_tableTransactions, where: where, whereArgs: whereArgs);
 
       for(Map<String, dynamic> transaction in transactions) {
-        // recalculate budget for transaction
-        await _recalculateBudgetForTransaction(db, transaction);
+//        // recalculate budget for transaction
+//        await _recalculateBudgetForTransaction(db, transaction);
         // recalculate account balance for transaction
         await _recalculateAccountForTransaction(db, transaction);
       }
@@ -951,97 +1043,97 @@ class _Database {
     if(_watchers[table] != null) _watchers[table].forEach((f) => f.onDatabaseUpdate(table));
   }
 
-  Future<void> _recalculateBudgets(Database db, List<dynamic> ids) async {
-    var budgets = await db.rawQuery("SELECT $_id, $_budgetCategoryId, $_budgetStart, $_budgetEnd, $_budgetPerMonth FROM $_tableBudget WHERE $_id IN ${ids.map((f) => "$f").toString()}");
-
-    for(Map<String, dynamic> budget in budgets) {
-      await _recalculateBudget(db, budget);
-    }
-  }
-
-  Future<void> _recalculateBudget(Database db, Map<String, dynamic> budget) async {
-    do {
-      if(budget == null) break;
-      if(budget.isEmpty) break;
-
-      // get budget category ID out
-      var catId = budget[_budgetCategoryId];
-      // get startDate out
-      var startDate = budget[_budgetStart];
-      // and end date
-      var endDate = budget[_budgetEnd];
-      // get budget ID
-      var id = budget[_id];
-      // get budget per month
-      var amount = budget[_budgetPerMonth];
-
-      // query all transactions of type income for this category between this start and end date
-      var typesList = TransactionType.typeExpense;
-      String types = typesList.map((f) => "${f.id}").toString();
-      var sql = "SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startDate AND $endDate) AND $_transCategory = $catId AND $_transType in $types";
-      var sum = await db.rawQuery(sql);
-      var spent = sum[0].values.first ?? 0.0;
-
-      typesList = TransactionType.typeIncome;
-      types = typesList.map((f) => "${f.id}").toString();
-      sql = "SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startDate AND $endDate) AND $_transCategory = $catId AND $_transType in $types";
-      sum = await db.rawQuery(sql);
-      var earn = sum[0].values.first ?? 0.0;
-
-      var newBudget = <String, dynamic>{
-        _id: id,
-        _budgetCategoryId: catId,
-        _budgetStart: startDate,
-        _budgetEnd: endDate,
-        _budgetPerMonth: amount,
-        _budgetSpent: spent,
-        _budgetEarn: earn
-      };
-
-      // update this budget
-      await db.update(_tableBudget, newBudget, where: "$_id = ?", whereArgs: [id]);
-    } while(false);
-  }
-
-  Future<void> _recalculateAllBudgets(Database db) async {
-    var budgets = await db.rawQuery("SELECT  $_id from $_tableBudget");
-
-    for(dynamic budget in budgets) {
-      await _recalculateBudget(db, budget);
-    }
-  }
-
-  Future<void> _recalculateBudgetForTransaction(Database db, Map<String, dynamic> tran) async {
-    do {
-
-      if(tran == null) break;
-      if(tran.isEmpty) break;
-
-      // get full transaction info
-      var transactionId = tran[_id];
-
-      var listTransactions = await db.query(_tableTransactions,where: "$_id = ?", whereArgs: [transactionId]);
-
-      if(listTransactions == null) break;
-      if(listTransactions.isEmpty) break;
-
-      var transaction = listTransactions[0];
-      var catId = transaction[_transCategory];
-
-      var transDate = transaction[_transDateTime];
-
-      var startDate = Utils.firstMomentOfMonth(DateTime.fromMillisecondsSinceEpoch(transDate)).millisecondsSinceEpoch;
-      var endDate = Utils.lastDayOfMonth(DateTime.fromMillisecondsSinceEpoch(transDate)).millisecondsSinceEpoch;
-
-      // query budget for thsi transaction
-      var budgets = await db.query(_tableBudget, where: "$_budgetCategoryId = $catId AND ($_budgetStart BETWEEN $startDate AND $endDate)");
-      if(budgets == null) break;
-      if(budgets.isEmpty) break;
-
-      // update budget now
-      await _recalculateBudget(db, budgets[0]);
-    } while(false);
-  }
+//  Future<void> _recalculateBudgets(Database db, List<dynamic> ids) async {
+//    var budgets = await db.rawQuery("SELECT $_id, $_budgetCategoryId, $_budgetStart, $_budgetEnd, $_budgetPerMonth FROM $_tableBudget WHERE $_id IN ${ids.map((f) => "$f").toString()}");
+//
+//    for(Map<String, dynamic> budget in budgets) {
+//      await _recalculateBudget(db, budget);
+//    }
+//  }
+//
+//  Future<void> _recalculateBudget(Database db, Map<String, dynamic> budget) async {
+//    do {
+//      if(budget == null) break;
+//      if(budget.isEmpty) break;
+//
+//      // get budget category ID out
+//      var catId = budget[_budgetCategoryId];
+//      // get startDate out
+//      var startDate = budget[_budgetStart];
+//      // and end date
+//      var endDate = budget[_budgetEnd];
+//      // get budget ID
+//      var id = budget[_id];
+//      // get budget per month
+//      var amount = budget[_budgetPerMonth];
+//
+//      // query all transactions of type income for this category between this start and end date
+//      var typesList = TransactionType.typeExpense;
+//      String types = typesList.map((f) => "${f.id}").toString();
+//      var sql = "SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startDate AND $endDate) AND $_transCategory = $catId AND $_transType in $types";
+//      var sum = await db.rawQuery(sql);
+//      var spent = sum[0].values.first ?? 0.0;
+//
+//      typesList = TransactionType.typeIncome;
+//      types = typesList.map((f) => "${f.id}").toString();
+//      sql = "SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startDate AND $endDate) AND $_transCategory = $catId AND $_transType in $types";
+//      sum = await db.rawQuery(sql);
+//      var earn = sum[0].values.first ?? 0.0;
+//
+//      var newBudget = <String, dynamic>{
+//        _id: id,
+//        _budgetCategoryId: catId,
+//        _budgetStart: startDate,
+//        _budgetEnd: endDate,
+//        _budgetPerMonth: amount,
+//        _budgetSpent: spent,
+//        _budgetEarn: earn
+//      };
+//
+//      // update this budget
+//      await db.update(_tableBudget, newBudget, where: "$_id = ?", whereArgs: [id]);
+//    } while(false);
+//  }
+//
+//  Future<void> _recalculateAllBudgets(Database db) async {
+//    var budgets = await db.rawQuery("SELECT  $_id from $_tableBudget");
+//
+//    for(dynamic budget in budgets) {
+//      await _recalculateBudget(db, budget);
+//    }
+//  }
+//
+//  Future<void> _recalculateBudgetForTransaction(Database db, Map<String, dynamic> tran) async {
+//    do {
+//
+//      if(tran == null) break;
+//      if(tran.isEmpty) break;
+//
+//      // get full transaction info
+//      var transactionId = tran[_id];
+//
+//      var listTransactions = await db.query(_tableTransactions,where: "$_id = ?", whereArgs: [transactionId]);
+//
+//      if(listTransactions == null) break;
+//      if(listTransactions.isEmpty) break;
+//
+//      var transaction = listTransactions[0];
+//      var catId = transaction[_transCategory];
+//
+//      var transDate = transaction[_transDateTime];
+//
+//      var startDate = Utils.firstMomentOfMonth(DateTime.fromMillisecondsSinceEpoch(transDate)).millisecondsSinceEpoch;
+//      var endDate = Utils.lastDayOfMonth(DateTime.fromMillisecondsSinceEpoch(transDate)).millisecondsSinceEpoch;
+//
+//      // query budget for thsi transaction
+//      var budgets = await db.query(_tableBudget, where: "$_budgetCategoryId = $catId AND ($_budgetStart BETWEEN $startDate AND $endDate)");
+//      if(budgets == null) break;
+//      if(budgets.isEmpty) break;
+//
+//      // update budget now
+//      await _recalculateBudget(db, budgets[0]);
+//    } while(false);
+//  }
 
   Future<void> _recalculateAllAccounts(Database db) async {
     var accounts = await db.rawQuery("SELECT $_id FROM $_tableAccounts");
