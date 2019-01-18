@@ -87,41 +87,37 @@ void main() async {
     ];
   })).listen((List<bool> result) {
     print("run ap[ $result");
-    runApp(MyApp(result));
+    runApp(MyApp(list: result,));
   }, onError: (e, stacktrace) {
     print("onError $e");
+    runApp(MyApp(error: e,));
   });
 }
 
-//class _MaterialPageRoute<T> extends MaterialPageRoute<T> {
-//  _MaterialPageRoute({@required WidgetBuilder builder}) : super(builder: builder);
-//
-//  @override
-//  Widget buildTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
-//    return SlideTransition(
-//      position: new Tween<Offset>(
-//        begin: const Offset(0.0, 1.0),
-//        end: Offset.zero,
-//      ).animate(animation),
-//      child: child,
-//    );
-//  }
-//}
 
 class MyApp extends StatelessWidget {
 
   final bool hasUser;
   final bool hasProfile;
-
+  final Exception error;
   final GlobalKey<MyWalletState> homeKey = GlobalKey();
 
-  MyApp(List<bool> list) : assert(list != null && list.isNotEmpty), this.hasUser = list[0], this.hasProfile = list[1];
+  MyApp({List<bool> list, Exception error})
+      : assert(list != null || error != null),
+        this.hasUser = list == null || list.isEmpty ? false : list[0],
+        this.hasProfile = list == null || list.isEmpty ? false : list[1],
+        this.error = error;
 
   @override
   Widget build(BuildContext context) {
     var home;
 
     do {
+//      if(error != null) {
+//        home = ErrorPage();
+//        break;
+//      }
+
       if(!hasUser) {
         home = Login();
         break;

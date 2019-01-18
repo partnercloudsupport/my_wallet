@@ -23,7 +23,7 @@ class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
       await repo.saveUserToHome(host);
 
       return true;
-    }), next, error: err);
+    }), next, err);
   }
 
   void joinHomeWithHost(String host, onNext<bool> onJoinSuccess, onError onJoinFailed) {
@@ -47,6 +47,6 @@ class NewHomeUseCase extends CleanArchitectureUseCase<NewHomeRepository> {
       await repo.saveUserToHome(myProfile);
 
       return true;
-    }), onJoinSuccess, error: onJoinFailed);
+    }), onJoinSuccess, onJoinFailed);
   }
 }

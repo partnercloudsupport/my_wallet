@@ -6,6 +6,9 @@ class MyWalletHomeUseCase extends CleanArchitectureUseCase<MyWalletHomeRepositor
   MyWalletHomeUseCase() : super(MyWalletHomeRepository());
 
   void loadExpense(onNext<List<ExpenseEntity>> next) {
-    execute(repo.loadExpense(), next);
+    execute(repo.loadExpense(), next, (e) {
+      print("Load expense error $e");
+      next([]);
+    });
   }
 }

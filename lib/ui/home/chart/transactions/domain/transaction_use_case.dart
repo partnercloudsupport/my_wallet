@@ -7,6 +7,9 @@ class TransactionUseCase extends CleanArchitectureUseCase<TransactionRepository>
   TransactionUseCase() : super(TransactionRepository());
 
   void loadTransaction(List<TransactionType> type, onNext<List<TransactionEntity>> next) {
-    execute<List<TransactionEntity>>(repo.loadTransaction(type), next);
+    execute<List<TransactionEntity>>(repo.loadTransaction(type), next, (e) {
+      print("Load transaction error $e");
+      next([]);
+    });
   }
 }

@@ -34,14 +34,17 @@ class BudgetDetailRepository extends CleanArchitectureRepository {
   }
 
   Future<bool> insertBudget(Budget budget) {
+    _dbRepo.insertBudget(budget);
     return _fbRepo.insertBudget(budget);
   }
 
   Future<bool> updateBudget(Budget budget) {
+    _dbRepo.updateBudget(budget);
     return _fbRepo.updateBudget(budget);
   }
 
   Future<bool> deleteBudget(Budget budget) {
+    _dbRepo.deleteBudget(budget);
     return _fbRepo.deleteBudget(budget);
   }
 }
@@ -68,6 +71,18 @@ class BudgetDetailDatabaseRepository {
 
   Future<int> generateBudgetId() {
     return db.generateBudgetId();
+  }
+
+  Future<int> insertBudget(Budget budget) {
+    return db.insertBudget(budget);
+  }
+
+  Future<int> updateBudget(Budget budget) {
+    return db.updateBudget(budget);
+  }
+
+  Future<int> deleteBudget(Budget budget) {
+    return db.deleteBudget(budget.id);
   }
 }
 

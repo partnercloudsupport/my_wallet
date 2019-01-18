@@ -424,22 +424,13 @@ Future<Budget> findBudget({int catId, DateTime start, DateTime end}) async {
 
   var findBudget = "";
 
-  // Sum all budgets into budget amount
-  var columns = [
-      _id,
-      _budgetStart,
-      _budgetEnd,
-      catId == null ? "SUM($_budgetPerMonth) as $_budgetPerMonth" : _budgetPerMonth,
-      _budgetCategoryId,
-    ];
-
   var findCategory = "";
   if(catId != null) findCategory = "$_budgetCategoryId = $catId AND ";
 
   findBudget = _compileFindBudgetSqlQuery(monthStart, monthEnd);
 
   return _lock.synchronized(() async {
-    var listMap = await db._query(_tableBudget, where: "$findCategory$findBudget", columns: columns);
+    var listMap = await db._query(_tableBudget, where: "$findCategory$findBudget", );
 
     if(listMap != null && listMap.isNotEmpty) {
       var budget = _toBudget(listMap.first);
@@ -454,7 +445,6 @@ Future<Budget> findBudget({int catId, DateTime start, DateTime end}) async {
 /// There can be multiple ID returns, incase there are multiple budgets fall that cover the period between start and end time.
 /// Cases
 ///     - 0 ID is returned: create new budget
-///     - 1 ID is returned: update this budget
 ///     - more IDs are returned: Update the first budget, and delete other collapsing budgets
 Future<List<Budget>> findCollapsingBudgets({@required int catId, @required DateTime start, @required DateTime end}) {
   return _lock.synchronized(() async {

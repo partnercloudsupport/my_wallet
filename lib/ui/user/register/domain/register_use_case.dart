@@ -17,10 +17,7 @@ class RegisterUseCase extends CleanArchitectureUseCase<RegisterRepository> {
 
         if(!await repo.registerEmail(email, password, displayName)) break;
 
-//        await repo.updateDisplayName(displayName);
-
         User user = await repo.getCurrentUser();
-//        await repo.saveUser(user);
 
         await repo.saveUserReference(user.uuid);
 
@@ -28,6 +25,6 @@ class RegisterUseCase extends CleanArchitectureUseCase<RegisterRepository> {
       } while (false);
 
       return result;
-    }), next, error: error);
+    }), next, error);
   }
 }

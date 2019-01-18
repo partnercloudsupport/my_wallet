@@ -33,7 +33,10 @@ class ListCategoryUseCase extends CleanArchitectureUseCase<CategoryListRepositor
       }
 
       return entities;
-    }), next);
+    }), next, (e) {
+      print("Load categories error $e");
+      next([]);
+    });
   }
 
   void deleteCategory(int catId) async {
@@ -55,6 +58,6 @@ class ListCategoryUseCase extends CleanArchitectureUseCase<CategoryListRepositor
       }
 
       return;
-    }), (_) {});
+    }), (_) {}, (e) {});
   }
 }

@@ -6,6 +6,8 @@ class AboutUsUseCase extends CleanArchitectureUseCase<AboutUsRepository> {
   AboutUsUseCase() : super(AboutUsRepository());
 
   void loadData(onNext<AboutEntity> next) {
-    execute<AboutEntity>(repo.loadData(), next);
+    execute<AboutEntity>(repo.loadData(), next, (e) {
+      print("Load about entity error");
+    });
   }
 }

@@ -20,7 +20,7 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
         result = (user.displayName != null && user.displayName.isNotEmpty);
       } while(false);
       return result;
-    }), onNext, error: (e) => handleError(onError, e));
+    }), onNext, (e) => handleError(onError, e));
   }
 
   void checkUserHome(onNext<bool> next, onError onError) {
@@ -53,7 +53,7 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
       } while (false);
 
       return result;
-    }), next, error: (e) => handleError(onError, e));
+    }), next, (e) => handleError(onError, e));
   }
 
   void handleError(onError onError, dynamic e) {
@@ -78,7 +78,7 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         return result;
       } while (false);
-    }), next, error: (e) => handleError(error, e));
+    }), next, (e) => handleError(error, e));
   }
 
   void signInWithFacebook(onNext<bool> next, onError error) {
@@ -95,6 +95,6 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
       } while(false);
 
       return result;
-    }), next, error: (e) => handleError(error, e));
+    }), next, (e) => handleError(error, e));
   }
 }

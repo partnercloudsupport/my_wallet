@@ -6,19 +6,28 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
   AddTransactionUseCase() : super(AddTransactionRepository());
 
   void loadAccounts(onNext<List<Account>> next) {
-    execute(repo.loadAccounts(), next);
+    execute(repo.loadAccounts(), next, (e) {
+      print("Load accounts error $e");
+      next([]);
+    });
   }
 
   void loadCategory(onNext<List<AppCategory>> next) {
-    execute(repo.loadCategory(), next);
+    execute(repo.loadCategory(), next, (e) {
+      print("Load category error $e");
+      next([]);
+    });
   }
 
   void loadTransactionDetail(int id, onNext<TransactionDetail> next, onError error) {
-    execute(repo.loadTransactionDetail(id), next, error: error);
+    execute(repo.loadTransactionDetail(id), next, error);
   }
 
   void loadCurrentUserName(onNext<UserDetail> next) {
-    execute(repo.loadCurrentUserName(), next);
+    execute(repo.loadCurrentUserName(), next, (e) {
+      print("Load current user error $e");
+      next(null);
+    });
   }
 
   void saveTransaction(int _id,TransactionType _type, Account _account, AppCategory _category, double _amount, DateTime _date, String _desc, onNext<bool> next, onError error) async {
@@ -61,6 +70,6 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
       } while(false);
 
       return result;
-    }), next, error: error);
+    }), next, error);
   }
 }

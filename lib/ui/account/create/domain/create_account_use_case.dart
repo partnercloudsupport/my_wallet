@@ -29,6 +29,6 @@ class CreateAccountUseCase extends CleanArchitectureUseCase<CreateAccountReposit
       } while (false);
 
       return result;
-    }), next);
+    }), next, error);
   }
 }

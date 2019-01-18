@@ -16,6 +16,9 @@ class UserDetailUseCase extends CleanArchitectureUseCase<UserDetailRepository> {
       UserDetailEntity user = await repo.loadUserWithUuid(uuid);
 
       return user;
-    }), next);
+    }), next, (e) {
+      print("Load current user error $e");
+      next(null);
+    });
   }
 }

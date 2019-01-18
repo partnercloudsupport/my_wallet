@@ -150,6 +150,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
   void _showToMonth() {
     showBottomSheetForMonths(_to, (date) {
+      print("select $date as end date");
       setState(() => _to = date);
       Navigator.pop(context);
     });
@@ -163,21 +164,9 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
           selectedDateTime: selectedDate,
           height: 430,
           onDayPressed: (date, events) => onSelected(date),
-));
-//        builder: (_) => BottomViewContent.count(context, maxMonthSupport, (_, index) {
-//          var date = monthsAfter(DateTime.now(), index);
-//
-//          return InkWell(
-//            child: Center(
-//              child: Padding(
-//                padding: const EdgeInsets.all(18.0),
-//                child: Text(df.format(date), style: Theme.of(context).textTheme.headline.apply(color: AppTheme.darkBlue),),
-//              ),
-//            ),
-//            onTap: () => onSelected(date)
-//          );
-//        }));
+        ));
   }
+
   void _onNumberInput(String number, String decimal) {
     setState(() {
       this._number = number;
@@ -257,6 +246,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   }
 
   void dismissDialog() {
+    print("Dismiss dialog ${alertDialog.currentContext}");
     if(alertDialog.currentContext != null) {
       // alert dialog is showing
       Navigator.pop(context);

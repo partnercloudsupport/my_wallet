@@ -6,6 +6,6 @@ class AccountDetailUseCase extends CleanArchitectureUseCase<AccountDetailReposit
   AccountDetailUseCase() : super(AccountDetailRepository());
 
   void loadAccount(int accountId, onNext<Account> next, onError error) {
-    execute<Account>(repo.loadAccount(accountId), next, error: error);
+    execute<Account>(repo.loadAccount(accountId), next, error);
   }
 }

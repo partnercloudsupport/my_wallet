@@ -11,6 +11,9 @@ class TransactionListUseCase extends CleanArchitectureUseCase<TransactionListRep
       DateTime day,
       onNext<TransactionListEntity> next
       ) {
-    execute(repo.loadDataFor(accountId, categoryId, day), next);
+    execute(repo.loadDataFor(accountId, categoryId, day), next, (e) {
+      print("Load data for transaction error $e");
+      next(null);
+    });
   }
 }

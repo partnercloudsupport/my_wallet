@@ -47,7 +47,9 @@ class ListBudgetsRepository extends CleanArchitectureRepository{
   }
 
   Future<double> queryBudgetAmount(DateTime from, DateTime to) async{
-    return (await db.findBudget(start: from, end: to)).budgetPerMonth;
+    var budget = (await db.findBudget(start: from, end: to));
+
+    return budget == null ? 0.0 : budget.budgetPerMonth;
   }
 
   Future<double> sumAllTransactionBetweenDateByType(DateTime from, DateTime to, List<TransactionType> type) {

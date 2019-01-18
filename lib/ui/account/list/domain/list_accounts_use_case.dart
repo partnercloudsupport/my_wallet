@@ -6,7 +6,10 @@ class ListAccountsUseCase extends CleanArchitectureUseCase<ListAccountsRepositor
   ListAccountsUseCase() : super(ListAccountsRepository());
 
   void loadAllAccounts(onNext<List<Account>> next) {
-    execute<List<Account>>(repo.loadAllAccounts(), next);
+    execute<List<Account>>(repo.loadAllAccounts(), next, (e) {
+      print("onLoadAccount error $e");
+      next([]);
+    });
   }
 
   void deleteAccount(Account acc, onNext<bool> next) {
@@ -22,6 +25,9 @@ class ListAccountsUseCase extends CleanArchitectureUseCase<ListAccountsRepositor
           }
         }
       }
-    }), next);
+    }), next, (e) {
+      print("Delete account error");
+      next(false);
+    });
   }
 }

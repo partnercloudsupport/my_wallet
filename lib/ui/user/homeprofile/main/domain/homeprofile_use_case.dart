@@ -12,6 +12,9 @@ class HomeProfileUseCase extends CleanArchitectureUseCase<HomeProfileRepository>
       HomeEntity entity = await repo.searchUserHome(user);
 
       return entity;
-    }), next);
+    }), next, (e) {
+      print("Find user home error $e");
+      next(null);
+    });
   }
 }

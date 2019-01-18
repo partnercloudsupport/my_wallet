@@ -12,6 +12,9 @@ class GoHomeUseCase extends CleanArchitectureUseCase<GoHomeRepository> {
       await repo.switchReference(homeKey);
 
       return true;
-    }), next);
+    }), next, (e) {
+      print("Go home error $e");
+      next(false);
+    });
   }
 }

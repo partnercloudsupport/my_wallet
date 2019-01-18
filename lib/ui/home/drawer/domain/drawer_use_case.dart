@@ -20,6 +20,6 @@ class LeftDrawerUseCase extends CleanArchitectureUseCase<LeftDrawerRepository> {
       await repo.signOut();
 
       return true;
-    }), next);
+    }), next, err);
   }
 }

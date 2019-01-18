@@ -16,6 +16,6 @@ class CreateCategoryUseCase extends CleanArchitectureUseCase<CreateCategoryRepos
       await repo.saveCategory(id, name, color);
 
       return id;
-    }), next, error: error);
+    }), next, error);
   }
 }
