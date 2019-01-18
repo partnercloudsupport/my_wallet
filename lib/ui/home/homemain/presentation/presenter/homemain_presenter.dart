@@ -9,4 +9,12 @@ class MyWalletHomePresenter extends CleanArchitecturePresenter<MyWalletHomeUseCa
   void loadExpense() {
     return useCase.loadExpense(dataView.onExpensesDetailLoaded);
   }
+
+  void resumeDatabase() {
+    useCase.resumeDatabase(dataView.onResumeDone);
+  }
+
+  void dispose() {
+    useCase.suspenseStream();
+  }
 }

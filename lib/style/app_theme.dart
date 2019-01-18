@@ -17,6 +17,9 @@ class AppTheme {
   static const lightBlue = Colors.lightBlue;
   static const red = Colors.red;
 
+  static const _bgLeftColor = Color(0xFF330867);
+  static const _bgRightColor = Color(0xFF30cfd0);
+
   static ThemeData appTheme = ThemeData(
       brightness: Brightness.dark,
       primarySwatch: MaterialColor(0xFF292787, <int, Color>{
@@ -116,8 +119,8 @@ class AppTheme {
 
   static final bgGradient = LinearGradient(
       colors: [
-        Color(0xFF330867),
-        Color(0xFF30cfd0),
+        _bgLeftColor,
+        _bgRightColor,
         ],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight

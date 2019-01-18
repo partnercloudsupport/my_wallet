@@ -12,3 +12,4 @@ export 'package:my_wallet/widget/card_list_title.dart';
 export 'package:my_wallet/widget/page_route.dart';
 export 'package:my_wallet/widget/enter_name_view.dart';
 export 'package:my_wallet/widget/data_row.dart';
+export 'package:my_wallet/widget/error_page.dart';

@@ -3,8 +3,9 @@ class BudgetEntity {
   final String categoryName;
   final double total;
   final double spent;
+  final String colorHex;
 
-  BudgetEntity(this.categoryId, this.categoryName, this.spent, this.total);
+  BudgetEntity(this.categoryId, this.categoryName, this.colorHex, this.spent, this.total);
 }
 
 class BudgetSummary {

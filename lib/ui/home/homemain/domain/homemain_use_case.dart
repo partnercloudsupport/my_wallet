@@ -11,4 +11,14 @@ class MyWalletHomeUseCase extends CleanArchitectureUseCase<MyWalletHomeRepositor
       next([]);
     });
   }
+
+  void resumeDatabase(onNext<bool> next) {
+    execute(repo.resumeDatabase(), next, (e) {
+      next(false);
+    });
+  }
+
+  void suspenseStream() {
+    execute(repo.dispose(), (_) {}, (_) {});
+  }
 }

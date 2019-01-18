@@ -441,6 +441,31 @@ Future<Budget> findBudget({int catId, DateTime start, DateTime end}) async {
 //  return listMap == null || listMap.isEmpty ? null : _toBudget(listMap[0]);
 }
 
+Future<double> querySumAllBudgetForMonth(DateTime start, DateTime end) async {
+  var monthStart = Utils.firstMomentOfMonth(start).millisecondsSinceEpoch;
+  var monthEnd = end == null ? null : Utils.lastDayOfMonth(end).millisecondsSinceEpoch;
+
+  var findBudget = "";
+
+  findBudget = _compileFindBudgetSqlQuery(monthStart, monthEnd);
+
+  return _lock.synchronized(() async {
+    var listMap = await db._query(_tableBudget, where: "$findBudget", columns: [ 'SUM($_budgetPerMonth)']);
+
+    double amount = 0.0;
+    do {
+      if(listMap == null) break;
+      if(listMap.isEmpty) break;
+      if(listMap.first == null) break;
+      if(listMap.first.values == null) break;
+      if(listMap.first.values.first == null) break;
+
+      amount = listMap.first.values.first;
+    } while(false);
+    return amount;
+  });
+}
+
 /// Find budget IDs for this category with start/end time, which means any budget with duration collapse with this duration
 /// There can be multiple ID returns, incase there are multiple budgets fall that cover the period between start and end time.
 /// Cases

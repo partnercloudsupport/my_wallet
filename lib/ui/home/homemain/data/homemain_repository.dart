@@ -1,13 +1,31 @@
 import 'package:my_wallet/ca/data/ca_repository.dart';
 import 'package:my_wallet/ui/home/homemain/data/homemain_expenses_entity.dart';
 import 'package:my_wallet/data/database_manager.dart' as _db;
+import 'package:my_wallet/data/firebase/database.dart' as _fdb;
+
 import 'package:my_wallet/utils.dart' as Utils;
 export 'package:my_wallet/ui/home/homemain/data/homemain_expenses_entity.dart';
 
 class MyWalletHomeRepository extends CleanArchitectureRepository {
   final _MyWalletHomeDatabaseRepository _dbRepo = _MyWalletHomeDatabaseRepository();
+  final _MyWalletHomeFirebaseRepository _fbRepo = _MyWalletHomeFirebaseRepository();
+
   Future<List<ExpenseEntity>> loadExpense() {
     return _dbRepo.loadExpense();
+  }
+
+  Future<bool> resumeDatabase() async {
+    await _dbRepo.resume();
+    await _fbRepo.resume();
+
+    return true;
+  }
+
+  Future<bool> dispose() async {
+    await _dbRepo.dispose();
+    await _fbRepo.dispose();
+
+    return true;
   }
 }
 
@@ -33,5 +51,23 @@ class _MyWalletHomeDatabaseRepository {
     }
 
     return homeEntities;
+  }
+
+  Future<void> resume() {
+    return _db.resume();
+  }
+
+  Future<void> dispose() {
+    return _db.dispose();
+  }
+}
+
+class _MyWalletHomeFirebaseRepository {
+  Future<void> resume() {
+    return _fdb.resume();
+  }
+
+  Future<void> dispose() {
+    return _fdb.dispose();
   }
 }

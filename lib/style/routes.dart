@@ -27,6 +27,8 @@ class routes {
 
   static const AboutUs = "AboutUs";
 
+  static const SplashView = "SplashView";
+
   static String EditTransaction(int id) {
     return "$AddTransaction/$id";
   }

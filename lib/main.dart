@@ -13,11 +13,6 @@ import 'package:my_wallet/ui/account/detail/presentation/view/detail_view.dart';
 import 'package:my_wallet/ui/category/list/presentation/view/list_category.dart';
 import 'package:my_wallet/ui/category/create/presentation/view/create_category_view.dart';
 
-import 'package:my_wallet/data/firebase/database.dart' as fdb;
-import 'package:my_wallet/data/firebase/authentication.dart' as auth;
-
-import 'package:my_wallet/data/database_manager.dart' as db;
-
 import 'package:my_wallet/ui/user/login/presentation/view/login_view.dart';
 import 'package:my_wallet/ui/user/register/presentation/view/register_view.dart';
 import 'package:my_wallet/ui/user/homeprofile/main/presentation/view/homeprofile_view.dart';
@@ -28,14 +23,9 @@ import 'package:my_wallet/ui/budget/detail/presentation/view/detail_view.dart';
 
 import 'package:my_wallet/ui/about/presentation/view/about_view.dart';
 
+import 'package:my_wallet/ui/splash/presentation/view/splash_view.dart';
+
 import 'package:flutter/services.dart';
-
-import 'package:my_wallet/firebase_config.dart' as fbConfig;
-import 'package:my_wallet/firebase/firebase_common.dart';
-
-import 'dart:io' show Platform;
-
-import 'package:rxdart/rxdart.dart';
 
 void main() async {
   await SystemChrome.setPreferredOrientations([
@@ -44,97 +34,20 @@ void main() async {
   ]);
   await SystemChrome.setEnabledSystemUIOverlays([]);
 
-  Observable.fromFuture(Future(() async {
-    FirebaseApp _app = await FirebaseApp.configure(
-        name: Platform.isIOS ? "MyWallet" : "My Wallet",
-        options: Platform.isIOS
-            ? const FirebaseOptions(
-          googleAppID: fbConfig.firebase_ios_app_id,
-          gcmSenderID: fbConfig.firebase_gcm_sender_id,
-          projectID: fbConfig.firebase_project_id,
-          databaseURL: fbConfig.firebase_database_url,
-          apiKey: fbConfig.firebase_api_key,
-        )
-            : const FirebaseOptions(
-          googleAppID: fbConfig.firebase_android_app_id,
-          apiKey: fbConfig.firebase_api_key,
-          projectID: fbConfig.firebase_project_id,
-          databaseURL: fbConfig.firebase_database_url,
-        ));
-
-    await db.init();
-
-    await auth.init(_app);
-
-    var user = await auth.getCurrentUser();
-
-    var profile;
-
-    if(user != null) {
-      var home = await auth.searchUserHome(user);
-      if (home != null) profile = home.key;
-
-      if(profile == null) {
-        var host = await auth.findHomeOfHost(user.email);
-        if(host != null) profile = host.key;
-      }
-    }
-
-    await fdb.init(_app, homeProfile: profile);
-
-    return [
-      user != null && user.uuid != null && user.uuid.isNotEmpty, profile != null && profile.isNotEmpty
-    ];
-  })).listen((List<bool> result) {
-    print("run ap[ $result");
-    runApp(MyApp(list: result,));
-  }, onError: (e, stacktrace) {
-    print("onError $e");
-    runApp(MyApp(error: e,));
-  });
+  runApp(MyApp());
 }
 
 
 class MyApp extends StatelessWidget {
 
-  final bool hasUser;
-  final bool hasProfile;
-  final Exception error;
   final GlobalKey<MyWalletState> homeKey = GlobalKey();
-
-  MyApp({List<bool> list, Exception error})
-      : assert(list != null || error != null),
-        this.hasUser = list == null || list.isEmpty ? false : list[0],
-        this.hasProfile = list == null || list.isEmpty ? false : list[1],
-        this.error = error;
 
   @override
   Widget build(BuildContext context) {
-    var home;
-
-    do {
-//      if(error != null) {
-//        home = ErrorPage();
-//        break;
-//      }
-
-      if(!hasUser) {
-        home = Login();
-        break;
-      }
-
-      if(!hasProfile) {
-        home = HomeProfile();
-        break;
-      }
-
-      home=MyWalletHome(key: homeKey);
-    } while (false);
-
     var app = MaterialApp(
       title: 'My Wallet',
       theme: AppTheme.appTheme,
-      home: home, //hasUser && hasProfile ? MyWalletHome() : hasUser && !hasProfile ? HomeProfile() : Login(),
+      home: SplashView(), //hasUser && hasProfile ? MyWalletHome() : hasUser && !hasProfile ? HomeProfile() : Login(),
       debugShowCheckedModeBanner: false,
       showPerformanceOverlay: false,
       showSemanticsDebugger: false,
@@ -170,6 +83,8 @@ class MyApp extends StatelessWidget {
               return ListBudgets();
             case routes.AboutUs:
               return AboutUs();
+            case routes.SplashView:
+              return SplashView();
             default:
               Widget paramRoute = _getParamRoute(settings.name);
 
@@ -325,25 +240,14 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.suspending:
-        Observable.fromFuture(Future(() async {
-          fdb.dispose();
-          db.dispose();
-        })).listen((_) {
-          print("Disposed");
-        });
+        if(homeKey.currentContext != null) {
+          homeKey.currentState.onPaused();
+        }
         break;
       case AppLifecycleState.resumed:
-        if(app.home is MyWalletHome) {
-          homeKey.currentState.onResumeStart();
+        if(homeKey.currentContext != null) {
+          homeKey.currentState.onResume();
         }
-        Observable.fromFuture(Future(() async {
-          await fdb.resume();
-          await db.resume();
-        })).listen((_) {
-          if(app.home is MyWalletHome) {
-            homeKey.currentState.onResumeEnd();
-          }
-        });
         break;
     }
   }

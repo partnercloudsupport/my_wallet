@@ -4,7 +4,7 @@ import 'package:my_wallet/data/database_manager.dart' as _db;
 import 'package:my_wallet/utils.dart' as Utils;
 import 'package:my_wallet/ca/data/ca_repository.dart';
 
-class ChartTitleRepository implements CleanArchitectureRepository{
+class ChartTitleRepository extends CleanArchitectureRepository{
   Future<ChartTitleEntity> loadTitleDetail() async {
     var from = Utils.firstMomentOfMonth(DateTime.now());
     var to = Utils.lastDayOfMonth(DateTime.now());

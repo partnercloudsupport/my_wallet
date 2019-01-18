@@ -12,16 +12,20 @@ class CleanArchitectureUseCase<T extends CleanArchitectureRepository> {
   CleanArchitectureUseCase(this.repo);
 
   void execute<T>(Future<T> task, onNext<T> next, onError error) {
-    Observable(Stream.fromFuture(task)).listen((data) => next(data), onError: (e, stacktrace) {
-      print(stacktrace);
+    if(task != null) {
+      Observable(Stream.fromFuture(task)).listen((data) => next(data), onError: (e, stacktrace) {
+        print(stacktrace);
 
-      if(error != null) {
-        if (e is Exception) {
-          error(e);
-        } else {
-          error(Exception(e.toString()));
+        if (error != null) {
+          if (e is Exception) {
+            error(e);
+          } else {
+            error(Exception(e.toString()));
+          }
         }
-      }
-    });
+      });
+    } else {
+      print("task is null: $task ${this.toString()}");
+    }
   }
 }

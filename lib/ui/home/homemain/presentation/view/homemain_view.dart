@@ -183,31 +183,38 @@ class MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePres
         slivers: list);
   }
 
-  void onResumeStart() {
-    if(_resumeDialogKey != null) return;
+  void onResume() {
+    if(_resumeDialogKey == null) {
+      _resumeDialogKey = new GlobalKey();
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) =>
+              AlertDialog(
+                key: _resumeDialogKey,
+                title: Row(
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12.0),
+                      child: Text("Syncing..."),
+                    )
+                  ],
+                ),
+              )
+      );
+    }
 
-    _resumeDialogKey = new GlobalKey();
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AlertDialog(
-        key: _resumeDialogKey,
-        title: Row(
-          children: <Widget>[
-            CircularProgressIndicator(),
-            Padding(
-              padding: const EdgeInsets.only(left: 12.0),
-              child: Text("Syncing..."),
-            )
-          ],
-        ),
-      )
-    );
+    presenter.resumeDatabase();
   }
 
-  void onResumeEnd() {
+  void onResumeDone(bool done) {
     if(_resumeDialogKey != null && _resumeDialogKey.currentContext != null) Navigator.of(context).pop();
 
     _resumeDialogKey = null;
+  }
+
+  void onPaused() {
+    presenter.dispose();
   }
 }

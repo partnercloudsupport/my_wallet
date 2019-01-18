@@ -145,7 +145,7 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
                         heightFactor: _budgetList == null ? 0.0 : _budgetList[index].total == 0 ? 0.0 : _budgetList[index].spent / _budgetList[index].total,
                         child: Container(
                           alignment: Alignment.center,
-                          decoration: BoxDecoration(shape: BoxShape.circle, color: AppTheme.pinkAccent),
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: Color(AppTheme.hexToInt(_budgetList[index].colorHex))),
                         ),
                       ),
                     ),
@@ -167,7 +167,7 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
                 alignment: Alignment.bottomCenter,
                 child: Text(
                   _budgetList[index].categoryName,
-                  style: Theme.of(context).textTheme.title,
+                  style: Theme.of(context).textTheme.title.apply(color: Color(AppTheme.hexToInt(_budgetList[index].colorHex))),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
@@ -214,8 +214,8 @@ class _MonthSummaryState extends State<_MonthSummary> {
   DateTime _month;
   List<BudgetSummary> summary = [];
   var _nf = NumberFormat("\$##0.00");
-  final _columnWidth = 50.0;
-  final _columnHeight = 110.0;
+  var _columnWidth = 50.0;
+  var _columnHeight = 110.0;
 
   final _simpleDf = DateFormat("MMM");
 
@@ -238,6 +238,9 @@ class _MonthSummaryState extends State<_MonthSummary> {
 
   @override
   Widget build(BuildContext context) {
+    _columnWidth = MediaQuery.of(context).size.width / 7;
+    _columnHeight = _columnWidth * 2;
+
     return Container(
       height: _columnHeight,
 //      color: AppTheme.white,
