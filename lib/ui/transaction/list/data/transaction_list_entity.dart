@@ -9,6 +9,7 @@ class TransactionEntity {
   final DateTime dateTime;
   final int userColor;
   final int transactionColor;
+  final bool isTransfer;
 
   TransactionEntity(
       this.id,
@@ -19,6 +20,7 @@ class TransactionEntity {
       this.dateTime,
       this.userColor,
       this.transactionColor,
+      this.isTransfer,
       );
 }
 

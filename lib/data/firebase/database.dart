@@ -100,6 +100,14 @@ Future<void> _addSubscriptions() async {
     }
   })));
 
+  subs.putIfAbsent(tblTransfer, () => _firestore.collection(tblTransfer).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    switch(change.type) {
+      case DocumentChangeType.added: _onTransferAdded(change.document); break;
+      case DocumentChangeType.modified: _onTransferChanged(change.document); break;
+      case DocumentChangeType.removed: _onTransferRemoved(change.document); break;
+    }
+  })));
+
   await Future.delayed(Duration(seconds: 5));
 }
 
@@ -181,18 +189,52 @@ AppTransaction _snapshotToTransaction(DocumentSnapshot snapshot) {
       snapshot.data[fldUuid]);
 }
 
+Map<String, dynamic> _TransferToMap(Transfer transfer) {
+  return {
+    fldTransferId: transfer.id,
+    fldTransferFrom: transfer.fromAccount,
+    fldTransferTo: transfer.toAccount,
+    fldAmount: transfer.amount,
+    fldDateTime: transfer.transferDate.millisecondsSinceEpoch,
+    fldUuid: transfer.userUuid
+  };
+}
+
+Transfer _snapshotToTransfer(DocumentSnapshot snapshot) {
+  return Transfer(
+      _toId(snapshot),
+      snapshot.data[fldTransferFrom],
+      snapshot.data[fldTransferTo],
+      snapshot.data[fldAmount],
+      snapshot.data[fldDateTime] == null ? null : DateTime.fromMillisecondsSinceEpoch(snapshot.data[fldDateTime]),
+      snapshot.data[fldUuid]
+  );
+}
+
 int _toId(DocumentSnapshot snapshot) {
   return int.parse(snapshot.documentID);
 }
 
 void _onAccountAdded(DocumentSnapshot document) {
-  if(document.data == null) return;
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onAccountRemoved(document);
+
+    return;
+  }
   db.insertAccount(_snapshotToAccount(document)).catchError((e) => _onAccountChanged(document));
 }
 
 void _onAccountChanged(DocumentSnapshot document) {
-  if(document.data == null) return;
-  db.updateAccount(_snapshotToAccount(document));
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onAccountRemoved(document);
+
+    return;
+  }
+    db.updateAccount(_snapshotToAccount(document));
 }
 
 void _onAccountRemoved(DocumentSnapshot document) {
@@ -200,12 +242,25 @@ void _onAccountRemoved(DocumentSnapshot document) {
 }
 
 void _onCategoryAdded(DocumentSnapshot document) {
-  if(document.data == null) return;
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onCategoryRemoved(document);
+
+    return;
+  }
   db.insertCagetory(_snapshotToCategory(document)).catchError((e) => _onCategoryChanged(document));
 }
 
 void _onCategoryChanged(DocumentSnapshot document) {
-  if(document.data == null) return;
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onCategoryRemoved(document);
+
+    return;
+  }
+
   db.updateCategory(_snapshotToCategory(document));
 }
 
@@ -214,12 +269,25 @@ void _onCategoryRemoved(DocumentSnapshot document) {
 }
 
 void _onTransactionAdded(DocumentSnapshot document) {
-  if(document.data == null) return;
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onTransactionRemoved(document);
+
+    return;
+  }
+
   db.insertTransaction(_snapshotToTransaction(document)).catchError((e) => _onTransactionChanged(document));
 }
 
 void _onTransactionChanged(DocumentSnapshot document) {
-  if(document.data == null) return;
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onTransactionRemoved(document);
+
+    return;
+  }
   db.updateTransaction(_snapshotToTransaction(document));
 }
 
@@ -228,12 +296,24 @@ void _onTransactionRemoved(DocumentSnapshot document) {
 }
 
 void _onUserAdded(DocumentSnapshot document) {
-  if(document.data == null) return;
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onUserRemoved(document);
+
+    return;
+  }
   db.insertUser(snapshotToUser(document)).catchError((e) => _onUserChanged(document));
 }
 
 void _onUserChanged(DocumentSnapshot document) {
-  if(document.data == null) return;
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onUserRemoved(document);
+
+    return;
+  }
   db.updateUser(snapshotToUser(document));
 }
 
@@ -242,7 +322,13 @@ void _onUserRemoved(DocumentSnapshot document) {
 }
 
 void _onBudgetAdded(DocumentSnapshot document) {
-  if(document.data == null) return;
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onBudgetRemoved(document);
+
+    return;
+  }
   db.insertBudget(_snapshotToBudget(document)).catchError((e) => _onBudgetChanged(document));
 }
 
@@ -253,6 +339,34 @@ void _onBudgetChanged(DocumentSnapshot document) {
 
 void _onBudgetRemoved(DocumentSnapshot document) {
   db.deleteBudget(_toId(document));
+}
+
+void _onTransferAdded(DocumentSnapshot document) {
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onTransferRemoved(document);
+
+    return;
+  }
+
+  db.insertTransfer(_snapshotToTransfer(document)).catchError((e) => _onTransferChanged(document));
+}
+
+void _onTransferChanged(DocumentSnapshot document) {
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onTransferRemoved(document);
+
+    return;
+  }
+
+  db.updateTransfer(_snapshotToTransfer(document));
+}
+
+void _onTransferRemoved(DocumentSnapshot document) {
+  db.deleteTransfer(_toId(document));
 }
 // ####################################################################################################
 // Account
@@ -358,7 +472,18 @@ Future<bool> deleteBudget(Budget budget) async {
   });
 }
 
+// ####################################################################################################
+// Transfer
 
+Future<bool> addTransfer(Transfer transfer) {
+  return _lock.synchronized(() async {
+    _firestore.collection(tblTransfer).document("${transfer.id}").setData(_TransferToMap(transfer));
+    return true;
+  });
+}
+
+// ####################################################################################################
+// other reference task
 Future<bool> removeRefenrence() async {
   return _lock.synchronized(() async {
     _unsubscribe();
