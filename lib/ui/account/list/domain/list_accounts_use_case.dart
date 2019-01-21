@@ -20,9 +20,13 @@ class ListAccountsUseCase extends CleanArchitectureUseCase<ListAccountsRepositor
         List<AppTransaction> transactions = await repo.loadAllTransaction(acc.id);
 
         if (transactions != null && transactions.isNotEmpty) {
-          for (int i = 0; i < transactions.length; i++) {
-            await repo.deleteTransaction(transactions[i]);
-          }
+          await repo.deleteAllTransaction(transactions);
+        }
+
+        List<Transfer> transfer = await repo.loadAllTransfers(acc.id);
+
+        if(transfer !=null && transfer.isNotEmpty) {
+          await repo.deleteAllTransfer(transfer);
         }
       }
     }), next, (e) {

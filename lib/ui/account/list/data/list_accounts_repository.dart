@@ -21,10 +21,20 @@ class ListAccountsRepository extends CleanArchitectureRepository {
     return _dbRepo.loadAllTransaction(accountId);
   }
 
-  Future<void> deleteTransaction(AppTransaction transaction) {
-    _fbRepo.deleteTransaction(transaction);
+  Future<void> deleteAllTransaction(List<AppTransaction> transactions) {
+    _fbRepo.deleteAllTransaction(transactions);
 
-    return _dbRepo.deleteTransaction(transaction);
+    return _dbRepo.deleteAllTransaction(transactions);
+  }
+
+  Future<List<Transfer>> loadAllTransfers(int accountId) {
+    return _dbRepo.loadAllTransfers(accountId);
+  }
+
+  Future<void> deleteAllTransfer(List<Transfer> transfer) {
+    _fbRepo.deleteAllTransfer(transfer);
+
+    return _dbRepo.deleteAllTransfer(transfer);
   }
 }
 
@@ -41,8 +51,16 @@ class _ListAccountsDatabaseRepository {
     return (await db.deleteAccount(acc.id)) >= 0;
   }
 
-  Future<void> deleteTransaction(AppTransaction transaction) {
-    return db.deleteTransaction(transaction.id);
+  Future<void> deleteAllTransaction(List<AppTransaction> transactions) {
+    return db.deleteTransactions(transactions.map((f) => f.id).toList());
+  }
+
+  Future<List<Transfer>> loadAllTransfers(int accountId) {
+    return db.queryTransfer(accountId);
+  }
+
+  Future<void> deleteAllTransfer(List<Transfer> transfer) {
+    return db.deleteTransfers(transfer.map((f) => f.id).toList());
   }
 }
 
@@ -51,7 +69,11 @@ class _ListAccountsFirebaseRepository {
     return await fb.deleteAccount(acc);
   }
 
-  Future<void> deleteTransaction(AppTransaction transaction) {
-    return fb.deleteTransaction(transaction);
+  Future<void> deleteAllTransaction(List<AppTransaction> transaction) {
+    return fb.deleteAllTransaction(transaction);
+  }
+
+  Future<void> deleteAllTransfer(List<Transfer> transfer) {
+    return fb.deleteAllTransfer(transfer);
   }
 }

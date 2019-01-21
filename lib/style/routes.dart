@@ -14,6 +14,7 @@ class routes {
   static const ListAccounts = "ListAccounts";
   static const Accounts = "_AccountDetail";
   static const AddAccount = "AddAccount";
+  static const TransferAccount = "TransferAccount";
 
   static const UserProfile = "UserProfile";
 
@@ -47,5 +48,9 @@ class routes {
 
   static String AccountDetail({@required int accountId, @required String accountName}) {
     return "$Accounts/$accountId:$accountName";
+  }
+
+  static String TransferToAccount({@required String accountName, @required int accountId}) {
+    return "$TransferAccount/from:$accountId/name:$accountName";
   }
 }

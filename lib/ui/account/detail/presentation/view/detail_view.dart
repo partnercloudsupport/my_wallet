@@ -72,6 +72,13 @@ class _AccountDetailState extends CleanArchitectureView<AccountDetail, AccountDe
               child: Padding(padding: EdgeInsets.all(12.0), child: Text("View Transactions", style: TextStyle(color: AppTheme.white),),),
               color: AppTheme.blue,
             ),
+            RoundedButton(
+              onPressed: () {
+                if(_account != null) Navigator.pushNamed(context, routes.TransferToAccount(accountName: _account.name, accountId: _account.id));
+              },
+              child: Padding(padding: EdgeInsets.all(12.0), child: Text("Make a transfer", style: TextStyle(color: AppTheme.white),),),
+              color: AppTheme.blue,
+            ),
           ],
         )
       ),

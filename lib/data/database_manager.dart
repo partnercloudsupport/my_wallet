@@ -45,8 +45,6 @@ final _budgetCategoryId = "_catId";
 final _budgetPerMonth = "_budgetPerMonth";
 final _budgetStart = "_budgetStart";
 final _budgetEnd = "_budgetEnd";
-//final _budgetSpent = "_budgetSpent";
-//final _budgetEarn = "_budgetEarn";
 
 final _tableUser = tableUser;
 final _userDisplayName = "_displayName";
@@ -54,6 +52,14 @@ final _userEmail = "_email";
 final _userPhotoUrl = "_photoUrl";
 final _userColor = "_userColor";
 final _userVerified = "_userVerified";
+
+// table money transfer
+final _tableTransfer = tableTransfer;
+final _transferFrom = "_transferFrom";
+final _transferTo = "_transferTo";
+final _transferAmount = "_transferAmount";
+final _transferDate = "_date";
+final _transferUuid = "_uuid";
 
 _Database db = _Database();
 Lock _lock = Lock();
@@ -210,6 +216,20 @@ Future<List<Account>> queryAccounts({int id, AccountType type}) async {
   return null;
 }
 
+Future<List<Account>> queryAccountsExcept(List<int> exceptAccountId) async {
+  if(exceptAccountId == null || exceptAccountId.isEmpty) throw Exception("No list of account IDs to exclude");
+
+  String where = "$_id NOT IN ${exceptAccountId.map((f) => "$f").toString()}";
+
+  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableAccounts, where: where));
+
+  if (map != null) {
+    return map.map((f) => _toAccount(f)).toList();
+  }
+
+  return null;
+
+}
 Future<List<AppTransaction>> queryTransactions({int id}) async {
   String where;
 
@@ -254,6 +274,22 @@ Future<List<AppTransaction>> queryTransactionForAccount(int accountId, DateTime 
   List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: "$_transAcc = $accountId AND ($_transDateTime BETWEEN ${startOfDay.millisecondsSinceEpoch} AND ${endOfDay.millisecondsSinceEpoch})"));
 
   return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
+}
+
+Future<List<Transfer>> queryTransfer(int account, {DateTime day}) {
+  return _lock.synchronized(() async {
+    var dateQuery = "";
+    if(day != null) {
+      var startOfDay = Utils.startOfDay(day == null ? DateTime.now() : day);
+      var endOfDay = Utils.endOfDay(day == null ? DateTime.now() : day);
+
+      dateQuery = " AND ($_transferDate BETWEEN ${startOfDay.millisecondsSinceEpoch} AND ${endOfDay.millisecondsSinceEpoch})";
+    }
+
+    List<Map<String, dynamic>> map = await db._query(_tableTransfer, where: "($_transferFrom = $account OR $_transferTo = $account)$dateQuery");
+
+    return map == null ? [] : map.map((f) => _toTransfer(f)).toList();
+  });
 }
 
 Future<List<AppTransaction>> queryAllTransactionForAccount(int accountId) async {
@@ -512,6 +548,10 @@ Future<int> generateBudgetId() {
   return _lock.synchronized(() => db._generateId(_tableBudget));
 }
 
+Future<int> generateTransferId() {
+  return _lock.synchronized(() => db._generateId(_tableTransfer));
+}
+
 // ------------------------------------------------------------------------------------------------------------------------
 // inserts
 Future<int> insertAccount(Account acc) {
@@ -560,6 +600,14 @@ Future<int> insertBudgets(List<Budget> budgets) {
   return _lock.synchronized(() => db._insert(tableBudget, items: budgets.map((f) => _budgetToMap(f)).toList()));
 }
 
+Future<int> insertTransfer(Transfer transfer) {
+  return _lock.synchronized(() => db._insert(tableTransfer, item: _transferToMap(transfer)));
+}
+
+Future<int> insertTransfers(List<Transfer> transfers) {
+  return _lock.synchronized(() => db._insert(tableTransfer, items: transfers.map((f) => _transferToMap(f)).toList()));
+}
+
 // ------------------------------------------------------------------------------------------------------------------------
 // delete
 Future<int> deleteAccount(int id) {
@@ -602,6 +650,14 @@ Future<int> deleteBudgets(List<int> ids) {
   return _lock.synchronized(() => db._delete(tableBudget, "$_id = ?", ids));
 }
 
+Future<int> deleteTransfer(int id) {
+  return _lock.synchronized(() => db._delete(tableTransfer, "$_id = ?", [id]));
+}
+
+Future<int> deleteTransfers(List<int> ids) {
+  return _lock.synchronized(() => db._delete(tableTransfer, "$_id = ?", ids));
+}
+
 Future<void> dropAllTables() {
   return _lock.synchronized(() => db._deleteDb());
 }
@@ -631,6 +687,10 @@ Future<int> updateUser(User user) {
 
 Future<int> updateBudget(Budget budget) {
   return _lock.synchronized(() => db._update(tableBudget, _budgetToMap(budget), "$_id = ?", [budget.id]));
+}
+
+Future<int> updateTransfer(Transfer transfer) {
+  return _lock.synchronized(() => db._update(tableTransfer, _transferToMap(transfer), "$_id = ?", [transfer.id]));
 }
 
 // ################################################################################################################
@@ -676,6 +736,17 @@ User _toUser(Map<String, dynamic> map) {
     map[_userPhotoUrl],
     map[_userColor],
     map[_userVerified]
+  );
+}
+
+Transfer _toTransfer(Map<String, dynamic> map) {
+  return Transfer(
+    map[_id],
+    map[_transferFrom],
+    map[_transferTo],
+    map[_transferAmount],
+    map[_transferDate] == null ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(map[_transferDate]),
+    map[_transferUuid]
   );
 }
 
@@ -756,6 +827,22 @@ Map<String, dynamic> _userToMap(User user) {
   return map;
 }
 
+Map<String, dynamic> _transferToMap(Transfer transfer) {
+  if(transfer.id == null) return null;
+
+   var map = <String, dynamic> {};
+
+   if(transfer.transferDate != null) map.putIfAbsent(_transferDate, () => transfer.transferDate.millisecondsSinceEpoch);
+   if(transfer.amount != null) map.putIfAbsent(_transferAmount, () => transfer.amount);
+   if(transfer.fromAccount != null) map.putIfAbsent(_transferFrom, () => transfer.fromAccount);
+   if(transfer.toAccount != null) map.putIfAbsent(_transferTo, () => transfer.toAccount);
+   if(transfer.userUuid != null) map.putIfAbsent(_transferUuid, () => transfer.userUuid);
+
+   map.putIfAbsent(_id, () => transfer.id);
+
+   return map;
+}
+
 String _compileFindBudgetSqlQuery(int monthStart, int monthEnd) {
   String findBudget = "";
 
@@ -797,7 +884,7 @@ class _Database {
     String dbPath = join((await getApplicationDocumentsDirectory()).path, "MyWalletDb");
     db = await openDatabase(
         dbPath,
-        version: 5, onCreate: (Database db, int version) async {
+        version: 6, onCreate: (Database db, int version) async {
       await _executeCreateDatabase(db);
     },
     onUpgrade: (Database db, int oldVersion, int newVersion) async {
@@ -881,6 +968,17 @@ class _Database {
         $_userColor INTEGER
       )
       """);
+
+    await db.execute("""
+        CREATE TABLE $_tableTransfer (
+        $_id INTEGER PRIMARY KEY,
+        $_transferFrom INTEGER NOT NULL,
+        $_transferTo INTEGER NOT NULL,
+        $_transferAmount DOUBLE NOT NULL,
+        $_transferDate INTEGER NOT NULL,
+        $_transferUuid TEXT NOT NULL
+        )
+        """);
   }
 
   Future<int> _generateId(String table) async {
@@ -925,20 +1023,18 @@ class _Database {
       result = await db.insert(table, item);
 
       if(result >= 0) {
-//        if (table == _tableBudget) {
-//          // recalculate budget
-//          await _recalculateBudget(db, item);
-//        }
-
         if (table == _tableTransactions) {
-//          // recalculate budget for transaction
-//          await _recalculateBudgetForTransaction(db, item);
           // recalculate account balance for transaction
           await _recalculateAccountForTransaction(db, item);
         }
 
         if (table == _tableAccounts) {
           await _recalculateAccount(db, item[_id]);
+        }
+
+        if(table == _tableTransfer) {
+          await _recalculateAccount(db, item[_transferFrom]);
+          await _recalculateAccount(db, item[_transferTo]);
         }
       }
     }
@@ -958,20 +1054,18 @@ class _Database {
           result += singleResult;
 
         if(singleResult >= 0) {
-//          if (table == _tableBudget) {
-//            // recalculate budget
-//            await _recalculateBudget(db, item);
-//          }
-
           if (table == _tableTransactions) {
-//            // recalculate budget for transaction
-//            await _recalculateBudgetForTransaction(db, item);
             // recalculate account balance for transaction
             await _recalculateAccountForTransaction(db, item);
           }
 
           if(table == _tableAccounts) {
             await _recalculateAccount(db, item[_id]);
+          }
+
+          if(table == _tableTransfer) {
+            await _recalculateAccount(db, item[_transferFrom]);
+            await _recalculateAccount(db, item[_transferTo]);
           }
         }
       }
@@ -986,14 +1080,7 @@ class _Database {
     if(!db.isOpen) db = await _openDatabase();
     var result = await db.delete(table, where: where, whereArgs: whereArgs);
 
-//    if(table == _tableBudget) {
-//      // recalculate budgets table
-//      _recalculateBudgets(db, whereArgs);
-//    }
-
-    if(table == _tableTransactions) {
-//      // recalculate budget table
-//      _recalculateAllBudgets(db);
+    if(table == _tableTransactions || table == _tableTransfer) {
       // recalculate account table
       _recalculateAllAccounts(db);
     }
@@ -1007,21 +1094,10 @@ class _Database {
     if(!db.isOpen) db = await _openDatabase();
     var result = await db.update(table, item, where: where, whereArgs: whereArgs);
 
-//    if (table == _tableBudget) {
-//      var budgets = await db.query(_tableBudget, where: where, whereArgs: whereArgs);
-//
-//      for(Map<String, dynamic> budget in budgets) {
-//        // recalculate budget
-//        await _recalculateBudget(db, budget);
-//      }
-//    }
-
     if (table == _tableTransactions) {
       var transactions = await db.query(_tableTransactions, where: where, whereArgs: whereArgs);
 
       for(Map<String, dynamic> transaction in transactions) {
-//        // recalculate budget for transaction
-//        await _recalculateBudgetForTransaction(db, transaction);
         // recalculate account balance for transaction
         await _recalculateAccountForTransaction(db, transaction);
       }
@@ -1032,6 +1108,15 @@ class _Database {
 
       for(Map<String, dynamic> account in accounts) {
         await _recalculateAccount(db, account[_id]);
+      }
+    }
+
+    if(table == _tableTransfer) {
+      var transfers = await db.query(_tableTransfer, where: where, whereArgs: whereArgs);
+
+      for(Map<String, dynamic> transfer in transfers) {
+        await _recalculateAccount(db, transfer[_transferFrom]);
+        await _recalculateAccount(db, transfer[_transferTo]);
       }
     }
 
@@ -1057,98 +1142,6 @@ class _Database {
   void _notifyObservers(String table) async {
     if(_watchers[table] != null) _watchers[table].forEach((f) => f.onDatabaseUpdate(table));
   }
-
-//  Future<void> _recalculateBudgets(Database db, List<dynamic> ids) async {
-//    var budgets = await db.rawQuery("SELECT $_id, $_budgetCategoryId, $_budgetStart, $_budgetEnd, $_budgetPerMonth FROM $_tableBudget WHERE $_id IN ${ids.map((f) => "$f").toString()}");
-//
-//    for(Map<String, dynamic> budget in budgets) {
-//      await _recalculateBudget(db, budget);
-//    }
-//  }
-//
-//  Future<void> _recalculateBudget(Database db, Map<String, dynamic> budget) async {
-//    do {
-//      if(budget == null) break;
-//      if(budget.isEmpty) break;
-//
-//      // get budget category ID out
-//      var catId = budget[_budgetCategoryId];
-//      // get startDate out
-//      var startDate = budget[_budgetStart];
-//      // and end date
-//      var endDate = budget[_budgetEnd];
-//      // get budget ID
-//      var id = budget[_id];
-//      // get budget per month
-//      var amount = budget[_budgetPerMonth];
-//
-//      // query all transactions of type income for this category between this start and end date
-//      var typesList = TransactionType.typeExpense;
-//      String types = typesList.map((f) => "${f.id}").toString();
-//      var sql = "SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startDate AND $endDate) AND $_transCategory = $catId AND $_transType in $types";
-//      var sum = await db.rawQuery(sql);
-//      var spent = sum[0].values.first ?? 0.0;
-//
-//      typesList = TransactionType.typeIncome;
-//      types = typesList.map((f) => "${f.id}").toString();
-//      sql = "SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN $startDate AND $endDate) AND $_transCategory = $catId AND $_transType in $types";
-//      sum = await db.rawQuery(sql);
-//      var earn = sum[0].values.first ?? 0.0;
-//
-//      var newBudget = <String, dynamic>{
-//        _id: id,
-//        _budgetCategoryId: catId,
-//        _budgetStart: startDate,
-//        _budgetEnd: endDate,
-//        _budgetPerMonth: amount,
-//        _budgetSpent: spent,
-//        _budgetEarn: earn
-//      };
-//
-//      // update this budget
-//      await db.update(_tableBudget, newBudget, where: "$_id = ?", whereArgs: [id]);
-//    } while(false);
-//  }
-//
-//  Future<void> _recalculateAllBudgets(Database db) async {
-//    var budgets = await db.rawQuery("SELECT  $_id from $_tableBudget");
-//
-//    for(dynamic budget in budgets) {
-//      await _recalculateBudget(db, budget);
-//    }
-//  }
-//
-//  Future<void> _recalculateBudgetForTransaction(Database db, Map<String, dynamic> tran) async {
-//    do {
-//
-//      if(tran == null) break;
-//      if(tran.isEmpty) break;
-//
-//      // get full transaction info
-//      var transactionId = tran[_id];
-//
-//      var listTransactions = await db.query(_tableTransactions,where: "$_id = ?", whereArgs: [transactionId]);
-//
-//      if(listTransactions == null) break;
-//      if(listTransactions.isEmpty) break;
-//
-//      var transaction = listTransactions[0];
-//      var catId = transaction[_transCategory];
-//
-//      var transDate = transaction[_transDateTime];
-//
-//      var startDate = Utils.firstMomentOfMonth(DateTime.fromMillisecondsSinceEpoch(transDate)).millisecondsSinceEpoch;
-//      var endDate = Utils.lastDayOfMonth(DateTime.fromMillisecondsSinceEpoch(transDate)).millisecondsSinceEpoch;
-//
-//      // query budget for thsi transaction
-//      var budgets = await db.query(_tableBudget, where: "$_budgetCategoryId = $catId AND ($_budgetStart BETWEEN $startDate AND $endDate)");
-//      if(budgets == null) break;
-//      if(budgets.isEmpty) break;
-//
-//      // update budget now
-//      await _recalculateBudget(db, budgets[0]);
-//    } while(false);
-//  }
 
   Future<void> _recalculateAllAccounts(Database db) async {
     var accounts = await db.rawQuery("SELECT $_id FROM $_tableAccounts");
@@ -1207,9 +1200,27 @@ class _Database {
         && rawEarn.first.values.isNotEmpty
         && rawEarn.first.values.first != null) earn = rawEarn.first.values.first;
 
-    var balance = initialBalance + earn - spent;
+    var transferFrom = 0.0;
+    var rawTransferFrom = await db.rawQuery("SELECT SUM($_transferAmount) FROM $_tableTransfer WHERE $_transferFrom = $accountId");
+    if(rawTransferFrom != null
+        && rawTransferFrom.isNotEmpty
+        && rawTransferFrom.first != null
+        && rawTransferFrom.first.values != null
+        && rawTransferFrom.first.values.isNotEmpty
+        && rawTransferFrom.first.values.first != null) transferFrom = rawTransferFrom.first.values.first;
 
-    db.update(_tableAccounts, {
+    var transferTo = 0.0;
+    var rawTransferTo = await db.rawQuery("SELECT SUM($_transferAmount) FROM $_tableTransfer WHERE $_transferTo = $accountId");
+    if(rawTransferTo != null
+        && rawTransferTo.isNotEmpty
+        && rawTransferTo.first != null
+        && rawTransferTo.first.values != null
+        && rawTransferTo.first.values.isNotEmpty
+        && rawTransferTo.first.values.first != null) transferTo = rawTransferTo.first.values.first;
+
+    var balance = initialBalance + earn - spent - transferFrom + transferTo;
+
+    await db.update(_tableAccounts, {
       _accBalance: balance,
       _accSpent: spent,
       _accEarned: earn

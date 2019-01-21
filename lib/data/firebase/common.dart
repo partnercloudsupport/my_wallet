@@ -15,6 +15,7 @@ const tblTransaction = "Transaction";
 const tblCategory = "Category";
 const tblUser = "User";
 const tblBudget = "Budget";
+const tblTransfer = "Transfer";
 
 const fldName = "name";
 const fldType = "type";
@@ -39,6 +40,9 @@ const fldColor = "color";
 const fldStart = "start";
 const fldEnd = "end";
 const fldEmailVerified = "emailVerified";
+const fldTransferId = "transferId";
+const fldTransferFrom = "fromAccount";
+const fldTransferTo = "toAccount";
 
 User snapshotToUser(DocumentSnapshot snapshot) {
   return User(snapshot.data[fldUuid], snapshot.data[fldEmail], snapshot.data[fldDisplayName], snapshot.data[fldPhotoUrl], snapshot.data[fldColor], snapshot.data[fldEmailVerified]);

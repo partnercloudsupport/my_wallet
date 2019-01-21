@@ -65,7 +65,6 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
             },
           ),
         ],
-        leading: isEditMode ? Text("", style: TextStyle(color: Colors.transparent),) : null,
       ),
       body: Padding(
         padding: EdgeInsets.all(10.0),
@@ -74,8 +73,16 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
             itemBuilder: (context, index) => CardListTile(
               title: _accounts[index].name,
                 onTap: () {
-                  if(!isEditMode) Navigator.pushNamed(context,
-                    routes.AccountDetail(accountId: _accounts[index].id, accountName: _accounts[index].name), );
+                if(isEditMode) return;
+                if(_accounts[index].type == AccountType.liability) {
+                  // open liability view
+                } else if(_accounts[index].type == AccountType.assets) {
+                  // open access view
+                } else {
+                  // open transaction account view
+                  Navigator.pushNamed(context,
+                    routes.AccountDetail(accountId: _accounts[index].id, accountName: _accounts[index].name),);
+                }
                 },
               subTitle: "${_nf.format(_accounts[index].balance)}",
               trailing: isEditMode ? IconButton(
@@ -118,7 +125,7 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
             padding: EdgeInsets.all(10.0),
           ),
           Flexible(
-            child: Text("Warning: All transactions related to this account will be remove. Are you sure to delete this account?"),
+            child: Text("Warning: All transactions related to this account will be remove, that includes payment transactions as well as money transfer in and out of this account. Are you sure to delete this account?"),
           ),
         ],
       ),

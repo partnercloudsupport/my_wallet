@@ -33,7 +33,7 @@ class _LeftDrawerFirebaseRepository {
   }
 
   Future<void> unlinkFbDatabase() async {
-    return fdb.removeRefenrence();
+    return fdb.removeReference();
   }
 }
 
