@@ -16,6 +16,8 @@ class AppTheme {
   static const transparent = Colors.transparent;
   static const lightBlue = Colors.lightBlue;
   static const red = Colors.red;
+  static const soulRed = Color(0xFFA80112);
+  static const fadedRed = Color(0xa0d66a69);
 
   static const _bgLeftColor = Color(0xFF330867);
   static const _bgRightColor = Color(0xFF30cfd0);

@@ -26,7 +26,7 @@ class TransactionEntity {
 
 class TransactionListEntity {
   final List<TransactionEntity> entities;
-  final List<DateTime> dates;
+  final Map<DateTime, double> dates;
   final double total;
   final double fraction;
 

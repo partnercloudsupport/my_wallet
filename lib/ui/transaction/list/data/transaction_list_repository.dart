@@ -91,12 +91,24 @@ class _TransactionListDatabaseRepository {
       }
     }
 
+    // calculate total expenses for each day
+    Map<DateTime, double> dateExpenses = {};
+    if(dates != null && dates.isNotEmpty) {
+      for(DateTime dateTime in dates) {
+        var start = Utils.startOfDay(dateTime);
+        var end = Utils.endOfDay(dateTime);
+        var total = await db.sumAllTransactionBetweenDateByType(start, end, TransactionType.typeExpense);
+
+        if(total != null && total > 0) dateExpenses.putIfAbsent(dateTime, () => total);
+      }
+    }
+
     // sort transactions by date
     entities.sort((a, b) => a.dateTime.millisecondsSinceEpoch - b.dateTime.millisecondsSinceEpoch);
 
     var budget = await db.findBudget(start: Utils.firstMomentOfMonth(day == null ? DateTime.now() : day), end: Utils.lastDayOfMonth(day == null ? DateTime.now() : day), catId: categoryId);
     var fraction = budget == null || budget.budgetPerMonth == 0 ? 1.0 : total/budget.budgetPerMonth;
-    return TransactionListEntity(entities, dates, total, fraction);
+    return TransactionListEntity(entities, dateExpenses, total, fraction);
   }
 
   String _buildUserInitial(User user) {

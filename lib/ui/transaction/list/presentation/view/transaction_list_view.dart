@@ -33,7 +33,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
   var _total = 0.0;
   var _fraction = 1.0;
 
-  NumberFormat _nf = NumberFormat("#,##0.00");
+  NumberFormat _nf = NumberFormat("\$#,##0.00");
   DateFormat _df = DateFormat("dd MMM, yyyy HH:mm:ss");
 
   @override
@@ -87,8 +87,13 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
                 },
                 selectedDateTime: _day,
                 markedDatesMap: _markedDates,
+                markedDateIconBuilder: (data) => Align(
+                  child: Text("$data", style: Theme.of(context).textTheme.caption.apply(color: AppTheme.soulRed, fontSizeFactor: 0.8),),
+                  alignment: Alignment.bottomCenter,),
+                markedDateShowIcon: true,
                 weekendTextStyle: Theme.of(context).textTheme.title.apply(color: AppTheme.pinkAccent),
                 height: 430.0,
+                todayButtonColor: AppTheme.fadedRed,
               ),
             );
 
@@ -129,8 +134,9 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
       this._fraction = list.fraction;
 
       if(list.dates != null || list.dates.isNotEmpty) {
-        Map<DateTime, List<Event>> events = {};
-        list.dates.forEach((f) => events.putIfAbsent(f, () => [Event(date: f)]));
+        Map<DateTime, List<String>> events = {};
+        list.dates.forEach((date, spent) => events.putIfAbsent(date, () => [_nf.format(spent)]));
+
         this._markedDates = EventList(
             events: events
         );
