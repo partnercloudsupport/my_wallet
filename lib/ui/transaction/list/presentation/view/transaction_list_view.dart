@@ -6,7 +6,6 @@ import 'package:my_wallet/ui/transaction/list/presentation/view/transaction_list
 import 'package:my_wallet/data/data_observer.dart' as observer;
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:flutter_calendar_carousel/classes/event_list.dart';
-import 'package:flutter_calendar_carousel/classes/event.dart';
 
 class TransactionList extends StatefulWidget {
   final String title;
@@ -88,7 +87,10 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
                 selectedDateTime: _day,
                 markedDatesMap: _markedDates,
                 markedDateIconBuilder: (data) => Align(
-                  child: Text("$data", style: Theme.of(context).textTheme.caption.apply(color: AppTheme.soulRed, fontSizeFactor: 0.8),),
+                  child: FittedBox(
+                      child: Text("$data",
+                        style: Theme.of(context).textTheme.caption.apply(color: AppTheme.soulRed, fontSizeFactor: 0.8),
+                      overflow: TextOverflow.fade,)),
                   alignment: Alignment.bottomCenter,),
                 markedDateShowIcon: true,
                 weekendTextStyle: Theme.of(context).textTheme.title.apply(color: AppTheme.pinkAccent),
@@ -100,7 +102,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
             if(index == 1) return Container(
               alignment: Alignment.centerRight,
               padding: EdgeInsets.all(8.0),
-              child: Text("TOTAL EXPENSES \$${_nf.format(_total)}", style: TextStyle(color: AppTheme.darkBlue),),
+              child: Text("TOTAL EXPENSES ${_nf.format(_total)}", style: TextStyle(color: AppTheme.darkBlue),),
               color: AppTheme.blueGrey.withOpacity(0.2),
             );
 
@@ -114,7 +116,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
                   backgroundColor: Color(item.userColor),
                 ),
                 subtitle: Text(_df.format(item.dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
-                trailing: Text("\$${_nf.format(item.amount)}", style: TextStyle(color: Color(item.transactionColor)),),
+                trailing: Text("${_nf.format(item.amount)}", style: TextStyle(color: Color(item.transactionColor)),),
                 onTap: () {
                   if(!item.isTransfer) Navigator.pushNamed(context, routes.EditTransaction(item.id));
                 },
