@@ -101,6 +101,6 @@ class BudgetDetailFirebaseRepository {
   }
 
   Future<bool> deleteBudget(Budget budget) {
-    return fd.deleteBudget(budget);
+    return fd.deleteBudget(budget.id);
   }
 }

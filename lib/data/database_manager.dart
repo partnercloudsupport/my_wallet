@@ -5,6 +5,7 @@ import 'package:my_wallet/data/data.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:my_wallet/data/data_observer.dart';
 import 'package:my_wallet/utils.dart' as Utils;
+import 'package:my_wallet/shared_pref/shared_preference.dart';
 
 import 'package:flutter/foundation.dart';
 
@@ -12,6 +13,7 @@ import 'package:flutter/foundation.dart';
 // database manager
 // #############################################################################################################################
 final _id = "_id";
+final _updated = "_updated";
 
 // table Account
 final _tableAccounts = tableAccount;
@@ -64,6 +66,15 @@ final _transferUuid = "_uuid";
 _Database db = _Database();
 Lock _lock = Lock();
 
+Map<String, String> _tableMap = {
+  "Account" : _tableAccounts,
+  "Transaction": _tableTransactions,
+  "Category" : _tableCategory,
+  "User" : _tableUser,
+  "Budget" : _tableBudget,
+  "Transfer" : _tableTransfer
+};
+
 void registerDatabaseObservable(List<String> tables, DatabaseObservable observable) {
   _lock.synchronized(() => db.registerDatabaseObservable(tables, observable));
 }
@@ -84,6 +95,32 @@ Future<void> dispose() {
   return db.dispose();
 }
 
+Future<List<int>> queryOutOfSync(String table) {
+  return _lock.synchronized(() async {
+    do {
+      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+      var pausedTime = sharedPreferences.getInt(prefPausedTime);
+      if (pausedTime == null) break;
+
+      var dbTable = _tableMap[table];
+      if (dbTable == null) break;
+
+      var map = await db._query(dbTable, where: "$_updated <= $pausedTime", columns: [_id]);
+
+      if(map == null) break;
+
+      if(map.isEmpty) break;
+
+      List<int> result = [];
+      map.forEach((f) => result.add(f[_id]));
+
+      return result;
+    } while (false);
+
+    return [];
+  });
+}
 // ------------------------------------------------------------------------------------------------------------------------
 // other SQL helper methods
 Future<double> sumAllTransactionBetweenDateByType(DateTime from, DateTime to, List<TransactionType> type) async {
@@ -880,7 +917,7 @@ class _Database {
     String dbPath = join((await getApplicationDocumentsDirectory()).path, "MyWalletDb");
     db = await openDatabase(
         dbPath,
-        version: 6, onCreate: (Database db, int version) async {
+        version: 7, onCreate: (Database db, int version) async {
       await _executeCreateDatabase(db);
     },
     onUpgrade: (Database db, int oldVersion, int newVersion) async {
@@ -890,11 +927,16 @@ class _Database {
         _tableBudget,
         _tableCategory,
         _tableUser,
-        _tableAccounts
+        _tableAccounts,
+        _tableTransfer
       ];
 
       for(String tbl in allTables) {
-        await db.execute("DROP TABLE $tbl");
+        try {
+          await db.execute("DROP TABLE $tbl");
+        } catch(e, stacktrace) {
+          print(stacktrace);
+        }
       }
 
       await _executeCreateDatabase(db);
@@ -908,6 +950,9 @@ class _Database {
   }
 
   Future<void> dispose() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setInt(prefPausedTime, DateTime.now().millisecondsSinceEpoch);
+
     await db.close();
   }
 
@@ -922,7 +967,8 @@ class _Database {
               $_accCurrency TEXT NOT NULL,
               $_accBalance DOUBLE,
               $_accSpent DOUBLE,
-              $_accEarned DOUBLE
+              $_accEarned DOUBLE,
+              $_updated INTEGER NOT NULL
             )""");
 
     await db.execute("""
@@ -934,14 +980,16 @@ class _Database {
           $_transAmount DOUBLE NOT NULL,
           $_transDesc TEXT,
           $_transType INTEGER NOT NULL,
-          $_transUid TEXT NOT NULL
+          $_transUid TEXT NOT NULL,
+          $_updated INTEGER NOT NULL
           )""");
 
     await db.execute("""
         CREATE TABLE $_tableCategory (
         $_id INTEGER PRIMARY KEY,
         $_catName TEXT NOT NULL,
-        $_catColorHex TEXT NOT NULL
+        $_catColorHex TEXT NOT NULL,
+        $_updated INTEGER NOT NULL
         )
         """);
 
@@ -951,7 +999,8 @@ class _Database {
         $_budgetCategoryId INTEGER NOT NULL,
         $_budgetPerMonth DOUBLE NOT NULL,
         $_budgetStart INTEGER NOT NULL,
-        $_budgetEnd INTEGER
+        $_budgetEnd INTEGER,
+        $_updated INTEGER NOT NULL
         )
         """);
 
@@ -961,7 +1010,8 @@ class _Database {
         $_userDisplayName TEXT NOT NULL,
         $_userEmail TEXT NOT NULL,
         $_userPhotoUrl TEXT,
-        $_userColor INTEGER
+        $_userColor INTEGER,
+        $_updated INTEGER NOT NULL
       )
       """);
 
@@ -972,7 +1022,8 @@ class _Database {
         $_transferTo INTEGER NOT NULL,
         $_transferAmount DOUBLE NOT NULL,
         $_transferDate INTEGER NOT NULL,
-        $_transferUuid TEXT NOT NULL
+        $_transferUuid TEXT NOT NULL,
+        $_updated INTEGER NOT NULL
         )
         """);
   }
@@ -1011,6 +1062,7 @@ class _Database {
     var result = -1;
 
     if (item != null) {
+      item.putIfAbsent(_updated, () => DateTime.now().millisecondsSinceEpoch);
       if (item[_id] == null) {
         var id = await _generateId(table);
         item.putIfAbsent(_id, () => id);
@@ -1037,6 +1089,7 @@ class _Database {
 
     if (items != null) {
       for (item in items) {
+        item.putIfAbsent(_updated, () => DateTime.now().millisecondsSinceEpoch);
         if (item[_id] == null) {
           var id = await _generateId(table);
           item.putIfAbsent(_id, () => id);
@@ -1088,6 +1141,8 @@ class _Database {
 
   Future<int> _update(String table, Map<String, dynamic> item, String where, List whereArgs) async {
     if(!db.isOpen) db = await _openDatabase();
+
+    item.putIfAbsent(_updated, () => DateTime.now().millisecondsSinceEpoch);
     var result = await db.update(table, item, where: where, whereArgs: whereArgs);
 
     if (table == _tableTransactions) {

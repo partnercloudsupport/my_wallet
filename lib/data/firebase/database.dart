@@ -14,6 +14,7 @@ bool _isDbSetup = false;
 FirebaseApp _app;
 
 Map<String, StreamSubscription> subs = {};
+Timer _timerSync;
 
 Future<void> init(FirebaseApp app, {String homeProfile}) async {
   if (_isInit) return;
@@ -108,7 +109,63 @@ Future<void> _addSubscriptions() async {
     }
   })));
 
-  await Future.delayed(Duration(seconds: 5));
+  _delaySync(initiate: true);
+}
+
+//Future<void> _sync(
+//    List<int> items,
+//    String table,
+//    Function(DocumentSnapshot snapshot) onUpdated) async {
+//  for(int id in items) {
+//    var snapshot = await _firestore.collection(table).document("$id").get();
+//
+//    onUpdated(snapshot);
+//  }
+//}
+
+void _delaySync({bool initiate = false}) {
+  if(!initiate) {
+    if (_timerSync == null) return;
+    if (!_timerSync.isActive) return;
+
+    _timerSync.cancel();
+  }
+
+  _timerSync = new Timer(Duration(seconds: 1), () async {
+    Map<String, String> tables = {
+      tblAccount : "table_accounts",
+      tblTransaction : "table_transactions",
+      tblCategory : "table_categories",
+      tblUser : "table_user",
+      tblBudget : "table_budget",
+      tblTransfer : "table_transfer"
+    };
+    for(String table in tables.keys) {
+      List<int> ids = await db.queryOutOfSync(table);
+      if(ids != null && ids.isNotEmpty) {
+        for(int id in ids) {
+          var snapshot = await _firestore.collection(table).document("$id").get();
+
+          // only care of deleted items
+          if(snapshot.data == null) {
+            print("table $table has item ${snapshot.documentID} deleted");
+
+            switch(table) {
+              case tblAccount: db.deleteAccount(_toId(snapshot)); break;
+              case tblTransaction: db.deleteTransaction(_toId(snapshot)); break;
+              case tblCategory: db.deleteCategory(_toId(snapshot)); break;
+              case tblUser: db.deleteUser(snapshot.documentID); break;
+              case tblTransfer: db.deleteTransfer(_toId(snapshot)); break;
+              case tblBudget: db.deleteBudget(_toId(snapshot)); break;
+            }
+          }
+        }
+      }
+    }
+
+    // remove this timer after sync is done
+    _timerSync = null;
+  });
 }
 
 // ####################################################################################################
@@ -216,6 +273,8 @@ int _toId(DocumentSnapshot snapshot) {
 }
 
 void _onAccountAdded(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) {
     var id = _toId(document);
 
@@ -227,6 +286,8 @@ void _onAccountAdded(DocumentSnapshot document) {
 }
 
 void _onAccountChanged(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) {
     var id = _toId(document);
 
@@ -238,10 +299,14 @@ void _onAccountChanged(DocumentSnapshot document) {
 }
 
 void _onAccountRemoved(DocumentSnapshot document) {
+  _delaySync();
+
   db.deleteAccount(_toId(document));
 }
 
 void _onCategoryAdded(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) {
     var id = _toId(document);
 
@@ -253,6 +318,8 @@ void _onCategoryAdded(DocumentSnapshot document) {
 }
 
 void _onCategoryChanged(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) {
     var id = _toId(document);
 
@@ -265,10 +332,14 @@ void _onCategoryChanged(DocumentSnapshot document) {
 }
 
 void _onCategoryRemoved(DocumentSnapshot document) {
+  _delaySync();
+
   db.deleteCategory(_toId(document));
 }
 
 void _onTransactionAdded(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) {
     var id = _toId(document);
 
@@ -281,6 +352,8 @@ void _onTransactionAdded(DocumentSnapshot document) {
 }
 
 void _onTransactionChanged(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) {
     var id = _toId(document);
 
@@ -292,10 +365,14 @@ void _onTransactionChanged(DocumentSnapshot document) {
 }
 
 void _onTransactionRemoved(DocumentSnapshot document) {
+  _delaySync();
+
   db.deleteTransaction(_toId(document));
 }
 
 void _onUserAdded(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) {
     var id = _toId(document);
 
@@ -307,6 +384,8 @@ void _onUserAdded(DocumentSnapshot document) {
 }
 
 void _onUserChanged(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) {
     var id = _toId(document);
 
@@ -318,10 +397,14 @@ void _onUserChanged(DocumentSnapshot document) {
 }
 
 void _onUserRemoved(DocumentSnapshot document) {
+  _delaySync();
+
   db.deleteUser(document.data[fldUuid]);
 }
 
 void _onBudgetAdded(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) {
     var id = _toId(document);
 
@@ -333,15 +416,21 @@ void _onBudgetAdded(DocumentSnapshot document) {
 }
 
 void _onBudgetChanged(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) return;
   db.updateBudget(_snapshotToBudget(document));
 }
 
 void _onBudgetRemoved(DocumentSnapshot document) {
+  _delaySync();
+
   db.deleteBudget(_toId(document));
 }
 
 void _onTransferAdded(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) {
     var id = _toId(document);
 
@@ -354,6 +443,8 @@ void _onTransferAdded(DocumentSnapshot document) {
 }
 
 void _onTransferChanged(DocumentSnapshot document) {
+  _delaySync();
+
   if(document.data == null) {
     var id = _toId(document);
 
@@ -366,6 +457,8 @@ void _onTransferChanged(DocumentSnapshot document) {
 }
 
 void _onTransferRemoved(DocumentSnapshot document) {
+  _delaySync();
+
   db.deleteTransfer(_toId(document));
 }
 // ####################################################################################################
@@ -475,9 +568,9 @@ Future<bool> updateBudget(Budget budget) {
   return addBudget(budget);
 }
 
-Future<bool> deleteBudget(Budget budget) async {
+Future<bool> deleteBudget(int id) async {
   return _lock.synchronized(() async {
-    await _firestore.collection(tblBudget).document("${budget.id}").delete();
+    await _firestore.collection(tblBudget).document("$id").delete();
     return true;
   });
 }

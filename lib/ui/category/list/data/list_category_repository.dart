@@ -102,7 +102,7 @@ class _CategoryListFirebaseRepository {
   Future<void> deleteAllBudgets(List<Budget> budgets) async {
     if(budgets != null && budgets.isNotEmpty) {
       for(Budget budget in budgets) {
-        await fb.deleteBudget(budget);
+        await fb.deleteBudget(budget.id);
       }
     }
   }

@@ -10,6 +10,8 @@ const prefHostEmail = "_HostEmail";
 
 const _prefIdToken = "prefIdToken";
 
+const prefPausedTime = "prefPausedTime";
+
 Future<void> saveRefreshToken(String token) async {
   SharedPreferences pref = await SharedPreferences.getInstance();
 

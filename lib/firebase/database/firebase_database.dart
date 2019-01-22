@@ -50,7 +50,7 @@ class DocumentReference extends Query {
     var response = await http.get(_url(path), headers: _headers);
 
     if (response.statusCode == 200) {
-      return DocumentSnapshot(documentID: "${path.substring(path.lastIndexOf("/"))}", data: jsonDecode(response.body));
+      return DocumentSnapshot(documentID: "${path.substring(path.lastIndexOf("/")).replaceFirst("/", "")}", data: jsonDecode(response.body));
     }
 
     // failed, what to do?
