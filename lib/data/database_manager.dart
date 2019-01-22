@@ -146,13 +146,9 @@ Future<List<T>> queryCategoryWithBudgetAndTransactionsForMonth<T>(DateTime month
           """
         );
 
-        var spent = rawSpend == null || rawSpend.first == null || rawSpend.first.values == null || rawSpend.first.values.isEmpty || rawSpend.first.values.first == null ? 0.0 : rawSpend.first.values.first;
-        var earn = rawEarn == null || rawEarn.first == null || rawEarn.first.values == null || rawEarn.first.values.isEmpty || rawEarn.first.values.first == null ? 0.0 : rawEarn.first.values.first;
-        var budgetPerMonth = rawBudgetPerMonth == null || rawBudgetPerMonth.first == null || rawBudgetPerMonth.first.values == null || rawBudgetPerMonth.first.values.isEmpty || rawBudgetPerMonth.first.values.first == null  ? 0.0 : rawBudgetPerMonth.first.values.first;
-
-        if(spent == null) spent = 0.0;
-        if(earn == null) earn = 0.0;
-        if(budgetPerMonth == null) budgetPerMonth = 0.0;
+        var spent = rawSpend.first.values.first ?? 0.0;
+        var earn = rawEarn.first.values.first ?? 0.0;
+        var budgetPerMonth = rawBudgetPerMonth.first.values.first ?? 0.0;
 
         result.add(conversion(category, budgetPerMonth, spent, earn));
       }
@@ -389,8 +385,8 @@ Future<List<AppCategory>> queryCategoryWithTransaction({DateTime from, DateTime 
           if(expenseMap != null && expenseMap.isNotEmpty && expenseMap.first != null && expenseMap.first.values != null && expenseMap.first.values.first != null) expense = expenseMap.first.values.first;
 
           var appCategory = _toCategory(category);
-          appCategory.income = income == null ? 0.0 : income;
-          appCategory.expense = expense == null ? 0.0 : expense;
+          appCategory.income = income ?? 0.0;
+          appCategory.expense = expense ?? 0.0;
 
           if(!filterZero) appCat.add(appCategory);
           else if(income > 0 || expense > 0) appCat.add(appCategory);
