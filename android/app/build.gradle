@@ -1,3 +1,9 @@
+def releaseProperties = new Properties()
+def releasePropertiesFile = rootProject.file('release.properties')
+if (releasePropertiesFile.exists()) {
+    releasePropertiesFile.withReader('UTF-8') { reader -> releaseProperties.load(reader) }
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -40,12 +46,27 @@ android {
         versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+
+        manifestPlaceholders = [beta_apitoken: releaseProperties.getProperty('fabric_api_token')]
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(releaseProperties.getProperty('keystore'))
+            storePassword releaseProperties.getProperty('keystore_password')
+            keyAlias releaseProperties.getProperty('keystore_alias')
+            keyPassword releaseProperties.getProperty('keystore_alias_password')
+        }
     }
 
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.release
+        }
+
+        debug {
             signingConfig signingConfigs.debug
         }
     }
@@ -59,6 +80,14 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.8@aar') {
+        transitive = true;
+    }
 }
 
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
