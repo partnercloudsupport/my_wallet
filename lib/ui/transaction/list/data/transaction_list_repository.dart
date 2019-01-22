@@ -97,7 +97,7 @@ class _TransactionListDatabaseRepository {
       for(DateTime dateTime in dates) {
         var start = Utils.startOfDay(dateTime);
         var end = Utils.endOfDay(dateTime);
-        var total = await db.sumAllTransactionBetweenDateByType(start, end, TransactionType.typeExpense);
+        var total = await db.sumAllTransactionBetweenDateByType(start, end, TransactionType.typeExpense, accountId: accountId, categoryId: categoryId);
 
         if(total != null && total > 0) dateExpenses.putIfAbsent(dateTime, () => total);
       }

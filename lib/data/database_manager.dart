@@ -123,10 +123,22 @@ Future<List<int>> queryOutOfSync(String table) {
 }
 // ------------------------------------------------------------------------------------------------------------------------
 // other SQL helper methods
-Future<double> sumAllTransactionBetweenDateByType(DateTime from, DateTime to, List<TransactionType> type) async {
-  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE ($_transDateTime BETWEEN ${from.millisecondsSinceEpoch} AND ${to.millisecondsSinceEpoch}) AND $_transType IN ${type.map((f) => "${f.id}").toString()}"));
+Future<double> sumAllTransactionBetweenDateByType(DateTime from, DateTime to, List<TransactionType> type, {int accountId, int categoryId}) async {
+  return _lock.synchronized(() async {
+    var dateQuery = "($_transDateTime BETWEEN ${from.millisecondsSinceEpoch} AND ${to.millisecondsSinceEpoch})";
+    var transactionTypeQuery = "$_transType IN ${type.map((f) => "${f.id}").toString()}";
+    // additional queries
+    var accountQuery = "";
+    var categoryQuery = "";
 
-  return sum[0].values.first ?? 0.0;
+    if(accountId != null) accountQuery = " AND $_transAcc = $accountId";
+    if(categoryId != null) categoryQuery = " AND $_transCategory = $categoryId";
+
+    var sum = await db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE $dateQuery AND $transactionTypeQuery$accountQuery$categoryQuery");
+    return sum[0].values.first ?? 0.0;
+
+  });
+
 }
 
 Future<double> sumAllAccountBalance({List<AccountType> types}) async {
