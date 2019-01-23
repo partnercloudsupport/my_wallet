@@ -587,10 +587,7 @@ Future<List<Budget>> findCollapsingBudgets({@required int catId, @required DateT
     // is this special case for budget coverage, not to be used in other budget query
     findBudget += " OR ($monthStart <= $_budgetStart${monthEnd == null ? "" : " AND $_budgetEnd >= $monthEnd"})";
 
-    print("Query: $findBudget");
     var map = await db._query(_tableBudget, where: "$_budgetCategoryId = $catId AND ($findBudget)",);
-
-    print("Map IDs $map");
 
     return map == null ? [] : map.map((f) => _toBudget(f)).toList();
   });
@@ -1354,8 +1351,6 @@ class _Database {
     var payLiability = (await db.rawQuery("SELECT SUM($_dischargeAmount) FROM $_tableDischargeLiability WHERE $_dischargeFromAcc = $accountId")).first.values.first ?? 0.0;
     spent += payLiability;
 
-    print("Account $accountId Spents: expenses $expenses, transfer out $transferOut, pay liability $payLiability");
-
     // ########################################################################
     // calculate money in
     type = TransactionType.typeIncome.map((f) => "${f.id}").toString();
@@ -1371,8 +1366,6 @@ class _Database {
 
     // discharge of liability
     var dischargeLiability = (await db.rawQuery("SELECT SUM($_dischargeAmount) FROM $_tableDischargeLiability WHERE $_dischargeLiabilityId = $accountId")).first.values.first ?? 0.0;
-
-    print("Account $accountId Initial balance: $initialBalance - Earn: income $income, transfer In $transferIn, discharge of liability $dischargeLiability");
 
     var balance = initialBalance + earn - spent - dischargeLiability;
 
