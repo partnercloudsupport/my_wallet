@@ -55,17 +55,17 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
                     ConversationRow(
                         "Create new",
                         _type.name,
-                        AppTheme.darkBlue,
+                        dataColor: AppTheme.darkBlue,
                         onPressed: _showAccountTypeSelection),
                     ConversationRow(
                       "with name",
                       _name == null || _name.isEmpty ? "Enter a name" : _name,
-                      AppTheme.darkBlue,
+                      dataColor: AppTheme.darkBlue,
                       onPressed: _showAccountNameDialog,),
                     ConversationRow(
                       "and intial amount",
                       _nf.format(_amount),
-                      AppTheme.brightPink,
+                      dataColor: AppTheme.brightPink,
                       style: Theme.of(context).textTheme.display2,),
                   ],
                 ),
@@ -109,8 +109,8 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
     Navigator.push(context, SlidePageRoute(builder: (context) => InputName("Account Name",(name) => setState(() => _name = name), hintText: "Enter Account Name",)));
   }
 
-  void _onNumberInput(String number, String decimal) {
-    setState(() => _amount = double.parse("${number == null || number.isEmpty ? "0" : number}.${decimal == null || decimal.isEmpty ? "0" : decimal}"));
+  void _onNumberInput(double amount) {
+    setState(() => _amount = amount);
   }
 
   void _saveAccount() {

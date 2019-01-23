@@ -2,7 +2,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter/material.dart';
 
 class NumberInputPad extends StatefulWidget {
-  final Function(String, String) _onValueChanged;
+  final Function(double) _onValueChanged;
   final String _number;
   final String _decimal;
   final bool showNumPad;
@@ -115,7 +115,8 @@ class NumberInputPadState extends State<NumberInputPad> {
         break;
     }
 
-    widget._onValueChanged(number, decimal);
+    var amount = double.parse("${number == null || number.isEmpty ? 0 : number}.${decimal == null || decimal.isEmpty ? 0 : decimal}");
+    widget._onValueChanged(amount);
   }
 
   void toggleVisiblity() {

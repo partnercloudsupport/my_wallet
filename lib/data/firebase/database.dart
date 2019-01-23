@@ -109,6 +109,14 @@ Future<void> _addSubscriptions() async {
     }
   })));
 
+  subs.putIfAbsent(tblDischargeOfLiability, () => _firestore.collection(tblDischargeOfLiability).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    switch(change.type) {
+      case DocumentChangeType.added: _onDischargeOfLiabilityAdded(change.document); break;
+      case DocumentChangeType.modified: _onDischargeOfLiabilityChanged(change.document); break;
+      case DocumentChangeType.removed: _onDischargeOfLiabilityRemoved(change.document); break;
+    }
+  })));
+
   _delaySync(initiate: true);
 }
 
@@ -141,10 +149,10 @@ void _delaySync({bool initiate = false}) {
       tblTransfer : "table_transfer"
     };
     for(String table in tables.keys) {
-      List<int> ids = await db.queryOutOfSync(table);
+      List<String> ids = await db.queryOutOfSync(table);
       if(ids != null && ids.isNotEmpty) {
-        for(int id in ids) {
-          var snapshot = await _firestore.collection(table).document("$id").get();
+        for(String id in ids) {
+          var snapshot = await _firestore.collection(table).document(id).get();
 
           // only care of deleted items
           if(snapshot.data == null) {
@@ -265,6 +273,29 @@ Transfer _snapshotToTransfer(DocumentSnapshot snapshot) {
       snapshot.data[fldAmount],
       snapshot.data[fldDateTime] == null ? null : DateTime.fromMillisecondsSinceEpoch(snapshot.data[fldDateTime]),
       snapshot.data[fldUuid]
+  );
+}
+
+Map<String, dynamic> _DischargeOfLiabilityToMap(DischargeOfLiability discharge) {
+  return {
+    fldDateTime: discharge.dateTime.millisecondsSinceEpoch,
+    fldAccountId: discharge.accountId,
+    fldLiabilityId: discharge.liabilityId,
+    fldCategoryId: discharge.categoryId,
+    fldAmount: discharge.amount,
+    fldUuid: discharge.userUid
+  };
+}
+
+DischargeOfLiability _snapshotToDischargeOfLiability(DocumentSnapshot snapshot) {
+  return DischargeOfLiability(
+    _toId(snapshot),
+    snapshot.data[fldDateTime] == null ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(snapshot.data[fldDateTime]),
+    snapshot.data[fldLiabilityId],
+    snapshot.data[fldAccountId],
+    snapshot.data[fldCategoryId],
+    snapshot.data[fldAmount],
+    snapshot.data[fldUuid]
   );
 }
 
@@ -461,6 +492,41 @@ void _onTransferRemoved(DocumentSnapshot document) {
 
   db.deleteTransfer(_toId(document));
 }
+
+void _onDischargeOfLiabilityAdded(DocumentSnapshot document) {
+  _delaySync();
+
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onDischargeOfLiabilityRemoved(document);
+
+    return;
+  }
+
+  db.insertDischargeOfLiability(_snapshotToDischargeOfLiability(document)).catchError((e) => _onDischargeOfLiabilityChanged(document));
+}
+
+void _onDischargeOfLiabilityChanged(DocumentSnapshot document) {
+  _delaySync();
+
+  if(document.data == null) {
+    var id = _toId(document);
+
+    if(id != null) _onDischargeOfLiabilityRemoved(document);
+
+    return;
+  }
+
+  db.updateDischargeOfLiability(_snapshotToDischargeOfLiability(document));
+}
+
+void _onDischargeOfLiabilityRemoved(DocumentSnapshot document) {
+  _delaySync();
+
+  db.deleteDischargeOfLiability(_toId(document));
+
+}
 // ####################################################################################################
 // Account
 Lock _lock = Lock();
@@ -596,6 +662,26 @@ Future<bool> deleteAllTransfer(List<Transfer> transfers) {
     }
 
     return true;
+  });
+}
+
+// ####################################################################################################
+// Transfer
+
+Future<bool> addDischargeOfLiability(DischargeOfLiability discharge) {
+  return _lock.synchronized(() async {
+    await _firestore.collection(tblDischargeOfLiability).document("${discharge.id}").setData(_DischargeOfLiabilityToMap(discharge));
+    return true;
+  });
+}
+
+Future<bool> update(DischargeOfLiability discharge) {
+  return addDischargeOfLiability(discharge);
+}
+
+Future<bool> deleteDischargeOfLiability(DischargeOfLiability discharge) {
+  return _lock.synchronized(() async {
+    await _firestore.collection(tblDischargeOfLiability).document("${discharge.id}").delete();
   });
 }
 

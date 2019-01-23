@@ -118,7 +118,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
                 subtitle: Text(_df.format(item.dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
                 trailing: Text("${_nf.format(item.amount)}", style: TextStyle(color: Color(item.transactionColor)),),
                 onTap: () {
-                  if(!item.isTransfer) Navigator.pushNamed(context, routes.EditTransaction(item.id));
+                  if(item.isUsualTransaction) Navigator.pushNamed(context, routes.EditTransaction(item.id));
                 },
               ),
               color: index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.2),

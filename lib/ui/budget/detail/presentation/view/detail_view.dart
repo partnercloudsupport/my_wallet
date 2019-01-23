@@ -29,7 +29,6 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
   GlobalKey alertDialog = GlobalKey();
 
-  String _number, _decimal;
   DateTime _from, _to;
   AppCategory _category;
   double _amount = 0.0;
@@ -94,18 +93,17 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
                     ConversationRow(
                       "A monthly budget for",
                       _category == null ? "Select Category" : _category.name,
-                      AppTheme.pinkAccent,
                     ),
                         ConversationRow(
                           "from",
                           df.format(_from),
-                          AppTheme.darkBlue,
+                          dataColor: AppTheme.darkBlue,
                           onPressed: _showFromMonth,
                         ),
                     ConversationRow(
                       "to",
                       _to == null ? "Forever" : df.format(_to),
-                      AppTheme.darkBlue,
+                      dataColor: AppTheme.darkBlue,
                       onPressed: _showToMonth,
                       trail: _to == null ? null : IconButton(
                           icon: Icon(Icons.close, color: AppTheme.pinkAccent,),
@@ -114,7 +112,6 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
                     ConversationRow(
                       "at max",
                       _nf.format(_amount),
-                      AppTheme.pinkAccent,
                       style: Theme.of(context).textTheme.display2,
                     )
                   ],
@@ -126,8 +123,8 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
             child: NumberInputPad(
               numPadKey,
               _onNumberInput,
-              _number,
-              _decimal,
+              null,
+              null,
               showNumPad: true,
             ),
             alignment: Alignment.bottomCenter,
@@ -167,12 +164,9 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
         ));
   }
 
-  void _onNumberInput(String number, String decimal) {
+  void _onNumberInput(double amount) {
     setState(() {
-      this._number = number;
-      this._decimal = decimal;
-
-      _amount = double.parse("${_number == null || _number.isEmpty ? "0" : _number}.${_decimal == null || _decimal.isEmpty ? "0" : _decimal}");
+      _amount = amount;
     });
   }
 

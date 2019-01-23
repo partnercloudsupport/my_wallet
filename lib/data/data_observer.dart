@@ -6,6 +6,7 @@ const tableCategory = "table_categories";
 const tableBudget = "table_budget";
 const tableUser = "table_user";
 const tableTransfer = "table_transfer";
+const tableDischargeLiability = "table_discharge_liability";
 
 abstract class DatabaseObservable {
   void onDatabaseUpdate(String table);

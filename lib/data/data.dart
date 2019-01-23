@@ -29,11 +29,11 @@ class TransactionType {
 
   static final expenses = TransactionType(0, "Expense");
   static final income = TransactionType(1, "Income");
-//  static final moneyTransfer = TransactionType(2, "Money Transfer");
+  static final moneyTransfer = TransactionType(2, "Money Transfer");
 //  static final assetPurchase = TransactionType(3, "Asset Purchase");
 //  static final assetSale = TransactionType(4, "Asset Sale");
 //  static final liabilityAcquisition = TransactionType(5, "Liability Acquisition");
-//  static final dischargeOfLiability = TransactionType(6, "Discharge Of Liability");
+  static final dischargeOfLiability = TransactionType(6, "Discharge Of Liability");
 
   static final List<TransactionType> typeIncome = [
     income,
@@ -50,7 +50,7 @@ class TransactionType {
   static final List<TransactionType> all = [
     expenses,
     income,
-//    moneyTransfer,
+    moneyTransfer,
 //    assetSale,
 //    assetSale,
 //    liabilityAcquisition,
@@ -113,6 +113,19 @@ class AppTransaction {
       this.type,
       this.userUid
       );
+}
+
+class DischargeOfLiability extends AppTransaction {
+  final int liabilityId;
+
+  DischargeOfLiability(
+      int id,
+      DateTime dateTime,
+      this.liabilityId,
+      int accountId,
+      int categoryId,
+      double amount,
+      String userUid) : super(id, dateTime, accountId, categoryId, amount, "Discharge Of Liability", TransactionType.dischargeOfLiability, userUid);
 }
 
 class AppCategory {

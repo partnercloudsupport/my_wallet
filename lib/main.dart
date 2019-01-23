@@ -10,6 +10,8 @@ import 'package:my_wallet/ui/account/list/presentation/view/list_accounts.dart';
 import 'package:my_wallet/ui/account/create/presentation/view/create_account_view.dart';
 import 'package:my_wallet/ui/account/detail/presentation/view/detail_view.dart';
 import 'package:my_wallet/ui/account/transfer/presentation/view/transfer_view.dart';
+import 'package:my_wallet/ui/account/liability/detail/presentation/view/liability_view.dart';
+import 'package:my_wallet/ui/account/liability/payment/presentation/view/payment_view.dart';
 
 import 'package:my_wallet/ui/category/list/presentation/view/list_category.dart';
 import 'package:my_wallet/ui/category/create/presentation/view/create_category_view.dart';
@@ -233,7 +235,28 @@ class MyApp extends StatelessWidget {
       var accName = splits[2].split(":")[1];
 
       return AccountTransfer(id, accName);
+    }
 
+    if(name.startsWith(routes.Liability)) {
+      List<String> splits = name.split("/"); //  "$TransferAccount/from:$accountId/name:$accountName";;
+
+      // get account ID:
+      var id = int.parse(splits[1].split(":")[1]);
+      // get account name
+      var accName = splits[2].split(":")[1];
+
+      return LiabilityView(id, accName);
+    }
+
+    if(name.startsWith(routes.Pay)) {
+      List<String> splits = name.split("/"); //  "$TransferAccount/from:$accountId/name:$accountName";;
+
+      // get account ID:
+      var id = int.parse(splits[1].split(":")[1]);
+      // get account name
+      var accName = splits[2].split(":")[1];
+
+      return PayLiability(id, accName);
     }
 
     return null;

@@ -23,7 +23,7 @@ class AccountDetail extends StatefulWidget {
 class _AccountDetailState extends CleanArchitectureView<AccountDetail, AccountDetailPresenter> implements AccountDetailDataView, observer.DatabaseObservable {
   _AccountDetailState() : super(AccountDetailPresenter());
 
-  final _tables = [observer.tableAccount];
+  final _tables = [observer.tableAccount, observer.tableTransactions];
   final _nf = NumberFormat("\$#,###.##");
   final _df = DateFormat("dd MMM, yyyy HH:mm");
 
@@ -53,7 +53,7 @@ class _AccountDetailState extends CleanArchitectureView<AccountDetail, AccountDe
   Widget build(BuildContext context) {
     return PlainScaffold(
       appBar: MyWalletAppBar(
-        title: widget._name,
+        title: _account == null ? widget._name : _account.name,
       ),
       body: Padding(
         padding: EdgeInsets.only(left: 8.0, right: 8.0),

@@ -29,6 +29,8 @@ class routes {
   static const AboutUs = "AboutUs";
 
   static const SplashView = "SplashView";
+  static const Liability = "Liability";
+  static const Pay = "PayLiability";
 
   static String EditTransaction(int id) {
     return "$AddTransaction/$id";
@@ -52,5 +54,13 @@ class routes {
 
   static String TransferToAccount({@required String accountName, @required int accountId}) {
     return "$TransferAccount/from:$accountId/name:$accountName";
+  }
+
+  static String LiabilityDetail({@required int accountId, @required String accountName}) {
+    return "$Liability/from:$accountId/name:$accountName";
+  }
+
+  static String PayLiability({@required int accountId, @required String accountName}) {
+    return "$Pay/from:$accountId/name:$accountName";
   }
 }

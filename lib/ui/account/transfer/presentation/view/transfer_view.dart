@@ -290,13 +290,12 @@ class _EnterAmountState extends State<_EnterAmount> {
                 ConversationRow(
                   "Transfer to account",
                   _toAccount.name,
-                  AppTheme.darkBlue,
+                  dataColor: AppTheme.darkBlue,
                   onPressed: widget.onAccountReselect,
                 ),
                 ConversationRow(
                   "amount",
                   _nf.format(_amount),
-                  AppTheme.pinkAccent,
                   style: Theme
                       .of(context)
                       .textTheme
@@ -326,8 +325,8 @@ class _EnterAmountState extends State<_EnterAmount> {
     );
   }
 
-  void _onNumberInput(String number, String decimal) {
-    _amount = double.parse("${number == null || number.isEmpty ? 0 : number}.${decimal == null || decimal.isEmpty ? 0 : decimal}");
+  void _onNumberInput(double amount) {
+    _amount = amount;
 
     setState(() {});
   }
@@ -372,12 +371,10 @@ class _ConfirmState extends State<_Confirm> {
         ConversationRow(
             "Confirm transfer to account",
             toAccount == null ? "" : toAccount.name,
-            AppTheme.pinkAccent
         ),
         ConversationRow(
           "amount",
           _nf.format(amount == null ? 0.0 : amount),
-          AppTheme.pinkAccent,
           style: Theme
               .of(context)
               .textTheme
@@ -386,7 +383,6 @@ class _ConfirmState extends State<_Confirm> {
         ConversationRow(
             "After transfer is done, balance is",
             "",
-            AppTheme.pinkAccent
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -394,12 +390,10 @@ class _ConfirmState extends State<_Confirm> {
             ConversationRow(
                 "Account",
                 toAccount == null ? "" : toAccount.name,
-                AppTheme.pinkAccent
             ),
             ConversationRow(
               "has",
               _nf.format((toAccount == null ? 0.0 : toAccount.balance) + (amount == null ? 0.0 : amount)),
-              AppTheme.pinkAccent,
               style: Theme
                   .of(context)
                   .textTheme
@@ -413,12 +407,10 @@ class _ConfirmState extends State<_Confirm> {
             ConversationRow(
                 "and Account",
                 fromAccount == null ? "" : fromAccount.name,
-                AppTheme.pinkAccent
             ),
             ConversationRow(
               "has",
               _nf.format((fromAccount == null ? 0.0 : fromAccount.balance) - (amount == null ? 0.0 : amount)),
-              AppTheme.pinkAccent,
               style: Theme
                   .of(context)
                   .textTheme

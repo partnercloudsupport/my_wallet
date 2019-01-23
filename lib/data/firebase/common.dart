@@ -16,6 +16,7 @@ const tblCategory = "Category";
 const tblUser = "User";
 const tblBudget = "Budget";
 const tblTransfer = "Transfer";
+const tblDischargeOfLiability = "DischargeOfLiability";
 
 const fldName = "name";
 const fldType = "type";
@@ -43,6 +44,7 @@ const fldEmailVerified = "emailVerified";
 const fldTransferId = "transferId";
 const fldTransferFrom = "fromAccount";
 const fldTransferTo = "toAccount";
+const fldLiabilityId = "liabilityId";
 
 User snapshotToUser(DocumentSnapshot snapshot) {
   return User(snapshot.data[fldUuid], snapshot.data[fldEmail], snapshot.data[fldDisplayName], snapshot.data[fldPhotoUrl], snapshot.data[fldColor], snapshot.data[fldEmailVerified]);

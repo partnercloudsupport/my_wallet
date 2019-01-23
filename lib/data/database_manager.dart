@@ -63,6 +63,15 @@ final _transferAmount = "_transferAmount";
 final _transferDate = "_date";
 final _transferUuid = "_uuid";
 
+// table discharge liability
+final _tableDischargeLiability = tableDischargeLiability;
+final _dischargeDateTime = "_dateTime";
+final _dischargeFromAcc = "_accountId";
+final _dischargeLiabilityId = "_liabilityId";
+final _dischargeCategory = "_categoryId";
+final _dischargeAmount = "_amount";
+final _dischargeUid = "_dischargeUserUid";
+
 _Database db = _Database();
 Lock _lock = Lock();
 
@@ -95,7 +104,7 @@ Future<void> dispose() {
   return db.dispose();
 }
 
-Future<List<int>> queryOutOfSync(String table) {
+Future<List<String>> queryOutOfSync(String table) {
   return _lock.synchronized(() async {
     do {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -112,8 +121,8 @@ Future<List<int>> queryOutOfSync(String table) {
 
       if(map.isEmpty) break;
 
-      List<int> result = [];
-      map.forEach((f) => result.add(f[_id]));
+      List<String> result = [];
+      map.forEach((f) => result.add("${f[_id]}"));
 
       return result;
     } while (false);
@@ -334,6 +343,22 @@ Future<List<Transfer>> queryTransfer(int account, {DateTime day}) {
     List<Map<String, dynamic>> map = await db._query(_tableTransfer, where: "($_transferFrom = $account OR $_transferTo = $account)$dateQuery");
 
     return map == null ? [] : map.map((f) => _toTransfer(f)).toList();
+  });
+}
+
+Future<List<DischargeOfLiability>> queryDischargeOfLiability(int account, {DateTime day}) {
+  return _lock.synchronized(() async {
+    var dateQuery = "";
+    if(day != null) {
+      var startOfDay = Utils.startOfDay(day == null ? DateTime.now() : day);
+      var endOfDay = Utils.endOfDay(day == null ? DateTime.now() : day);
+
+      dateQuery = " AND ($_dischargeDateTime BETWEEN ${startOfDay.millisecondsSinceEpoch} AND ${endOfDay.millisecondsSinceEpoch})";
+    }
+
+    List<Map<String, dynamic>> map = await db._query(_tableDischargeLiability, where: "($_dischargeLiabilityId = $account OR $_dischargeFromAcc = $account)$dateQuery");
+
+    return map == null ? [] : map.map((f) => _toDischargeOfLiability(f)).toList();
   });
 }
 
@@ -597,6 +622,10 @@ Future<int> generateTransferId() {
   return _lock.synchronized(() => db._generateId(_tableTransfer));
 }
 
+Future<int> generateDischargeLiabilityId() {
+  return _lock.synchronized(() => db._generateId(_tableDischargeLiability));
+}
+
 // ------------------------------------------------------------------------------------------------------------------------
 // inserts
 Future<int> insertAccount(Account acc) {
@@ -653,6 +682,13 @@ Future<int> insertTransfers(List<Transfer> transfers) {
   return _lock.synchronized(() => db._insert(tableTransfer, items: transfers.map((f) => _transferToMap(f)).toList()));
 }
 
+Future<int> insertDischargeOfLiability(DischargeOfLiability discharge) {
+  return _lock.synchronized(() => db._insert(tableDischargeLiability, item: _dischargeLiabilityToMap(discharge)));
+}
+
+Future<int> insertDischargeOfLiabilities(List<DischargeOfLiability> discharges) {
+  return _lock.synchronized(() => db._insert(tableDischargeLiability, items: discharges.map((f) => _dischargeLiabilityToMap(f)).toList()));
+}
 // ------------------------------------------------------------------------------------------------------------------------
 // delete
 Future<int> deleteAccount(int id) {
@@ -703,6 +739,14 @@ Future<int> deleteTransfers(List<int> ids) {
   return _lock.synchronized(() => db._delete(tableTransfer, "$_id = ?", ids));
 }
 
+Future<int> deleteDischargeOfLiability(int id) {
+  return _lock.synchronized(() => db._delete(tableDischargeLiability, "$_id = ?", [id]));
+}
+
+Future<int> deleteDischargeOfLiabilities(List<int> ids) {
+  return _lock.synchronized(() => db._delete(tableDischargeLiability, "$_id = ?", ids));
+}
+
 Future<void> dropAllTables() {
   return _lock.synchronized(() => db._deleteDb());
 }
@@ -736,6 +780,10 @@ Future<int> updateBudget(Budget budget) {
 
 Future<int> updateTransfer(Transfer transfer) {
   return _lock.synchronized(() => db._update(tableTransfer, _transferToMap(transfer), "$_id = ?", [transfer.id]));
+}
+
+Future<int> updateDischargeOfLiability(DischargeOfLiability discharge) {
+  return _lock.synchronized(() => db._update(tableDischargeLiability, _dischargeLiabilityToMap(discharge), "$_id = ?", [discharge.id]));
 }
 
 // ################################################################################################################
@@ -795,6 +843,17 @@ Transfer _toTransfer(Map<String, dynamic> map) {
   );
 }
 
+DischargeOfLiability _toDischargeOfLiability(Map<String, dynamic> map) {
+  return DischargeOfLiability(
+    map[_id],
+    map[_dischargeDateTime] == null ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(map[_dischargeDateTime]),
+    map[_dischargeLiabilityId],
+    map[_dischargeFromAcc],
+    map[_dischargeCategory],
+    map[_dischargeAmount],
+    map[_dischargeUid]
+  );
+}
 Map<String, dynamic> _transactionToMap(AppTransaction transaction) {
   if(transaction.id == null) return null;
 
@@ -888,6 +947,22 @@ Map<String, dynamic> _transferToMap(Transfer transfer) {
    return map;
 }
 
+Map<String, dynamic> _dischargeLiabilityToMap(DischargeOfLiability discharge) {
+  if(discharge.id == null) return null;
+
+  var map = <String, dynamic>{};
+
+  if(discharge.liabilityId != null) map.putIfAbsent(_dischargeLiabilityId, () => discharge.liabilityId);
+  if(discharge.dateTime != null) map.putIfAbsent(_dischargeDateTime, () => discharge.dateTime.millisecondsSinceEpoch);
+  if(discharge.accountId != null) map.putIfAbsent(_dischargeFromAcc, () => discharge.accountId);
+  if(discharge.categoryId != null) map.putIfAbsent(_dischargeCategory, () => discharge.categoryId);
+  if(discharge.amount != null) map.putIfAbsent(_dischargeAmount, () => discharge.amount);
+  if(discharge.userUid != null) map.putIfAbsent(_dischargeUid, () => discharge.userUid);
+
+  map.putIfAbsent(_id, () => discharge.id);
+
+  return map;
+}
 String _compileFindBudgetSqlQuery(int monthStart, int monthEnd) {
   String findBudget = "";
 
@@ -929,7 +1004,7 @@ class _Database {
     String dbPath = join((await getApplicationDocumentsDirectory()).path, "MyWalletDb");
     db = await openDatabase(
         dbPath,
-        version: 7, onCreate: (Database db, int version) async {
+        version: 10, onCreate: (Database db, int version) async {
       await _executeCreateDatabase(db);
     },
     onUpgrade: (Database db, int oldVersion, int newVersion) async {
@@ -940,7 +1015,8 @@ class _Database {
         _tableCategory,
         _tableUser,
         _tableAccounts,
-        _tableTransfer
+        _tableTransfer,
+        _tableDischargeLiability
       ];
 
       for(String tbl in allTables) {
@@ -1038,6 +1114,19 @@ class _Database {
         $_updated INTEGER NOT NULL
         )
         """);
+
+    await db.execute("""
+      CREATE TABLE $_tableDischargeLiability (
+      $_id INTEGER PRIMARY KEY,
+      $_dischargeLiabilityId INTEGER NOT NULL,
+      $_dischargeFromAcc INTEGER NOT NULL,
+      $_dischargeAmount DOUBLE NOT NULL,
+      $_dischargeDateTime INTEGER NOT NULL,
+      $_dischargeCategory INTEGER NOT NULL,
+      $_dischargeUid TEXT NOT NULL,
+      $_updated INTEGER NOT NULL
+      )
+    """);
   }
 
   Future<int> _generateId(String table) async {
@@ -1095,6 +1184,11 @@ class _Database {
         if(table == _tableTransfer) {
           await _recalculateAccount(db, item[_transferFrom]);
           await _recalculateAccount(db, item[_transferTo]);
+        }
+
+        if(table == _tableDischargeLiability) {
+          await _recalculateAccount(db, item[_dischargeFromAcc]);
+          await _recalculateAccount(db, item[_dischargeLiabilityId]);
         }
       }
     }
@@ -1243,45 +1337,44 @@ class _Database {
         && rawInitialBalance.first.values.isNotEmpty
         && rawInitialBalance.first.values.first != null) initialBalance = rawInitialBalance.first.values.first;
 
+    // ########################################################################
+    // calculate all money out
     String type = TransactionType.typeExpense.map((f) => "${f.id}").toString();
     var spent = 0.0;
-    var rawSpend = await db.rawQuery("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE $_transAcc = $accountId AND $_transType in $type");
-    if(rawSpend != null
-        && rawSpend.isNotEmpty
-        && rawSpend.first != null
-        && rawSpend.first.values != null
-        && rawSpend.first.values.isNotEmpty
-        && rawSpend.first.values.first != null) spent = rawSpend.first.values.first;
 
+    // expenses
+    var expenses = (await db.rawQuery("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE $_transAcc = $accountId AND $_transType in $type")).first.values.first ?? 0.0;
+    spent += expenses;
+
+    // transfer out
+    var transferOut = (await db.rawQuery("SELECT SUM($_transferAmount) FROM $_tableTransfer WHERE $_transferFrom = $accountId")).first.values.first ?? 0.0;
+    spent += transferOut;
+
+    // pay liability
+    var payLiability = (await db.rawQuery("SELECT SUM($_dischargeAmount) FROM $_tableDischargeLiability WHERE $_dischargeFromAcc = $accountId")).first.values.first ?? 0.0;
+    spent += payLiability;
+
+    print("Account $accountId Spents: expenses $expenses, transfer out $transferOut, pay liability $payLiability");
+
+    // ########################################################################
+    // calculate money in
     type = TransactionType.typeIncome.map((f) => "${f.id}").toString();
     var earn = 0.0;
-    var rawEarn = await db.rawQuery("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE $_transAcc = $accountId AND $_transType in $type");
-    if(rawEarn != null
-        && rawEarn.isNotEmpty
-        && rawEarn.first != null
-        && rawEarn.first.values != null
-        && rawEarn.first.values.isNotEmpty
-        && rawEarn.first.values.first != null) earn = rawEarn.first.values.first;
 
-    var transferFrom = 0.0;
-    var rawTransferFrom = await db.rawQuery("SELECT SUM($_transferAmount) FROM $_tableTransfer WHERE $_transferFrom = $accountId");
-    if(rawTransferFrom != null
-        && rawTransferFrom.isNotEmpty
-        && rawTransferFrom.first != null
-        && rawTransferFrom.first.values != null
-        && rawTransferFrom.first.values.isNotEmpty
-        && rawTransferFrom.first.values.first != null) transferFrom = rawTransferFrom.first.values.first;
+    // income
+    var income = (await db.rawQuery("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE $_transAcc = $accountId AND $_transType in $type")).first.values.first ?? 0.0;
+    earn += income;
 
-    var transferTo = 0.0;
-    var rawTransferTo = await db.rawQuery("SELECT SUM($_transferAmount) FROM $_tableTransfer WHERE $_transferTo = $accountId");
-    if(rawTransferTo != null
-        && rawTransferTo.isNotEmpty
-        && rawTransferTo.first != null
-        && rawTransferTo.first.values != null
-        && rawTransferTo.first.values.isNotEmpty
-        && rawTransferTo.first.values.first != null) transferTo = rawTransferTo.first.values.first;
+    // transfer in
+    var transferIn = (await db.rawQuery("SELECT SUM($_transferAmount) FROM $_tableTransfer WHERE $_transferTo = $accountId")).first.values.first ?? 0.0;
+    earn += transferIn;
 
-    var balance = initialBalance + earn - spent - transferFrom + transferTo;
+    // discharge of liability
+    var dischargeLiability = (await db.rawQuery("SELECT SUM($_dischargeAmount) FROM $_tableDischargeLiability WHERE $_dischargeLiabilityId = $accountId")).first.values.first ?? 0.0;
+
+    print("Account $accountId Initial balance: $initialBalance - Earn: income $income, transfer In $transferIn, discharge of liability $dischargeLiability");
+
+    var balance = initialBalance + earn - spent - dischargeLiability;
 
     await db.update(_tableAccounts, {
       _accBalance: balance,

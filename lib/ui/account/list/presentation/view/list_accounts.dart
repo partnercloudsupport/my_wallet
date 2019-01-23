@@ -76,6 +76,7 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
                 if(isEditMode) return;
                 if(_accounts[index].type == AccountType.liability) {
                   // open liability view
+                  Navigator.pushNamed(context, routes.LiabilityDetail(accountId: _accounts[index].id, accountName: _accounts[index].name));
                 } else if(_accounts[index].type == AccountType.assets) {
                   // open access view
                 } else {
@@ -84,7 +85,7 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
                     routes.AccountDetail(accountId: _accounts[index].id, accountName: _accounts[index].name),);
                 }
                 },
-              subTitle: "${_nf.format(_accounts[index].balance)}",
+              subTitle: _accounts[index].type == AccountType.liability ? "(-${_nf.format(_accounts[index].balance)})" : "${_nf.format(_accounts[index].balance)}",
               trailing: isEditMode ? IconButton(
                 onPressed: () {
                   _deleteAccount(_accounts[index]);

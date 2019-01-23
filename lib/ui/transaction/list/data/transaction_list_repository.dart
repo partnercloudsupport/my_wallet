@@ -25,6 +25,7 @@ class _TransactionListDatabaseRepository {
       ) async {
     List<TransactionEntity> entities = [];
     List<Transfer> transfers = [];
+    List<DischargeOfLiability> discharge = [];
     List<DateTime> dates = [];
     var total = 0.0;
 
@@ -32,6 +33,7 @@ class _TransactionListDatabaseRepository {
     if(accountId != null) {
       transactions = await db.queryTransactionForAccount(accountId, day);
       transfers = await db.queryTransfer(accountId, day: day);
+      discharge = await db.queryDischargeOfLiability(accountId, day: day);
 
       dates = await db.findTransactionsDates(day, accountId : accountId, categoryId : categoryId, );
     }
@@ -72,7 +74,7 @@ class _TransactionListDatabaseRepository {
           var initial = _buildUserInitial(user);
 
           total += TransactionType.isExpense(trans.type) ? trans.amount : 0.0;
-          entities.add(TransactionEntity(trans.id, initial, catName, trans.desc, trans.amount, trans.dateTime, user.color, TransactionType.isIncome(trans.type) ? AppTheme.tealAccent.value : AppTheme.pinkAccent.value, false));
+          entities.add(TransactionEntity(trans.id, initial, catName, trans.desc, trans.amount, trans.dateTime, user.color, TransactionType.isIncome(trans.type) ? AppTheme.tealAccent.value : AppTheme.pinkAccent.value, trans.type));
         }
       }
     }
@@ -87,7 +89,22 @@ class _TransactionListDatabaseRepository {
         List<Account> from = await db.queryAccounts(id: transfer.fromAccount);
         List<Account> to = await db.queryAccounts(id: transfer.toAccount);
 
-        entities.add(TransactionEntity(transfer.id, initial, "Transfer", "from ${from[0].name} to ${to[0].name}", transfer.amount, transfer.transferDate, user.color, AppTheme.blueGrey.value, true));
+        entities.add(TransactionEntity(transfer.id, initial, "Transfer", "from ${from[0].name} to ${to[0].name}", transfer.amount, transfer.transferDate, user.color, AppTheme.blueGrey.value, TransactionType.moneyTransfer));
+      }
+    }
+
+    if(discharge != null && discharge.isNotEmpty) {
+      for (DischargeOfLiability dischargeOfLiability in discharge) {
+        // get user initial
+        List<User> users = await db.queryUser(uuid: dischargeOfLiability.userUid);
+        User user = users[0];
+        var initial = _buildUserInitial(user);
+
+        List<Account> from = await db.queryAccounts(id: dischargeOfLiability.accountId);
+        List<Account> to = await db.queryAccounts(id: dischargeOfLiability.liabilityId);
+
+        entities.add(TransactionEntity(dischargeOfLiability.id, initial, "Discharge of Liability", "from ${from[0].name} to ${to[0].name}", dischargeOfLiability.amount, dischargeOfLiability.dateTime, user.color, AppTheme.blueGrey.value, TransactionType.dischargeOfLiability));
+
       }
     }
 

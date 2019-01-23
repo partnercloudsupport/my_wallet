@@ -11,7 +11,7 @@ class ConversationRow extends StatelessWidget {
   final TextStyle style;
   final Widget trail;
 
-  ConversationRow(this.description, this.dataText, this.dataColor, {this.onPressed, this.style, this.trail});
+  ConversationRow(this.description, this.dataText, {this.dataColor = AppTheme.pinkAccent, this.onPressed, this.style, this.trail});
 
   @override
   Widget build(BuildContext context) {

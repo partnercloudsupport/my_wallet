@@ -9,7 +9,7 @@ class TransactionEntity {
   final DateTime dateTime;
   final int userColor;
   final int transactionColor;
-  final bool isTransfer;
+  final TransactionType type;
 
   TransactionEntity(
       this.id,
@@ -20,8 +20,12 @@ class TransactionEntity {
       this.dateTime,
       this.userColor,
       this.transactionColor,
-      this.isTransfer,
+      this.type
       );
+
+  bool get isUsualTransaction => TransactionType.isIncome(type) || TransactionType.isExpense(type);
+  bool get isTransfer => TransactionType.moneyTransfer == type;
+  bool get isDischargeLiability => TransactionType.dischargeOfLiability == type;
 }
 
 class TransactionListEntity {

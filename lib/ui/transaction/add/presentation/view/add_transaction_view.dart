@@ -26,9 +26,10 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
 
-  var _number = "";
-  var _decimal = "";
+//  var _number = "";
+//  var _decimal = "";
 
+  var _amount = 0.0;
   var _type = TransactionType.expenses;
   var _date = DateTime.now();
 
@@ -113,13 +114,13 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                   ConversationRow(
                       widget.transactionId == null ? "Create new" : "An",
                       _type.name,
-                      AppTheme.darkBlue,
+                      dataColor: AppTheme.darkBlue,
                       onPressed: _showTransactionTypeSelection,
                   ),
                   ConversationRow(
                       widget.transactionId == null ? "of" : "valued of",
-                      _numberFormat.format(_toNumber(_number, _decimal)),
-                      TransactionType.isIncome(_type) ? AppTheme.tealAccent : TransactionType.isExpense(_type) ? AppTheme.pinkAccent : AppTheme.blueGrey,
+                      _numberFormat.format(_amount),
+                      dataColor: TransactionType.isIncome(_type) ? AppTheme.tealAccent : TransactionType.isExpense(_type) ? AppTheme.pinkAccent : AppTheme.blueGrey,
                       style: Theme.of(context).textTheme.display2,
                   ),
                   Row(
@@ -129,20 +130,20 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                       ConversationRow(
                           "${widget.transactionId == null ? "" : "was made "}${TransactionType.isExpense(_type) ? "from" : TransactionType.isIncome(_type) ? "into" : "from"}",
                           _account == null ? "Select Account" : _account.name,
-                          AppTheme.darkGreen,
+                          dataColor: AppTheme.darkGreen,
                           onPressed: _showSelectAccount,
                       ),
                       ConversationRow(
                           "by ",
                           _user == null ? "Unknown" : _user.firstName,
-                          AppTheme.darkGreen,
+                          dataColor: AppTheme.darkGreen,
                       )
                     ],
                   ),
                   ConversationRow(
                       "for",
                       _category == null ? "Select Category" : _category.name,
-                      AppTheme.brightPink,
+                      dataColor: AppTheme.brightPink,
                       onPressed: _showSelectCategory,
                     trail: IconButton(
                       icon: Icon(_note == null || _note.isEmpty ? Icons.note_add : Icons.note, color: _note == null || _note.isEmpty ? AppTheme.darkGreen : AppTheme.pinkAccent,),
@@ -159,7 +160,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
             ),
           ),
             Align(
-              child: NumberInputPad(numPadKey, _onNumberInput, _number, _decimal, showNumPad: true,),
+              child: NumberInputPad(numPadKey, _onNumberInput, null, null, showNumPad: true,),
               alignment: Alignment.bottomCenter,
             )
           ],
@@ -235,16 +236,15 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
     });
   }
 
-  void _onNumberInput(String number, String decimal) {
+  void _onNumberInput(double amount) {
     setState(() {
-      this._number = number;
-      this._decimal = decimal;
+      this._amount = amount;
     });
   }
 
-  double _toNumber(String number, String decimal) {
-    return double.parse("${number == null || number.isEmpty ? "0" : number}.${decimal == null || decimal.isEmpty ? "0" : decimal}");
-  }
+//  double _toNumber(String number, String decimal) {
+//    return double.parse("${number == null || number.isEmpty ? "0" : number}.${decimal == null || decimal.isEmpty ? "0" : decimal}");
+//  }
 
   void _saveTransaction() {
     if(_isSaving) return;
@@ -274,7 +274,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
         _type,
         _account,
         _category,
-        _toNumber(_number, _decimal),
+        _amount,
         _date,
         _note
     );
@@ -326,9 +326,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
       _category = detail.category;
       _user = detail.user;
       _note = detail.desc;
-
-      _number = "${_nf.format(detail.amount)}";
-      _decimal = "${_nf.format((detail.amount - detail.amount.floor()) * 100)}";
     });
   }
 
