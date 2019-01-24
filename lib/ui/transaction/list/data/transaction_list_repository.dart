@@ -29,24 +29,24 @@ class _TransactionListDatabaseRepository {
     List<DateTime> dates = [];
     var total = 0.0;
 
+    dates = await db.findTransactionsDates(day, accountId : accountId, categoryId : categoryId, );
+
     List<AppTransaction> transactions = [];
     if(accountId != null) {
       transactions = await db.queryTransactionForAccount(accountId, day);
-      transfers = await db.queryTransfer(accountId, day: day);
-      discharge = await db.queryDischargeOfLiability(accountId, day: day);
-
-      dates = await db.findTransactionsDates(day, accountId : accountId, categoryId : categoryId, );
+      transfers = await db.queryTransfer(account: accountId, day: day);
+      discharge = await db.queryDischargeOfLiability(account: accountId, day: day);
     }
 
     if(categoryId != null) {
       transactions = await db.queryTransactionForCategory(categoryId, day);
-      dates = await db.findTransactionsDates(day, accountId : accountId, categoryId : categoryId, );
     }
 
     if(accountId == null && categoryId == null && day != null) {
       // only load for days when there's no account or category required
       transactions = await db.queryTransactionsBetweenDates(Utils.startOfDay(day), Utils.endOfDay(day));
-      dates = await db.findTransactionsDates(day, accountId : accountId, categoryId : categoryId, );
+      transfers = await db.queryTransfer(account: accountId, day: day);
+      discharge = await db.queryDischargeOfLiability(account: accountId, day: day);
     }
 
     if (transactions != null) {
@@ -112,11 +112,7 @@ class _TransactionListDatabaseRepository {
     Map<DateTime, double> dateExpenses = {};
     if(dates != null && dates.isNotEmpty) {
       for(DateTime dateTime in dates) {
-        var start = Utils.startOfDay(dateTime);
-        var end = Utils.endOfDay(dateTime);
-        var total = await db.sumAllTransactionBetweenDateByType(start, end, TransactionType.typeExpense, accountId: accountId, categoryId: categoryId);
-
-        if(total != null && total > 0) dateExpenses.putIfAbsent(dateTime, () => total);
+        dateExpenses.putIfAbsent(dateTime, () => 0.0);
       }
     }
 

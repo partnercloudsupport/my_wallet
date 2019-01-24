@@ -104,50 +104,52 @@ Future<void> dispose() {
   return db.dispose();
 }
 
-Future<List<String>> queryOutOfSync(String table) {
-  return _lock.synchronized(() async {
-    do {
-      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+Future<List<String>> queryOutOfSync(String table) async {
+  var result = <String> [];
 
-      var pausedTime = sharedPreferences.getInt(prefPausedTime);
-      if (pausedTime == null) break;
+  do {
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-      var dbTable = _tableMap[table];
-      if (dbTable == null) break;
+  var pausedTime = sharedPreferences.getInt(prefPausedTime);
+  if (pausedTime == null) break;
 
-      var map = await db._query(dbTable, where: "$_updated <= $pausedTime", columns: [_id]);
+  var dbTable = _tableMap[table];
+  if (dbTable == null) break;
 
-      if(map == null) break;
+  var map = await _lock.synchronized(() =>  db._query(dbTable, where: "$_updated <= $pausedTime", columns: [_id]));
 
-      if(map.isEmpty) break;
+  if(map == null) break;
 
-      List<String> result = [];
-      map.forEach((f) => result.add("${f[_id]}"));
+  if(map.isEmpty) break;
 
-      return result;
-    } while (false);
+  map.forEach((f) => result.add("${f[_id]}"));
 
-    return [];
-  });
+  } while (false);
+
+  return result;
 }
 // ------------------------------------------------------------------------------------------------------------------------
 // other SQL helper methods
 Future<double> sumAllTransactionBetweenDateByType(DateTime from, DateTime to, List<TransactionType> type, {int accountId, int categoryId}) async {
-  return _lock.synchronized(() async {
+  var amount = 0.0;
+
+  // query from transaction table
+      {
     var dateQuery = "($_transDateTime BETWEEN ${from.millisecondsSinceEpoch} AND ${to.millisecondsSinceEpoch})";
     var transactionTypeQuery = "$_transType IN ${type.map((f) => "${f.id}").toString()}";
+
     // additional queries
     var accountQuery = "";
     var categoryQuery = "";
 
-    if(accountId != null) accountQuery = " AND $_transAcc = $accountId";
-    if(categoryId != null) categoryQuery = " AND $_transCategory = $categoryId";
+    if (accountId != null) accountQuery = " AND $_transAcc = $accountId";
+    if (categoryId != null) categoryQuery = " AND $_transCategory = $categoryId";
 
-    var sum = await db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE $dateQuery AND $transactionTypeQuery$accountQuery$categoryQuery");
-    return sum[0].values.first ?? 0.0;
+    var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_transAmount) FROM $_tableTransactions WHERE $dateQuery AND $transactionTypeQuery$accountQuery$categoryQuery"));
+    amount += sum[0].values.first ?? 0.0;
+  }
 
-  });
-
+  return amount;
 }
 
 Future<double> sumAllAccountBalance({List<AccountType> types}) async {
@@ -164,28 +166,27 @@ Future<double> sumAllAccountBalance({List<AccountType> types}) async {
   return sum[0].values.first ?? 0.0;
 }
 
-Future<List<T>> queryCategoryWithBudgetAndTransactionsForMonth<T>(DateTime month, Function(AppCategory cat, double budgetPerMonth, double spent, double earn) conversion) {
-  return _lock.synchronized(() async {
-    List<T> result = [];
+Future<List<T>> queryCategoryWithBudgetAndTransactionsForMonth<T>(DateTime month, Function(AppCategory cat, double budgetPerMonth, double spent, double earn) conversion) async {
+  List<T> result = [];
 
-    List<Map<String, dynamic>> cats = await db._query(_tableCategory);
+  List<Map<String, dynamic>> cats = await _lock.synchronized(() => db._query(_tableCategory));
 
-    DateTime firstDay = Utils.firstMomentOfMonth(month);
-    DateTime lastDay = Utils.lastDayOfMonth(month);
+  DateTime firstDay = Utils.firstMomentOfMonth(month);
+  DateTime lastDay = Utils.lastDayOfMonth(month);
 
-    if(cats != null) {
-      for(Map<String, dynamic> f in cats) {
-        var category = _toCategory(f);
+  if(cats != null) {
+    for(Map<String, dynamic> f in cats) {
+      var category = _toCategory(f);
 
-        var findBudget = _compileFindBudgetSqlQuery(firstDay.millisecondsSinceEpoch, lastDay.millisecondsSinceEpoch);
-        var rawBudgetPerMonth = await db._executeSql(
-            """
+      var findBudget = _compileFindBudgetSqlQuery(firstDay.millisecondsSinceEpoch, lastDay.millisecondsSinceEpoch);
+      var rawBudgetPerMonth = await _lock.synchronized(() => db._executeSql(
+          """
                SELECT SUM($_budgetPerMonth)
                FROM $_tableBudget
                 WHERE $_budgetCategoryId = ${category.id} AND $findBudget
-                """);
+                """));
 
-        var rawSpend = await db._executeSql(
+      var rawSpend = await _lock.synchronized(() => db._executeSql(
           """
             SELECT SUM($_transAmount) 
             FROM $_tableTransactions
@@ -193,8 +194,8 @@ Future<List<T>> queryCategoryWithBudgetAndTransactionsForMonth<T>(DateTime month
             AND ($_transDateTime BETWEEN ${firstDay.millisecondsSinceEpoch} AND ${lastDay.millisecondsSinceEpoch})
             AND $_transType in ${TransactionType.typeExpense.map((f) => "${f.id}").toString()}
           """
-        );
-        var rawEarn = await db._executeSql(
+      ));
+      var rawEarn = await _lock.synchronized(() => db._executeSql(
           """
           SELECT SUM($_transAmount) 
             FROM $_tableTransactions
@@ -202,19 +203,17 @@ Future<List<T>> queryCategoryWithBudgetAndTransactionsForMonth<T>(DateTime month
             AND ($_transDateTime BETWEEN ${firstDay.millisecondsSinceEpoch} AND ${lastDay.millisecondsSinceEpoch})
             AND $_transType in ${TransactionType.typeIncome.map((f) => "${f.id}").toString()}
           """
-        );
+      ));
 
-        var spent = rawSpend.first.values.first ?? 0.0;
-        var earn = rawEarn.first.values.first ?? 0.0;
-        var budgetPerMonth = rawBudgetPerMonth.first.values.first ?? 0.0;
+      var spent = rawSpend.first.values.first ?? 0.0;
+      var earn = rawEarn.first.values.first ?? 0.0;
+      var budgetPerMonth = rawBudgetPerMonth.first.values.first ?? 0.0;
 
-        result.add(conversion(category, budgetPerMonth, spent, earn));
-      }
+      result.add(conversion(category, budgetPerMonth, spent, earn));
     }
+  }
 
-    return result;
-  });
-
+  return result;
 }
 
 Future<double> sumTransactionsByDay(DateTime day, TransactionType type) async {
@@ -234,9 +233,7 @@ Future<double> sumTransactionsByCategory({@required int catId, @required List<Tr
 }
 
 Future<double> sumAllBudget(DateTime start, DateTime end) async {
-  var sum = await _lock.synchronized(() {
-    return db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE ${_compileFindBudgetSqlQuery(start.millisecondsSinceEpoch, end.millisecondsSinceEpoch)}");
-  });
+  var sum = await _lock.synchronized(() => db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE ${_compileFindBudgetSqlQuery(start.millisecondsSinceEpoch, end.millisecondsSinceEpoch)}"););
   return sum[0].values.first ?? 0.0;
 }
 
@@ -330,33 +327,42 @@ Future<List<AppTransaction>> queryTransactionForAccount(int accountId, DateTime 
   return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
 }
 
-Future<List<Transfer>> queryTransfer(int account, {DateTime day}) {
+Future<List<Transfer>> queryTransfer({int account, DateTime day}) {
   return _lock.synchronized(() async {
-    var dateQuery = "";
+    String query = "";
+
     if(day != null) {
       var startOfDay = Utils.startOfDay(day == null ? DateTime.now() : day);
       var endOfDay = Utils.endOfDay(day == null ? DateTime.now() : day);
 
-      dateQuery = " AND ($_transferDate BETWEEN ${startOfDay.millisecondsSinceEpoch} AND ${endOfDay.millisecondsSinceEpoch})";
+      query = "($_transferDate BETWEEN ${startOfDay.millisecondsSinceEpoch} AND ${endOfDay.millisecondsSinceEpoch})";
     }
 
-    List<Map<String, dynamic>> map = await db._query(_tableTransfer, where: "($_transferFrom = $account OR $_transferTo = $account)$dateQuery");
+    if(account != null) {
+      query = "${query == null || query.isEmpty ? "" : "$query AND "}($_transferFrom = $account OR $_transferTo = $account)";
+    }
+
+    List<Map<String, dynamic>> map = await db._query(_tableTransfer, where: "$query");
 
     return map == null ? [] : map.map((f) => _toTransfer(f)).toList();
   });
 }
 
-Future<List<DischargeOfLiability>> queryDischargeOfLiability(int account, {DateTime day}) {
+Future<List<DischargeOfLiability>> queryDischargeOfLiability({int account, DateTime day}) {
   return _lock.synchronized(() async {
-    var dateQuery = "";
+    var query = "";
     if(day != null) {
       var startOfDay = Utils.startOfDay(day == null ? DateTime.now() : day);
       var endOfDay = Utils.endOfDay(day == null ? DateTime.now() : day);
 
-      dateQuery = " AND ($_dischargeDateTime BETWEEN ${startOfDay.millisecondsSinceEpoch} AND ${endOfDay.millisecondsSinceEpoch})";
+      query = "($_dischargeDateTime BETWEEN ${startOfDay.millisecondsSinceEpoch} AND ${endOfDay.millisecondsSinceEpoch})";
     }
 
-    List<Map<String, dynamic>> map = await db._query(_tableDischargeLiability, where: "($_dischargeLiabilityId = $account OR $_dischargeFromAcc = $account)$dateQuery");
+    if(account != null) {
+      query = "${query == null || query.isEmpty ? "" : "$query AND "}($_dischargeLiabilityId = $account OR $_dischargeFromAcc = $account)";
+    }
+
+    List<Map<String, dynamic>> map = await db._query(_tableDischargeLiability, where: "$query");
 
     return map == null ? [] : map.map((f) => _toDischargeOfLiability(f)).toList();
   });
@@ -371,27 +377,72 @@ Future<List<AppTransaction>> queryAllTransactionForAccount(int accountId) async 
 
 Future<List<DateTime>> findTransactionsDates(DateTime day, {int accountId, int categoryId}) async {
   Map<DateTime, DateTime> dates = {};
-  String where;
 
   DateTime start = Utils.firstMomentOfMonth(day == null ? DateTime.now() : day);
   DateTime end = Utils.lastDayOfMonth(day == null ? DateTime.now() : day);
 
-  String dateWhere = "$_transDateTime BETWEEN ${start.millisecondsSinceEpoch} AND ${end.millisecondsSinceEpoch}";
+  // transaction table
+  {
+    String where;
 
-  if(accountId != null) where = "$_transAcc = $accountId";
-  if(categoryId != null) where = "${where != null ? "$where AND " : ""}$_transCategory = $categoryId";
+    String dateWhere = "($_transDateTime BETWEEN ${start.millisecondsSinceEpoch} AND ${end.millisecondsSinceEpoch})";
 
-  where = "${where != null && where.isNotEmpty ? "$where AND ($dateWhere)" : "$dateWhere"}";
+    if(accountId != null) where = "$_transAcc = $accountId";
+    if(categoryId != null) where = "${where != null ? "$where AND " : ""}$_transCategory = $categoryId";
 
-  List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: where));
+    where = "${where != null && where.isNotEmpty ? "$where AND ($dateWhere)" : "$dateWhere"}";
 
-  if(map != null && map.isNotEmpty) {
-    for(int i = 0; i < map.length; i++) {
-      if(map[i][_transDateTime] != null) {
-        var date = Utils.startOfDay(DateTime.fromMillisecondsSinceEpoch(map[i][_transDateTime]));
+    List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransactions, where: where, columns: [_transDateTime]));
+
+    if(map != null && map.isNotEmpty) {
+      map.forEach((f) {
+        var date = Utils.startOfDay(DateTime.fromMillisecondsSinceEpoch(f[_transDateTime]));
 
         dates.putIfAbsent(date, () => date);
-      }
+      });
+    }
+  }
+
+  // transfer table
+  if(categoryId == null || accountId !=  null){
+    String where;
+
+    String dateWhere = "$_transferDate BETWEEN ${start.millisecondsSinceEpoch} AND ${end.millisecondsSinceEpoch}";
+
+    if(accountId != null) where = "($_transferFrom = $accountId OR $_transferTo = $accountId)";
+
+    where = "${where != null && where.isNotEmpty ? "$where AND ($dateWhere)" : "$dateWhere"}";
+
+    List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableTransfer, where: where, columns: [_transferDate]));
+
+    if(map != null && map.isNotEmpty) {
+      map.forEach((f) {
+        var date = Utils.startOfDay(DateTime.fromMillisecondsSinceEpoch(f[_transferDate]));
+
+        dates.putIfAbsent(date, () => date);
+      });
+    }
+  }
+
+  // discharge liability table
+  if(accountId != null || (accountId == null && categoryId == null)){
+    String where;
+
+    String dateWhere = "$_dischargeDateTime BETWEEN ${start.millisecondsSinceEpoch} AND ${end.millisecondsSinceEpoch}";
+
+    if(accountId != null) where = "($_dischargeFromAcc = $accountId OR $_dischargeLiabilityId = $accountId)";
+    if(categoryId != null) where = "${where != null ? "$where AND " : ""}$_dischargeCategory = $categoryId";
+
+    where = "${where != null && where.isNotEmpty ? "$where AND ($dateWhere)" : "$dateWhere"}";
+
+    List<Map<String, dynamic>> map = await _lock.synchronized(() => db._query(_tableDischargeLiability, where: where, columns: [_dischargeDateTime]));
+
+    if(map != null && map.isNotEmpty) {
+      map.forEach((f) {
+        var date = Utils.startOfDay(DateTime.fromMillisecondsSinceEpoch(f[_dischargeDateTime]));
+
+        dates.putIfAbsent(date, () => date);
+      });
     }
   }
 
@@ -558,16 +609,7 @@ Future<double> querySumAllBudgetForMonth(DateTime start, DateTime end) async {
   return _lock.synchronized(() async {
     var listMap = await db._query(_tableBudget, where: "$findBudget", columns: [ 'SUM($_budgetPerMonth)']);
 
-    double amount = 0.0;
-    do {
-      if(listMap == null) break;
-      if(listMap.isEmpty) break;
-      if(listMap.first == null) break;
-      if(listMap.first.values == null) break;
-      if(listMap.first.values.first == null) break;
-
-      amount = listMap.first.values.first;
-    } while(false);
+    double amount = listMap.first.values.first ?? 0.0;
     return amount;
   });
 }
@@ -578,15 +620,15 @@ Future<double> querySumAllBudgetForMonth(DateTime start, DateTime end) async {
 ///     - 0 ID is returned: create new budget
 ///     - more IDs are returned: Update the first budget, and delete other collapsing budgets
 Future<List<Budget>> findCollapsingBudgets({@required int catId, @required DateTime start, @required DateTime end}) {
+  int monthStart = Utils.firstMomentOfMonth(start == null ? DateTime.now() : start).millisecondsSinceEpoch;
+  int monthEnd = end == null ? null : Utils.lastDayOfMonth(end).millisecondsSinceEpoch;
+  String findBudget = _compileFindBudgetSqlQuery(monthStart, monthEnd);
+
+  // additional case when $start is before $monthStart, and endDate is null
+  // is this special case for budget coverage, not to be used in other budget query
+  findBudget += " OR ($monthStart <= $_budgetStart${monthEnd == null ? "" : " AND $_budgetEnd >= $monthEnd"})";
+
   return _lock.synchronized(() async {
-    int monthStart = Utils.firstMomentOfMonth(start == null ? DateTime.now() : start).millisecondsSinceEpoch;
-    int monthEnd = end == null ? null : Utils.lastDayOfMonth(end).millisecondsSinceEpoch;
-    String findBudget = _compileFindBudgetSqlQuery(monthStart, monthEnd);
-
-    // additional case when $start is before $monthStart, and endDate is null
-    // is this special case for budget coverage, not to be used in other budget query
-    findBudget += " OR ($monthStart <= $_budgetStart${monthEnd == null ? "" : " AND $_budgetEnd >= $monthEnd"})";
-
     var map = await db._query(_tableBudget, where: "$_budgetCategoryId = $catId AND ($findBudget)",);
 
     return map == null ? [] : map.map((f) => _toBudget(f)).toList();

@@ -86,13 +86,13 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
                 },
                 selectedDateTime: _day,
                 markedDatesMap: _markedDates,
-                markedDateIconBuilder: (data) => Align(
-                  child: FittedBox(
-                      child: Text("$data",
-                        style: Theme.of(context).textTheme.caption.apply(color: AppTheme.soulRed, fontSizeFactor: 0.8),
-                      overflow: TextOverflow.fade,)),
-                  alignment: Alignment.bottomCenter,),
-                markedDateShowIcon: true,
+//                markedDateIconBuilder: (data) => Align(
+//                  child: FittedBox(
+//                      child: Text("$data",
+//                        style: Theme.of(context).textTheme.caption.apply(color: AppTheme.soulRed, fontSizeFactor: 0.8),
+//                      overflow: TextOverflow.fade,)),
+//                  alignment: Alignment.bottomCenter,),
+//                markedDateShowIcon: true,
                 weekendTextStyle: Theme.of(context).textTheme.title.apply(color: AppTheme.pinkAccent),
                 height: 430.0,
                 todayButtonColor: AppTheme.fadedRed,

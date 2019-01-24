@@ -56,7 +56,7 @@ class _ListAccountsDatabaseRepository {
   }
 
   Future<List<Transfer>> loadAllTransfers(int accountId) {
-    return db.queryTransfer(accountId);
+    return db.queryTransfer(account: accountId);
   }
 
   Future<void> deleteAllTransfer(List<Transfer> transfer) {
