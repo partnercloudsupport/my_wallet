@@ -99,10 +99,11 @@ class _CategoryListState extends CleanArchitectureView<CategoryList, ListCategor
               ),
                   onTap: () => widget.returnValue
                       ? Navigator.pop(context, _categories[index])
+                      : isEditMode ? Navigator.pushNamed(context, routes.EditCategory(categoryId: _categories[index].categoryId, categoryName: _categories[index].name))
                       : Navigator.pushNamed(
-                          context,
-                          routes.TransactionList(_categories[index].name, categoryId: _categories[index].categoryId)
-                        ),
+                      context,
+                      routes.TransactionList(_categories[index].name, categoryId: _categories[index].categoryId)
+                  ),
                 ),
           )),
       floatingActionButton: isEditMode

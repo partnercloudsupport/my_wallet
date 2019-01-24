@@ -10,8 +10,8 @@ class AddTransactionPresenter extends CleanArchitecturePresenter<AddTransactionU
     useCase.loadAccounts(dataView.onAccountListLoaded);
   }
 
-  void loadCategory() {
-    useCase.loadCategory(dataView.onCategoryListLoaded);
+  void loadCategory(TransactionType _type) {
+    useCase.loadCategory(_type, dataView.onCategoryListLoaded);
   }
 
   void loadTransactionDetail(int id) {

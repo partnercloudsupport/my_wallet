@@ -26,9 +26,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
 
-//  var _number = "";
-//  var _decimal = "";
-
   var _amount = 0.0;
   var _type = TransactionType.expenses;
   var _date = DateTime.now();
@@ -55,7 +52,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   void onDatabaseUpdate(String table) {
     if(table == observer.tableAccount) presenter.loadAccounts();
 
-    if (table == observer.tableCategory) presenter.loadCategory();
+    if (table == observer.tableCategory) presenter.loadCategory(_type);
 
     if(table == observer.tableTransactions || table == observer.tableUser) {
       if(widget.transactionId == null) {
@@ -73,7 +70,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
     observer.registerDatabaseObservable(tables, this);
 
     presenter.loadAccounts();
-    presenter.loadCategory();
+    presenter.loadCategory(_type);
 
     if(widget.transactionId != null) {
       presenter.loadTransactionDetail(widget.transactionId);
@@ -170,7 +167,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   void _showTransactionTypeSelection() {
     showModalBottomSheet(context: context, builder: (context) =>
-        BottomViewContent(TransactionType.all, (f) =>
+        BottomViewContent(TransactionType.dailyTransaction, (f) =>
             Align(
               child: InkWell(
                 child: Padding(
@@ -178,7 +175,11 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                   child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue))
                 ),
                 onTap: () {
-                  setState(() => _type = f);
+                  setState(() {
+                    _type = f;
+
+                    presenter.loadCategory(_type);
+                  });
 
                   Navigator.pop(context);
                 },

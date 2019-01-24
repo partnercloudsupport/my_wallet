@@ -57,6 +57,10 @@ class TransactionType {
 //    dischargeOfLiability
   ];
 
+  static final List<TransactionType> dailyTransaction = []
+    ..addAll(typeExpense)
+    ..addAll(typeIncome);
+
   static bool isExpense(TransactionType type) {
     return typeExpense.contains(type);
   }
@@ -64,6 +68,20 @@ class TransactionType {
   static bool isIncome(TransactionType type) {
     return typeIncome.contains(type);
   }
+}
+
+class CategoryType {
+  final int id;
+  final String name;
+  CategoryType._(this.id, this.name);
+
+  static final expense = CategoryType._(0, "Expense");
+  static final income = CategoryType._(1, "Income");
+
+  static List<CategoryType> all = [
+    expense,
+    income
+  ];
 }
 
 class Account {
@@ -132,6 +150,7 @@ class AppCategory {
   final int id;
   final String name;
   final String colorHex;
+  final CategoryType categoryType;
   double income;
   double expense;
 
@@ -139,6 +158,7 @@ class AppCategory {
       this.id,
       this.name,
       this.colorHex,
+      this.categoryType,
       {
         this.income = 0.0,
         this.expense = 0.0}

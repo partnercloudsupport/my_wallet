@@ -12,8 +12,13 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
     });
   }
 
-  void loadCategory(onNext<List<AppCategory>> next) {
-    execute(repo.loadCategory(), next, (e) {
+  void loadCategory(TransactionType _type, onNext<List<AppCategory>> next) {
+    execute(Future(() {
+      var categoryType = CategoryType.expense;
+      if(TransactionType.isIncome(_type)) categoryType = CategoryType.income;
+
+      return repo.loadCategory(categoryType);
+    }), next, (e) {
       print("Load category error $e");
       next([]);
     });

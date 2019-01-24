@@ -63,4 +63,8 @@ class routes {
   static String PayLiability({@required int accountId, @required String accountName}) {
     return "$Pay/from:$accountId/name:$accountName";
   }
+
+  static String EditCategory({@required int categoryId, @required String categoryName}) {
+    return "$CreateCategory/id:$categoryId/name:$categoryName";
+  }
 }

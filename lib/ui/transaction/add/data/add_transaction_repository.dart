@@ -14,8 +14,8 @@ class AddTransactionRepository extends CleanArchitectureRepository {
     return _dbRepo.loadAccounts();
   }
 
-  Future<List<AppCategory>> loadCategory() {
-    return _dbRepo.loadCategory();
+  Future<List<AppCategory>> loadCategory(CategoryType type) {
+    return _dbRepo.loadCategory(type);
   }
 
   Future<TransactionDetail> loadTransactionDetail(int id) {
@@ -84,8 +84,8 @@ class _AddTransactionDatabaseRepository {
     return _db.queryAccounts(type: AccountType.paymentAccount);
   }
 
-  Future<List<AppCategory>> loadCategory() {
-    return _db.queryCategory();
+  Future<List<AppCategory>> loadCategory(CategoryType type) {
+    return _db.queryCategory(type: type);
   }
 
   Future<TransactionDetail> loadTransactionDetail(int id) async {

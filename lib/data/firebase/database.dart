@@ -204,7 +204,7 @@ Account _snapshotToAccount(DocumentSnapshot snapshot) {
 }
 
 Map<String, dynamic> _CategoryToMap(AppCategory cat) {
-  return {fldName: cat.name, fldColorHex: cat.colorHex, };
+  return {fldName: cat.name, fldColorHex: cat.colorHex, fldType: cat.categoryType.id};
 }
 
 Map<String, dynamic> _UserToMap(User user, {int color}) {
@@ -234,6 +234,7 @@ AppCategory _snapshotToCategory(DocumentSnapshot snapshot) {
       _toId(snapshot),
       snapshot.data[fldName],
       snapshot.data[fldColorHex],
+      CategoryType.all[snapshot.data[fldType] == null ? 0 : snapshot.data[fldType]]
   );
 //      snapshot.data[fldBalance] != null ? double.parse("${snapshot.data[fldBalance]}") : null);
 }

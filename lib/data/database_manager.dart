@@ -40,6 +40,7 @@ final _transUid = "_transactionUserUid";
 final _tableCategory = tableCategory;
 final _catName = "_name";
 final _catColorHex = "_colorHex";
+final _catCategoryType = "_type";
 
 // table budget
 final _tableBudget = tableBudget;
@@ -444,16 +445,19 @@ Future<List<DateTime>> findTransactionsDates(DateTime day, {int accountId, int c
   return dates.keys.toList();
 }
 
-Future<List<AppCategory>> queryCategory({int id}) async {
+Future<List<AppCategory>> queryCategory({int id, CategoryType type}) async {
   String where;
   List<int> whereArg;
 
-  if (id == null) {
+  if (id == null && type == null) {
     where = null;
     whereArg = null;
-  } else {
+  } else if(id != null) {
     where = "$_id = ?";
     whereArg = [id];
+  } else if(type != null) {
+    where = "$_catCategoryType = ?";
+    whereArg = [type.id];
   }
   List<Map<String, dynamic>> map = await db._query(_tableCategory, where: where, whereArgs: whereArg);
 
@@ -831,6 +835,7 @@ AppCategory _toCategory(Map<String, dynamic> map) {
     map[_id],
     map[_catName],
     map[_catColorHex],
+    CategoryType.all[map[_catCategoryType] == null ? 0 : map[_catCategoryType]]
   );
 }
 
@@ -918,6 +923,7 @@ Map<String, dynamic> _categoryToMap(AppCategory cat) {
 
   if(cat.name != null) map.putIfAbsent(_catName, () => cat.name);
   if(cat.colorHex != null) map.putIfAbsent(_catColorHex, () => cat.colorHex);
+  if(cat.categoryType != null) map.putIfAbsent(_catCategoryType, () => cat.categoryType.id);
 
   map.putIfAbsent(_id, () => cat.id);
 
@@ -1028,7 +1034,7 @@ class _Database {
     String dbPath = join((await getApplicationDocumentsDirectory()).path, "MyWalletDb");
     return await openDatabase(
         dbPath,
-        version: 10, onCreate: (Database db, int version) async {
+        version: 11, onCreate: (Database db, int version) async {
       await _privateDbHelper._executeCreateDatabase(db);
     },
     onUpgrade: (Database db, int oldVersion, int newVersion) async {
@@ -1311,6 +1317,7 @@ class _PrivateDbHelper {
         $_id INTEGER PRIMARY KEY,
         $_catName TEXT NOT NULL,
         $_catColorHex TEXT NOT NULL,
+        $_catCategoryType INTEGER NOT NULL,
         $_updated INTEGER NOT NULL
         )
         """);

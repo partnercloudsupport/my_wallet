@@ -259,6 +259,17 @@ class MyApp extends StatelessWidget {
       return PayLiability(id, accName);
     }
 
+    if(name.startsWith(routes.CreateCategory)) {
+      List<String> splits = name.split("/"); //  "$TransferAccount/from:$accountId/name:$accountName";;
+
+      // get category ID:
+      var id = int.parse(splits[1].split(":")[1]);
+      // get category name
+      var accName = splits[2].split(":")[1];
+
+      return CreateCategory(id: id, name: accName);
+    }
+
     return null;
   }
 

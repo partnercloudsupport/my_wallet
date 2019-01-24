@@ -5,7 +5,11 @@ import 'package:my_wallet/ui/category/create/presentation/view/create_category_d
 class CreateCategoryPresenter extends CleanArchitecturePresenter<CreateCategoryUseCase, CreateCategoryDataView>{
   CreateCategoryPresenter() : super(CreateCategoryUseCase());
 
-  void saveCategory(String name) {
-    return useCase.saveCategory(name, dataView.onCreateCategorySuccess, dataView.onCreateCategoryError);
+  void saveCategory(int id, String name, CategoryType type) {
+    return useCase.saveCategory(id, name, type, dataView.onCreateCategorySuccess, dataView.onCreateCategoryError);
+  }
+
+  void loadCategoryDetail(int id) {
+    return useCase.loadCategoryDetail(id, dataView.onCategoryDetailLoaded);
   }
 }

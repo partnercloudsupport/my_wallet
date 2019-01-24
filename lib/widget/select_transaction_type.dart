@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/style/app_theme.dart';
 
-class SelectTransactionType extends StatefulWidget {
-  final TransactionType _type;
-  final ValueChanged<TransactionType> _onChanged;
+typedef GetIndex<T> = int Function(T data);
+typedef GetName<T> = String Function(T data);
 
-  SelectTransactionType(this._type, this._onChanged);
+class SelectTransactionType<T> extends StatefulWidget {
+  final List<T> data;
+  final T _type;
+  final ValueChanged<T> _onChanged;
+  final GetIndex<T> _getIndex;
+  final GetName<T> _getName;
+
+  SelectTransactionType(this.data, this._type, this._getIndex, this._getName, this._onChanged, {GlobalKey<TransactionTypeState<T>> key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _TransactionTypeState();
+    return TransactionTypeState<T>();
   }
 }
 
-class _TransactionTypeState extends State<SelectTransactionType> with TickerProviderStateMixin {
-  TransactionType _type;
+class TransactionTypeState<T> extends State<SelectTransactionType<T>> with TickerProviderStateMixin {
+  T _type;
   TabController _tabController;
 
   @override
@@ -23,10 +28,10 @@ class _TransactionTypeState extends State<SelectTransactionType> with TickerProv
     super.initState();
 
     _type = widget._type;
-    _tabController = TabController(length: TransactionType.all.length, vsync: this);
+    _tabController = TabController(length: widget.data.length, vsync: this);
 
     _tabController.addListener(_onTabValueChanged);
-    _tabController.index = _type.id;
+    _tabController.index = widget._getIndex(_type);
 
   }
   @override
@@ -36,9 +41,9 @@ class _TransactionTypeState extends State<SelectTransactionType> with TickerProv
       child: Container(
         child: TabBar(
           isScrollable: true,
-          tabs: TransactionType.all.map((f) => Padding(
+          tabs: widget.data.map((f) => Padding(
             padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-            child: Text(f.name,
+            child: Text(widget._getName(f),
               style: TextStyle(color: _type == f ? Colors.white : AppTheme.darkBlue, fontSize: 16.0),),
           )).toList(),
           indicator: BoxDecoration(
@@ -53,9 +58,16 @@ class _TransactionTypeState extends State<SelectTransactionType> with TickerProv
 
   void _onTabValueChanged() {
     setState(() {
-      _type = TransactionType.all[_tabController.index];
+      _type = widget.data[_tabController.index];
     });
     widget._onChanged(_type);
+  }
+
+  void updateSelection(T selected) {
+    setState(() {
+      _type = selected;
+      _tabController.animateTo(widget._getIndex(_type));
+    });
   }
 
   @override

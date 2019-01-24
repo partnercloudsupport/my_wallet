@@ -5,9 +5,15 @@ import 'dart:math';
 import 'package:my_wallet/data/firebase/database.dart' as fm;
 import 'package:my_wallet/ca/data/ca_repository.dart';
 
+export 'package:my_wallet/data/data.dart';
+
 class CreateCategoryRepository extends CleanArchitectureRepository {
   final _CreateCategoryDatabaseRepository _dbRepo = _CreateCategoryDatabaseRepository();
   final _CreateCategoryFirebaseRepository _fbRepo = _CreateCategoryFirebaseRepository();
+
+  Future<AppCategory> loadCategory(int id) {
+    return _dbRepo.loadCategory(id);
+  }
 
   Future<int> generateId() {
     return _dbRepo.generateId();
@@ -17,10 +23,16 @@ class CreateCategoryRepository extends CleanArchitectureRepository {
     return _dbRepo._generateRandomColor();
   }
 
-  Future<bool> saveCategory(int id, String name, String color) {
-    _fbRepo.saveCategory(id, name, color);
+  Future<bool> saveCategory(int id, String name, String color, CategoryType type) {
+    _fbRepo.saveCategory(id, name, color, type);
 
-    return _dbRepo.saveCategory(id, name, color);
+    return _dbRepo.saveCategory(id, name, color, type);
+  }
+
+  Future<bool> updateCategory(int id, String name, String colorHex, CategoryType type) {
+    _fbRepo.updateCategory(id, name, colorHex, type);
+
+    return _dbRepo.updateCategory(id, name, colorHex, type);
   }
 
   Future<bool> validateName(String name) async {
@@ -29,6 +41,12 @@ class CreateCategoryRepository extends CleanArchitectureRepository {
 }
 
 class _CreateCategoryDatabaseRepository {
+
+  Future<AppCategory> loadCategory(int id) async {
+    var categoryList = await db.queryCategory(id: id);
+
+    return categoryList == null || categoryList.isEmpty ? null : categoryList.first;
+  }
 
   Future<bool> validateName(String name) async {
     return name == null || name.isEmpty ? throw CreateCategoryException("Please enter Category name") : true;
@@ -50,13 +68,21 @@ class _CreateCategoryDatabaseRepository {
     return color;
   }
 
-  Future<bool> saveCategory(int id, String name, String color) async {
-    return (await db.insertCagetory(AppCategory(id, name, color))) >= 0;
+  Future<bool> saveCategory(int id, String name, String color, CategoryType categoryType) async {
+    return (await db.insertCagetory(AppCategory(id, name, color, categoryType))) >= 0;
+  }
+
+  Future<bool> updateCategory(int id, String name, String colorHex, CategoryType type) async {
+    return (await db.updateCategory(AppCategory(id, name, colorHex, type))) >= 0;
   }
 }
 
 class _CreateCategoryFirebaseRepository {
-  Future<bool> saveCategory(int id, String name, String color) {
-    return fm.addCategory(AppCategory(id, name, color));
+  Future<bool> saveCategory(int id, String name, String color, CategoryType categoryType) {
+    return fm.addCategory(AppCategory(id, name, color, categoryType));
+  }
+
+  Future<bool> updateCategory(int id, String name, String colorHex, CategoryType type) {
+    return fm.updateCategory(AppCategory(id, name, colorHex, type));
   }
 }
