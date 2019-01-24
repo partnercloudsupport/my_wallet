@@ -6,7 +6,7 @@ import 'package:my_wallet/utils.dart' as Utils;
 class AccountType {
   final String name;
   final int id;
-  AccountType(this.id, this.name);
+  AccountType._(this.id, this.name);
 
   static final List<AccountType> all =[
     paymentAccount,
@@ -15,25 +15,25 @@ class AccountType {
     liability
   ];
 
-  static final AccountType paymentAccount = AccountType(0, "Payment Account");
-  static final AccountType credit = AccountType(1, "Credit");
-  static final AccountType assets = AccountType(2, "Assets");
-  static final AccountType liability = AccountType(3, "Liability");
+  static final AccountType paymentAccount = AccountType._(0, "Payment Account");
+  static final AccountType credit = AccountType._(1, "Credit");
+  static final AccountType assets = AccountType._(2, "Assets");
+  static final AccountType liability = AccountType._(3, "Liability");
 }
 
 class TransactionType {
   final String name;
   final int id;
 
-  TransactionType(this.id, this.name);
+  TransactionType._(this.id, this.name);
 
-  static final expenses = TransactionType(0, "Expense");
-  static final income = TransactionType(1, "Income");
-  static final moneyTransfer = TransactionType(2, "Money Transfer");
-//  static final assetPurchase = TransactionType(3, "Asset Purchase");
-//  static final assetSale = TransactionType(4, "Asset Sale");
-//  static final liabilityAcquisition = TransactionType(5, "Liability Acquisition");
-  static final dischargeOfLiability = TransactionType(6, "Discharge Of Liability");
+  static final expenses = TransactionType._(0, "Expense");
+  static final income = TransactionType._(1, "Income");
+  static final moneyTransfer = TransactionType._(2, "Money Transfer");
+//  static final assetPurchase = TransactionType._(3, "Asset Purchase");
+//  static final assetSale = TransactionType._(4, "Asset Sale");
+//  static final liabilityAcquisition = TransactionType._(5, "Liability Acquisition");
+  static final dischargeOfLiability = TransactionType._(6, "Discharge Of Liability");
 
   static final List<TransactionType> typeIncome = [
     income,

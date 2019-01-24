@@ -81,7 +81,7 @@ class AddTransactionRepository extends CleanArchitectureRepository {
 class _AddTransactionDatabaseRepository {
 
   Future<List<Account>> loadAccounts() async{
-    return _db.queryAccounts();
+    return _db.queryAccounts(type: AccountType.paymentAccount);
   }
 
   Future<List<AppCategory>> loadCategory() {

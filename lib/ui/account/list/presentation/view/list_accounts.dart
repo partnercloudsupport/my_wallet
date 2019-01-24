@@ -77,7 +77,7 @@ class _ListAccountsState extends CleanArchitectureView<ListAccounts, ListAccount
                 if(_accounts[index].type == AccountType.liability) {
                   // open liability view
                   Navigator.pushNamed(context, routes.LiabilityDetail(accountId: _accounts[index].id, accountName: _accounts[index].name));
-                } else if(_accounts[index].type == AccountType.assets) {
+//                } else if(_accounts[index].type == AccountType.assets) {
                   // open access view
                 } else {
                   // open transaction account view
