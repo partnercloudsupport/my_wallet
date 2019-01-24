@@ -362,7 +362,7 @@ class _ConfirmState extends State<_Confirm> {
 
   @override
   Widget build(BuildContext context) {
-    print("build confirm page $amount ${toAccount == null ? "no toAccount" : toAccount.name} and from ${fromAccount == null ? " no from account" : fromAccount.name}");
+    debugPrint("build confirm page $amount ${toAccount == null ? "no toAccount" : toAccount.name} and from ${fromAccount == null ? " no from account" : fromAccount.name}");
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,

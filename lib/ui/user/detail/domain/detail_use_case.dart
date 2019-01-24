@@ -17,7 +17,7 @@ class UserDetailUseCase extends CleanArchitectureUseCase<UserDetailRepository> {
 
       return user;
     }), next, (e) {
-      print("Load current user error $e");
+      debugPrint("Load current user error $e");
       next(null);
     });
   }

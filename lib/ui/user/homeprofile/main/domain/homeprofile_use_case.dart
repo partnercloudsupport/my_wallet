@@ -13,7 +13,7 @@ class HomeProfileUseCase extends CleanArchitectureUseCase<HomeProfileRepository>
 
       return entity;
     }), next, (e) {
-      print("Find user home error $e");
+      debugPrint("Find user home error $e");
       next(null);
     });
   }

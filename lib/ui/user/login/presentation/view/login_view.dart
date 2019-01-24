@@ -185,7 +185,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   void onUserHomeFailed(Exception e) {
     stopProcessing();
 
-    print(e.toString());
+    debugPrint(e.toString());
 
     onUserHomeResult(true);
   }
@@ -195,7 +195,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   }
 
 //  void _onFacebookButtonPressed() {
-//    print("Facebook authentication");
+//    debugPrint("Facebook authentication");
 //    if(_signingIn) return;
 //
 //    _signingIn = true;
@@ -204,7 +204,7 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
 //  }
 //
 //  void _onGoogleButtonPressed() {
-//    print("Google Authentication");
+//    debugPrint("Google Authentication");
 //    if(_signingIn) return;
 //
 //    _signingIn = true;

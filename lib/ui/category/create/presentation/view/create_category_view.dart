@@ -104,7 +104,7 @@ class _CreateCategoryState extends CleanArchitectureView<CreateCategory, CreateC
       }
     });
 
-    print("category loaded $_name ${_type.name}");
+    debugPrint("category loaded $_name ${_type.name}");
   }
 
   void _onNameChanged(String name) {

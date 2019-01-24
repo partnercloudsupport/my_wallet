@@ -3,6 +3,7 @@ import 'package:my_wallet/data/firebase/common.dart';
 import 'package:my_wallet/firebase/auth/firebase_authentication.dart';
 
 import 'package:my_wallet/data/data.dart';
+import 'package:flutter/foundation.dart';
 
 const _members = "members";
 const _homes = "homes";
@@ -137,7 +138,7 @@ Future<User> getCurrentUser() async {
         );
       }
     } on PlatformException catch (e) {
-      print("Error: ${e.toString()}");
+      debugPrint("Error: ${e.toString()}");
     }
 
     return _user;

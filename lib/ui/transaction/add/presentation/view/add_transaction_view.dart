@@ -301,7 +301,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   void onSaveTransactionFailed(Exception e) {
     _dismissDialog();
 
-    print(e.toString());
+    debugPrint(e.toString());
     showDialog(
         context: context,
         builder: (context) => AlertDialog(

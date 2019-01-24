@@ -136,7 +136,7 @@ class FirebaseAuthentication {
     final keyMessage = "message";
 
     Map<String, dynamic> error = json.decode(response.body);
-    print(error);
+    debugPrint(error.toString());
 
     if(error['error'] != null) {
       error = error['error'];

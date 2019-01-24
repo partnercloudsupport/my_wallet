@@ -100,6 +100,6 @@ class _AccountDetailState extends CleanArchitectureView<AccountDetail, AccountDe
 
   @override
   void failedToLoadAccount(Exception ex) {
-    print("Error $ex");
+    debugPrint("Error $ex");
   }
 }

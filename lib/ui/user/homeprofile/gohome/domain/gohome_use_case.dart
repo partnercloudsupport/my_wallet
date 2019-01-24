@@ -13,7 +13,7 @@ class GoHomeUseCase extends CleanArchitectureUseCase<GoHomeRepository> {
 
       return true;
     }), next, (e) {
-      print("Go home error $e");
+      debugPrint("Go home error $e");
       next(false);
     });
   }

@@ -147,7 +147,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
   void _showToMonth() {
     showBottomSheetForMonths(_to, (date) {
-      print("select $date as end date");
+      debugPrint("select $date as end date");
       setState(() => _to = date);
       Navigator.pop(context);
     });
@@ -202,7 +202,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
 
   @override
   void onSaveBudgetSuccess(bool result) {
-    print("save budget success $result");
+    debugPrint("save budget success $result");
     dismissDialog();
 
     Navigator.pop(context);
@@ -240,7 +240,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   }
 
   void dismissDialog() {
-    print("Dismiss dialog ${alertDialog.currentContext}");
+    debugPrint("Dismiss dialog ${alertDialog.currentContext}");
     if(alertDialog.currentContext != null) {
       // alert dialog is showing
       Navigator.pop(context);

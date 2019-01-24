@@ -7,7 +7,7 @@ class ChartTitleUseCase extends CleanArchitectureUseCase<ChartTitleRepository>{
 
   void loadTitleDetail(onNext<ChartTitleEntity> next) {
     execute<ChartTitleEntity>(repo.loadTitleDetail(), next, (e) {
-      print("Load title detail error $e");
+      debugPrint("Load title detail error $e");
       next(ChartTitleEntity(0.0, 0.0, 0.0));
     });
 }

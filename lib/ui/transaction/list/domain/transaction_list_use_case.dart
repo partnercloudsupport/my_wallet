@@ -12,7 +12,7 @@ class TransactionListUseCase extends CleanArchitectureUseCase<TransactionListRep
       onNext<TransactionListEntity> next
       ) {
     execute(repo.loadDataFor(accountId, categoryId, day), next, (e) {
-      print("Load data for transaction error $e");
+      debugPrint("Load data for transaction error $e");
       next(null);
     });
   }

@@ -67,7 +67,7 @@ class _RegisterFirebaseRepository {
     try {
       await fm.registerEmail(email, password, displayName: displayName);
     } on PlatformException catch (e) {
-      print("${e.code} :: ${e.message} :: ${e.toString()}");
+      debugPrint("${e.code} :: ${e.message} :: ${e.toString()}");
       throw RegisterException(e.message);
     } catch (e) {
       throw RegisterException(e.toString());
@@ -75,18 +75,6 @@ class _RegisterFirebaseRepository {
 
     return true;
   }
-
-//  Future<bool> updateDisplayName(String displayName) async {
-//    try {
-//      await fm.updateDisplayName(displayName);
-//    } on PlatformException catch (e) {
-//      throw RegisterException(e.message);
-//    } catch (e) {
-//      throw RegisterException(e.toString());
-//    }
-//
-//    return true;
-//  }
 
   Future<User> getCurrentUser() {
     return fm.getCurrentUser();

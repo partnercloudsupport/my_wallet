@@ -7,7 +7,7 @@ class ChartBudgetUseCase extends CleanArchitectureUseCase<ChartBudgetRepository>
 
   void loadSaving(onNext<ChartBudgetEntity> next) {
     execute<ChartBudgetEntity>(repo.loadSaving(), next, (e) {
-      print("Load saving error $e");
+      debugPrint("Load saving error $e");
       next(ChartBudgetEntity(0.0, 0.0, 0.0));
     });
   }

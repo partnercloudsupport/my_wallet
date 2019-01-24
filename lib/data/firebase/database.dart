@@ -4,6 +4,8 @@ import 'package:my_wallet/data/database_manager.dart' as db;
 import 'package:my_wallet/data/firebase/common.dart';
 import 'package:my_wallet/firebase/database/firebase_database.dart';
 
+import 'package:flutter/foundation.dart';
+
 const _data = "data";
 
 DocumentReference _firestore;
@@ -47,11 +49,11 @@ Future<void> setupDatabase(final String homeKey) async {
     try {
         snapShot = await _firestore.get();
     } catch (e) {
-      print("timeout on homekey data");
+      debugPrint("timeout on homekey data");
     }
 
     if(snapShot == null || snapShot.documentID == null || snapShot.documentID.isEmpty) {
-      print("drop all table");
+      debugPrint("drop all table");
       // drop database
       await db.dropAllTables();
     }
@@ -156,7 +158,7 @@ void _delaySync({bool initiate = false}) {
 
           // only care of deleted items
           if(snapshot.data == null) {
-            print("table $table has item ${snapshot.documentID} deleted");
+            debugPrint("table $table has item ${snapshot.documentID} deleted");
 
             switch(table) {
               case tblAccount: db.deleteAccount(_toId(snapshot)); break;

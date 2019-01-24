@@ -2,7 +2,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:my_wallet/data/data.dart';
-import 'package:synchronized/synchronized.dart';
 import 'package:my_wallet/data/data_observer.dart';
 import 'package:my_wallet/utils.dart' as Utils;
 import 'package:my_wallet/shared_pref/shared_preference.dart';
@@ -1053,7 +1052,7 @@ class _Database {
         try {
           await db.execute("DROP TABLE $tbl");
         } catch(e, stacktrace) {
-          print(stacktrace);
+          debugPrint(stacktrace.toString());
         }
       }
 

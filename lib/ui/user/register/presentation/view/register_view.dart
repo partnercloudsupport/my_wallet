@@ -214,11 +214,11 @@ class _RegisterState extends CleanArchitectureView<Register, RegisterPresenter> 
   }
 
 //  void _onFacebookButtonPressed() {
-//    print("Facebook");
+//    debugPrint("Facebook");
 //  }
 //
 //  void _onGoogleButtonPressed() {
-//    print("Google");
+//    debugPrint("Google");
 //  }
 
   void _registerEmail() {

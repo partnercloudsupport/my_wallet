@@ -165,7 +165,7 @@ class _NewHomeState extends CleanArchitectureView<NewHome, NewHomePresenter> imp
 
   @override
   void onJoinFailed(Exception e) {
-    print(e.toString());
+    debugPrint(e.toString());
     _joiningHome = false;
     _joinHomeState.currentState.stop();
 

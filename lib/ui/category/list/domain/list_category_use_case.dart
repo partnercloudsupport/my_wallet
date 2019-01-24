@@ -34,7 +34,7 @@ class ListCategoryUseCase extends CleanArchitectureUseCase<CategoryListRepositor
 
       return entities;
     }), next, (e) {
-      print("Load categories error $e");
+      debugPrint("Load categories error $e");
       next([]);
     });
   }

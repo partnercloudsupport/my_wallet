@@ -6,7 +6,7 @@ class HomeOverviewUseCase extends CleanArchitectureUseCase<HomeOverviewRepositor
 
   void loadTotal(onNext<double> next) {
     execute(repo.loadTotal(), next, (e) {
-      print("Load total error $e");
+      debugPrint("Load total error $e");
       next(0.0);
     });
   }

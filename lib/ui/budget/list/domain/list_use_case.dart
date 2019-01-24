@@ -9,7 +9,7 @@ class ListBudgetsUseCase extends CleanArchitectureUseCase<ListBudgetsRepository>
 
   void loadThisMonthBudgetList(DateTime month, onNext<List<BudgetEntity>> next) async {
     execute<List<BudgetEntity>>(repo.loadThisMonthBudgetList(month), next, (e) {
-      print("Load this month budget error $e");
+      debugPrint("Load this month budget error $e");
       next([]);
     });
   }
@@ -45,7 +45,7 @@ class ListBudgetsUseCase extends CleanArchitectureUseCase<ListBudgetsRepository>
 
       return summary;
     }), next, (e) {
-      print("Load summary error $e");
+      debugPrint("Load summary error $e");
       next([]);
     });
   }

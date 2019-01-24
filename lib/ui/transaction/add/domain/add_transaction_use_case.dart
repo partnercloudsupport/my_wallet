@@ -7,7 +7,7 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
 
   void loadAccounts(onNext<List<Account>> next) {
     execute(repo.loadAccounts(), next, (e) {
-      print("Load accounts error $e");
+      debugPrint("Load accounts error $e");
       next([]);
     });
   }
@@ -19,7 +19,7 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
 
       return repo.loadCategory(categoryType);
     }), next, (e) {
-      print("Load category error $e");
+      debugPrint("Load category error $e");
       next([]);
     });
   }
@@ -30,7 +30,7 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
 
   void loadCurrentUserName(onNext<UserDetail> next) {
     execute(repo.loadCurrentUserName(), next, (e) {
-      print("Load current user error $e");
+      debugPrint("Load current user error $e");
       next(null);
     });
   }

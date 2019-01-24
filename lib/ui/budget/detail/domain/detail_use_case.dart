@@ -14,7 +14,7 @@ class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepositor
 
       return BudgetDetailEntity(category, budget == null ? 0.0 : budget.budgetPerMonth, budget == null ? from : budget.budgetStart, budget == null ? to : budget.budgetEnd);
     }), next, (e) {
-      print("load category budget failed");
+      debugPrint("load category budget failed");
       next(null);
     });
   }
@@ -28,7 +28,7 @@ class BudgetDetailUseCase extends CleanArchitectureUseCase<BudgetDetailRepositor
 
       List<Budget> budgets = await repo.findCollapsingBudgets(_cat.id, startMonth, endMonth);
 
-      print("save with endmonth $endMonth");
+      debugPrint("save with endmonth $endMonth");
       do {
         // insert new budget
         var id = await repo.generateBudgetId();

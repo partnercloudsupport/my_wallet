@@ -26,7 +26,7 @@ class CreateCategoryUseCase extends CleanArchitectureUseCase<CreateCategoryRepos
 
   void loadCategoryDetail(int id, onNext<AppCategory> next) async {
     execute(repo.loadCategory(id), next, (e) {
-      print("$e");
+      debugPrint("$e");
     });
   }
 }
