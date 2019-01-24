@@ -240,6 +240,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
   }
 
   void dismissDialog() {
+    _savingBudget = false;
     debugPrint("Dismiss dialog ${alertDialog.currentContext}");
     if(alertDialog.currentContext != null) {
       // alert dialog is showing

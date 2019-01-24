@@ -45,6 +45,10 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
         if (!(await repo.checkCategory(_category))) break;
         if (!(await repo.checkDateTime(_date))) break;
 
+        if(_amount == 0 && _id == null) {
+          throw Exception("Please enter your transaction amount");
+        }
+
         int id;
         TransactionDetail currentTransaction;
         if (_id == null) {

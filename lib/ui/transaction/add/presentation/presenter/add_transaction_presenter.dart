@@ -30,6 +30,7 @@ class AddTransactionPresenter extends CleanArchitecturePresenter<AddTransactionU
       double _amount,
       DateTime _date,
       String _desc) {
+    print("_account $_account _category $_category");
     useCase.saveTransaction(
       id,
         _type,

@@ -17,7 +17,7 @@ class CleanArchitectureUseCase<T extends CleanArchitectureRepository> {
   void execute<T>(Future<T> task, onNext<T> next, onError error) {
     if(task != null) {
       Observable(Stream.fromFuture(task)).listen((data) => next(data), onError: (e, stacktrace) {
-        debugPrint(stacktrace);
+        debugPrint(stacktrace.toString());
 
         if (error != null) {
           if (e is Exception) {

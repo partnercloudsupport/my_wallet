@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:my_wallet/ui/transaction/add/data/add_transaction_entity.dart';
 import 'package:intl/intl.dart';
 
+import 'package:flutter/scheduler.dart';
+
 class AddTransaction extends StatefulWidget {
   final int transactionId;
 
@@ -243,10 +245,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
     });
   }
 
-//  double _toNumber(String number, String decimal) {
-//    return double.parse("${number == null || number.isEmpty ? "0" : number}.${decimal == null || decimal.isEmpty ? "0" : decimal}");
-//  }
-
   void _saveTransaction() {
     if(_isSaving) return;
 
@@ -270,15 +268,15 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
       ),
     ));
 
-    presenter.saveTransaction(
-      widget.transactionId,
+    SchedulerBinding.instance.addPostFrameCallback((duration) => presenter.saveTransaction(
+        widget.transactionId,
         _type,
         _account,
         _category,
         _amount,
         _date,
         _note
-    );
+    ));
   }
 
   @override
@@ -319,12 +317,11 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   @override
   void onLoadTransactionDetail(TransactionDetail detail) {
     setState(() {
-      var _nf = NumberFormat("#");
-
       _type = detail.type;
       _date = detail.dateTime;
       _account = detail.account;
       _category = detail.category;
+      _amount = detail.amount;
       _user = detail.user;
       _note = detail.desc;
     });
@@ -340,6 +337,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   }
 
   void _dismissDialog() {
+    _isSaving = false;
     if(_alertDialog.currentContext != null) {
       // alert dialog is showing
       Navigator.pop(context);
