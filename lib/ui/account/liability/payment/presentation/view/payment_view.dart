@@ -26,6 +26,13 @@ class _PayLiabilityState extends CleanArchitectureView<PayLiability, PayLiabilit
   final _timeFormat = DateFormat("HH:mm");
 
   final GlobalKey<NumberInputPadState> _numPadKey = GlobalKey();
+  final GlobalKey<BottomViewContentState<Account>> _accountKey = GlobalKey();
+  final GlobalKey<BottomViewContentState<AppCategory>> _categoryKey = GlobalKey();
+
+  final tables = [
+    observer.tableAccount,
+    observer.tableCategory
+  ];
 
   String _name;
   Account _account;
@@ -52,6 +59,8 @@ class _PayLiabilityState extends CleanArchitectureView<PayLiability, PayLiabilit
 
     _name = widget._name;
 
+    observer.registerDatabaseObservable(tables, this);
+
     _loadAccounts();
     _loadCategories();
   }
@@ -73,6 +82,7 @@ class _PayLiabilityState extends CleanArchitectureView<PayLiability, PayLiabilit
           Expanded(
             child: Container(
               color: AppTheme.white,
+              alignment: Alignment.center,
               child: FittedBox(
                 child: Column(
                   children: <Widget>[
@@ -114,35 +124,82 @@ class _PayLiabilityState extends CleanArchitectureView<PayLiability, PayLiabilit
 
   void _showAccountListSelection() {
     showModalBottomSheet(context: context, builder: (context) =>
-        BottomViewContent(_accounts, (f) => Align(
-          child: InkWell(
-            child: Padding(padding: EdgeInsets.all(10.0),
-                child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.brightPink), overflow: TextOverflow.ellipsis, maxLines: 1,)
-            ),
-            onTap: () {
-              setState(() => _account = f);
+        BottomViewContent(
+          _accounts,
+              (f) => Align(
+                child: InkWell(
+                  child: Padding(padding: EdgeInsets.all(10.0),
+                      child: Text(
+                        f.name,
+                        style: Theme.of(context).textTheme.title.apply(color: AppTheme.brightPink),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,)
+                  ),
+                  onTap: () {
+                    setState(() => _account = f);
 
-              Navigator.pop(context);
-            },
+                    Navigator.pop(context);
+                    },
+                ),
+              ),
+          noDataDescription: Stack(
+            children: <Widget>[
+              Center(
+                child: Text("No Account available.", style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: RoundedButton(
+                  onPressed: () => Navigator.pushNamed(context, routes.AddAccount),
+                  child: Text("Add Account"),
+                  color: AppTheme.darkBlue,
+                ),
+              )
+            ],
           ),
-        ))
+          key: _accountKey,
+        )
     );
   }
 
   void _showCategoryListSelection() {
     showModalBottomSheet(context: context, builder: (context) =>
-        BottomViewContent(_categories, (f) => Align(
-          child: InkWell(
-            child: Padding(padding: EdgeInsets.all(10.0),
-                child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.brightPink), overflow: TextOverflow.ellipsis, maxLines: 1,)
-            ),
-            onTap: () {
-              setState(() => _category = f);
-
-              Navigator.pop(context);
+        BottomViewContent(
+          _categories,
+              (f) => Align(
+                child: InkWell(
+                child: Padding(padding: EdgeInsets.all(10.0),
+                    child: Text(
+                      f.name,
+                      style: Theme.of(context).textTheme.title.apply(color: AppTheme.brightPink),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,)
+                ),
+                  onTap: () {
+                  setState(() => _category = f);
+                  Navigator.pop(context);
             },
           ),
-        ))
+        ),
+          noDataDescription: Stack(
+            children: <Widget>[
+              Center(
+                child: Text(
+                  "No Category available. Please create new Category to make payment.",
+                  style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),
+                  textAlign: TextAlign.center,),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: RoundedButton(
+                    onPressed: () => Navigator.pushNamed(context, routes.CreateCategory),
+                    child: Text("Create Category"),
+                color: AppTheme.darkBlue,),
+              )
+            ],
+          ),
+          key: _categoryKey,
+        )
     );
   }
 
@@ -169,6 +226,7 @@ class _PayLiabilityState extends CleanArchitectureView<PayLiability, PayLiabilit
   @override
   void onAccountListLoaded(List<Account> accounts) {
     setState(() => _accounts = accounts);
+    if(_accountKey.currentContext != null) _accountKey.currentState.updateData(accounts);
   }
 
   @override
@@ -179,6 +237,7 @@ class _PayLiabilityState extends CleanArchitectureView<PayLiability, PayLiabilit
   @override
   void onCategoryLoaded(List<AppCategory> categories) {
     setState(() => _categories = categories);
+    if(_categoryKey.currentContext != null) _categoryKey.currentState.updateData(categories);
   }
 
   @override

@@ -24,9 +24,11 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   var _numberFormat = NumberFormat("\$#,##0.00");
 
-  final tables = [observer.tableAccount, observer.tableCategory, observer.tableUser];
+  final tables = [observer.tableAccount, observer.tableCategory, observer.tableUser, observer.tableTransactions];
 
-  GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
+  final GlobalKey<NumberInputPadState> numPadKey = GlobalKey();
+  final GlobalKey<BottomViewContentState<Account>> _accountKey = GlobalKey();
+  final GlobalKey<BottomViewContentState<AppCategory>> _categoryKey = GlobalKey();
 
   var _amount = 0.0;
   var _type = TransactionType.expenses;
@@ -52,6 +54,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   @override
   void onDatabaseUpdate(String table) {
+    debugPrint("on database update $table");
+
     if(table == observer.tableAccount) presenter.loadAccounts();
 
     if (table == observer.tableCategory) presenter.loadCategory(_type);
@@ -169,7 +173,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   void _showTransactionTypeSelection() {
     showModalBottomSheet(context: context, builder: (context) =>
-        BottomViewContent(TransactionType.dailyTransaction, (f) =>
+        BottomViewContent(
+            TransactionType.dailyTransaction, (f) =>
             Align(
               child: InkWell(
                 child: Padding(
@@ -194,7 +199,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
 
   void _showSelectAccount() {
     showModalBottomSheet(context: context, builder: (context) =>
-        BottomViewContent(_accountList, (f) => Align(
+        BottomViewContent(
+          _accountList, (f) => Align(
           child: InkWell(
             child: Padding(padding: EdgeInsets.all(10.0),
               child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkGreen), overflow: TextOverflow.ellipsis, maxLines: 1,) //Data(f.name, theme.darkGreen)
@@ -206,13 +212,32 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
             },
           ),
         ),
+          noDataDescription: Stack(
+            children: <Widget>[
+              Center(
+                child: Text("No account is available. Please create your account to continue.",
+                  style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue),
+                textAlign: TextAlign.center,),
+              ),
+                 Align(
+                   alignment: Alignment.bottomCenter,
+                   child: RoundedButton(
+                      onPressed: () => Navigator.of(context).pushNamed(routes.AddAccount),
+                      child: Text("Add Account",),
+                      color: AppTheme.darkBlue,),
+                 ),
+            ],
+          ),
+          key: _accountKey,
         ),
     );
   }
 
   void _showSelectCategory() {
+    TextStyle style = Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue);
     showModalBottomSheet(context: context, builder: (context) =>
-        BottomViewContent(_categoryList, (f) => Align(
+        BottomViewContent(
+          _categoryList, (f) => Align(
           child: InkWell(
             child: Padding(padding: EdgeInsets.all(10.0),
                 child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.brightPink), overflow: TextOverflow.ellipsis, maxLines: 1,)
@@ -223,7 +248,35 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
               Navigator.pop(context);
             },
           ),
-        ))
+        ),
+          noDataDescription: Stack(
+            children: <Widget>[
+              Center(
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: <TextSpan> [
+                      TextSpan(text: "No Category available for transaction type ", style: style),
+                      TextSpan(text: _type.name, style: style.apply(color: AppTheme.pinkAccent)),
+                      TextSpan(text: ".\n Please create new category for transaction type ", style: style),
+                      TextSpan(text: _type.name, style: style.apply(color: AppTheme.pinkAccent)),
+                      TextSpan(text: ", or change transaction type", style: style)
+                    ]
+                  )
+        ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: RoundedButton(
+                  onPressed: () => Navigator.pushNamed(context, routes.CreateCategory),
+                  child: Text("Create Category"),
+                  color: AppTheme.darkBlue,
+                ),
+              )
+            ],
+          ),
+          key: _categoryKey,
+    )
     );
   }
 
@@ -282,11 +335,13 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   @override
   void onAccountListLoaded(List<Account> value) {
     setState(() => this._accountList = value);
+    if(_accountKey.currentContext != null) _accountKey.currentState.updateData(value);
   }
 
   @override
   void onCategoryListLoaded(List<AppCategory> value) {
     setState(() => this._categoryList = value);
+    if(_categoryKey.currentContext != null) _categoryKey.currentState.updateData(value);
   }
 
   @override

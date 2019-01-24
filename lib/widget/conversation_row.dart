@@ -89,7 +89,7 @@ class _Data extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Flexible(
-      child: onPressed == null ? Text(
+      child: onPressed == null ? AutoSizeText(
         _data,
         style: style == null ? Theme.of(context).textTheme.title.apply(color: _color, ) : style.apply(color: _color, ),
         overflow: TextOverflow.ellipsis,)

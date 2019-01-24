@@ -17,6 +17,7 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
   _CreateAccountState() : super(CreateAccountPresenter());
 
   final GlobalKey<NumberInputPadState> _numPadKey = GlobalKey();
+
   final _nf = NumberFormat("\$#,##0.00");
 
   AccountType _type = AccountType.paymentAccount;
@@ -84,7 +85,8 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
   void _showAccountTypeSelection() {
     _numPadKey.currentState.hide();
     showModalBottomSheet(context: context, builder: (context) =>
-        BottomViewContent(AccountType.all, (f) =>
+        BottomViewContent(
+            AccountType.all, (f) =>
             Align(
               child: InkWell(
                 child: Padding(
