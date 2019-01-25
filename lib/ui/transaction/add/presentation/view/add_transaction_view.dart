@@ -174,7 +174,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   void _showTransactionTypeSelection() {
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(
-            TransactionType.dailyTransaction, (f) =>
+            TransactionType.dailyTransaction, (context, f) =>
             Align(
               child: InkWell(
                 child: Padding(
@@ -192,7 +192,8 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
                 },
               ),
               alignment: Alignment.center,
-            )
+            ),
+          "Select Transaction Type",
         )
     );
   }
@@ -200,7 +201,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   void _showSelectAccount() {
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(
-          _accountList, (f) => Align(
+          _accountList, (context, f) => Align(
           child: InkWell(
             child: Padding(padding: EdgeInsets.all(10.0),
               child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.darkGreen), overflow: TextOverflow.ellipsis, maxLines: 1,) //Data(f.name, theme.darkGreen)
@@ -212,6 +213,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
             },
           ),
         ),
+          "Select Account",
           noDataDescription: Stack(
             children: <Widget>[
               Center(
@@ -237,7 +239,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
     TextStyle style = Theme.of(context).textTheme.title.apply(color: AppTheme.darkBlue);
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(
-          _categoryList, (f) => Align(
+          _categoryList, (context, f) => Align(
           child: InkWell(
             child: Padding(padding: EdgeInsets.all(10.0),
                 child: Text(f.name, style: Theme.of(context).textTheme.title.apply(color: AppTheme.brightPink), overflow: TextOverflow.ellipsis, maxLines: 1,)
@@ -249,6 +251,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
             },
           ),
         ),
+          "Select Category",
           noDataDescription: Stack(
             children: <Widget>[
               Center(

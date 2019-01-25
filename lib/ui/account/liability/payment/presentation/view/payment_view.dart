@@ -126,7 +126,7 @@ class _PayLiabilityState extends CleanArchitectureView<PayLiability, PayLiabilit
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(
           _accounts,
-              (f) => Align(
+              (context, f) => Align(
                 child: InkWell(
                   child: Padding(padding: EdgeInsets.all(10.0),
                       child: Text(
@@ -142,6 +142,7 @@ class _PayLiabilityState extends CleanArchitectureView<PayLiability, PayLiabilit
                     },
                 ),
               ),
+          "Select Account",
           noDataDescription: Stack(
             children: <Widget>[
               Center(
@@ -166,7 +167,7 @@ class _PayLiabilityState extends CleanArchitectureView<PayLiability, PayLiabilit
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(
           _categories,
-              (f) => Align(
+              (context, f) => Align(
                 child: InkWell(
                 child: Padding(padding: EdgeInsets.all(10.0),
                     child: Text(
@@ -181,6 +182,7 @@ class _PayLiabilityState extends CleanArchitectureView<PayLiability, PayLiabilit
             },
           ),
         ),
+          "Select Category",
           noDataDescription: Stack(
             children: <Widget>[
               Center(
@@ -213,14 +215,12 @@ class _PayLiabilityState extends CleanArchitectureView<PayLiability, PayLiabilit
     );
   }
 
-  @override
   void _loadAccounts() {
     presenter.loadAccounts(widget._id);
   }
 
-  @override
   void _loadCategories() {
-    presenter.loadCategories();
+    presenter.loadCategories(CategoryType.expense);
   }
 
   @override

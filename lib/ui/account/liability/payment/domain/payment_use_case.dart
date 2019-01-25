@@ -10,8 +10,8 @@ class PayLiabilityUseCase extends CleanArchitectureUseCase<PayLiabilityRepositor
     execute(repo.loadAccountsExceptId(exceptId), next, error);
   }
 
-  void loadCategories(onNext<List<AppCategory>> next, onError error) {
-    execute(repo.loadCategories(), next, error);
+  void loadCategories(CategoryType type, onNext<List<AppCategory>> next, onError error) {
+    execute(repo.loadCategories(type), next, error);
   }
 
   void savePayment(int liabilityId, Account fromAccount, AppCategory category, double amount, DateTime date, onNext<bool> next, onError error) {

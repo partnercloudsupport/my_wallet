@@ -86,7 +86,7 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
     _numPadKey.currentState.hide();
     showModalBottomSheet(context: context, builder: (context) =>
         BottomViewContent(
-            AccountType.all, (f) =>
+            AccountType.all, (context, f) =>
             Align(
               child: InkWell(
                 child: Padding(
@@ -102,7 +102,8 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
                 },
               ),
               alignment: Alignment.center,
-            )
+            ),
+          "Select Account Type",
         )
     );
   }

@@ -13,8 +13,8 @@ class PayLiabilityRepository extends CleanArchitectureRepository {
     return _dbRepo.loadAccountsExceptId(exceptId);
   }
 
-  Future<List<AppCategory>> loadCategories() {
-    return _dbRepo.loadCategories();
+  Future<List<AppCategory>> loadCategories(CategoryType type) {
+    return _dbRepo.loadCategories(type);
   }
 
   Future<int> generateDischargeLiabilityId() {
@@ -32,8 +32,8 @@ class _PayLiabilityDatabaseRepository {
     return db.queryAccountsExcept([exceptId]);
   }
 
-  Future<List<AppCategory>> loadCategories() {
-    return db.queryCategory();
+  Future<List<AppCategory>> loadCategories(CategoryType type) {
+    return db.queryCategory(type: type);
   }
 
   Future<int> generateDischargeLiabilityId() {
