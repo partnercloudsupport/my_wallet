@@ -1,0 +1,28 @@
+# More documentation about how to customize your build
+# can be found here:
+# https://docs.fastlane.tools
+fastlane_version "2.68.0"
+
+# Fastfile actions accept additional configuration, but
+# don't worry, fastlane will prompt you for required
+# info which you can add here later
+lane :beta do
+  # build android
+  # build_android_app(
+  #   project_dir:"android/",
+  #   task:"assemble",
+  #   build_type:"Release"
+  # )
+
+  # build ios
+  gym(
+     workspace: "ios/Runner.xcworkspace",
+     export_method:"development"
+  )
+
+  # upload to Beta by Crashlytics
+  #crashlytics(
+  #  apk_path:"build/app/outputs/apk/release/app-release.apk",
+  #  ipa_path:"Runner.ipa"
+  #)
+end
