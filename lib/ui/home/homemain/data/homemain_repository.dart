@@ -44,7 +44,7 @@ class _MyWalletHomeDatabaseRepository {
 
         var remainFactor = 1 - (budget == null || budget.budgetPerMonth == 0 ? 0.0 : cat.expense/budget.budgetPerMonth);
 
-        if(remainFactor < 0) remainFactor = 0;
+        if(remainFactor < 0) remainFactor = 0.0;
 
         homeEntities.add(ExpenseEntity(cat.id, cat.name, cat.income, cat.expense, cat.colorHex, remainFactor, budget != null ? budget.budgetPerMonth : 0.0));
       }

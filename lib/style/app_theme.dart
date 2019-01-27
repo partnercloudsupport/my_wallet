@@ -77,9 +77,10 @@ class AppTheme {
           body2: TextStyle(color: Colors.white),
           title: TextStyle(color: Colors.white),
           caption: TextStyle(color: Colors.white),
-          subtitle: TextStyle(color: Colors.white),
+//          subtitle: TextStyle(color: Colors.white),
           subhead: TextStyle(color: Colors.white),
-          overline: TextStyle(color: Colors.white)),
+//          overline: TextStyle(color: Colors.white)
+      ),
       primaryTextTheme: TextTheme(
           display1: TextStyle(color: blueGrey),
           display2: TextStyle(color: blueGrey),
@@ -91,9 +92,10 @@ class AppTheme {
           body2: TextStyle(color: blueGrey),
           title: TextStyle(color: blueGrey),
           caption: TextStyle(color: blueGrey),
-          subtitle: TextStyle(color: blueGrey),
+//          subtitle: TextStyle(color: blueGrey),
           subhead: TextStyle(color: blueGrey),
-          overline: TextStyle(color: blueGrey)),
+//          overline: TextStyle(color: blueGrey)
+      ),
 //    TextTheme accentTextTheme,
 //    InputDecorationTheme inputDecorationTheme,
 //    IconThemeData iconTheme,
@@ -113,9 +115,9 @@ class AppTheme {
         }
     ),
 //    ColorScheme colorScheme,
-    dialogTheme: DialogTheme(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-    ),
+//    dialogTheme: DialogTheme(
+//      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+//    ),
 //    Typography typograph
       );
 

@@ -51,9 +51,9 @@ class DateTimeRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           _Description("on", ),
-          _Data(_dateFormat.format(_date), AppTheme.darkBlue, onPressed: _onDatePressed, maxFont: 25, minFont: 12, ),
+          _Data(_dateFormat.format(_date), AppTheme.darkBlue, onPressed: _onDatePressed, maxFont: 25.0, minFont: 12.0, ),
           _Description("at", ),
-          _Data(_timeFormat.format(_date), AppTheme.darkBlue, onPressed: _onTimePressed,maxFont: 25, minFont: 12, ),
+          _Data(_timeFormat.format(_date), AppTheme.darkBlue, onPressed: _onTimePressed,maxFont: 25.0, minFont: 12.0, ),
         ],
       ),
     );
@@ -84,7 +84,7 @@ class _Data extends StatelessWidget {
   final double maxFont;
   final double minFont;
 
-  _Data(this._data, this._color, {this.style, this.onPressed, this.maxFont = 50, this.minFont = 12,});
+  _Data(this._data, this._color, {this.style, this.onPressed, this.maxFont = 50.0, this.minFont = 12.0,});
 
   @override
   Widget build(BuildContext context) {

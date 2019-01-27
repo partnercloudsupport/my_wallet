@@ -49,7 +49,7 @@ class _NewHomeState extends CleanArchitectureView<NewHome, NewHomePresenter> imp
                 hintText: "Enter host's email address",
                 hintStyle: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey),
               ),
-              style: Theme.of(context).textTheme.subtitle.apply(color: AppTheme.black),
+              style: Theme.of(context).textTheme.title.apply(color: AppTheme.black),
             ),
           ),
           RoundedButton(
@@ -98,7 +98,7 @@ class _NewHomeState extends CleanArchitectureView<NewHome, NewHomePresenter> imp
                 hintText: "Enter your home name",
                 hintStyle: Theme.of(context).textTheme.subhead.apply(color: AppTheme.blueGrey),
               ),
-              style: Theme.of(context).textTheme.subtitle.apply(color: AppTheme.black),
+              style: Theme.of(context).textTheme.title.apply(color: AppTheme.black),
             ),
           ),
           RoundedButton(

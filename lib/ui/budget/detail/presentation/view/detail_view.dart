@@ -159,7 +159,7 @@ class _BudgetDetailState extends CleanArchitectureView<BudgetDetail, BudgetDetai
         context: context,
         builder: (_) => CalendarCarousel(
           selectedDateTime: selectedDate,
-          height: 430,
+          height: 430.0,
           onDayPressed: (date, events) => onSelected(date),
         ));
   }

@@ -38,7 +38,7 @@ class ListBudgetsUseCase extends CleanArchitectureUseCase<ListBudgetsRepository>
           earn = await repo.sumAllTransactionBetweenDateByType(firstDay, end, TransactionType.typeIncome);
         }
 
-        summary.add(BudgetSummary(firstDay, budget == null ? 0 : budget, spend - earn > 0 ? spend - earn : 0));
+        summary.add(BudgetSummary(firstDay, budget == null ? 0.0 : budget, spend - earn > 0.0 ? spend - earn : 0.0));
 
         firstDay = nextMonthOf(firstDay);
       }

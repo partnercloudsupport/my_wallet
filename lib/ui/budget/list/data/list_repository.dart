@@ -10,7 +10,7 @@ export 'package:my_wallet/data/data.dart';
 
 class ListBudgetsRepository extends CleanArchitectureRepository{
   Future<List<BudgetEntity>> loadThisMonthBudgetList(DateTime month) async {
-    return await db.queryCategoryWithBudgetAndTransactionsForMonth<BudgetEntity>(month, (cat, budgetPerMonth, spent, earn) => BudgetEntity(cat.id, cat.name, cat.colorHex, spent - earn > 0 ? spent - earn : 0, budgetPerMonth));
+    return await db.queryCategoryWithBudgetAndTransactionsForMonth<BudgetEntity>(month, (cat, budgetPerMonth, spent, earn) => BudgetEntity(cat.id, cat.name, cat.colorHex, spent - earn > 0.0 ? spent - earn : 0.0, budgetPerMonth));
   }
 
   Future<DateTime> queryMinBudgetStart() {
