@@ -50,21 +50,21 @@ android {
         manifestPlaceholders = [beta_apitoken: releaseProperties.getProperty('fabric_api_token')]
     }
 
-#    signingConfigs {
-#        release {
-#            storeFile file(releaseProperties.getProperty('keystore'))
-#            storePassword releaseProperties.getProperty('keystore_password')
-#            keyAlias releaseProperties.getProperty('keystore_alias')
-#            keyPassword releaseProperties.getProperty('keystore_alias_password')
-#        }
-#    }
-#
+//    signingConfigs {
+//        release {
+//            storeFile file(releaseProperties.getProperty('keystore'))
+//            storePassword releaseProperties.getProperty('keystore_password')
+//            keyAlias releaseProperties.getProperty('keystore_alias')
+//            keyPassword releaseProperties.getProperty('keystore_alias_password')
+//        }
+//    }
+
     buildTypes {
-#        release {
-#            // TODO: Add your own signing config for the release build.
-#            // Signing with the debug keys for now, so `flutter run --release` works.
-#            signingConfig signingConfigs.debug
-#        }
+//        release {
+//            // TODO: Add your own signing config for the release build.
+//            // Signing with the debug keys for now, so `flutter run --release` works.
+//            signingConfig signingConfigs.debug
+//        }
 
         debug {
             signingConfig signingConfigs.debug
