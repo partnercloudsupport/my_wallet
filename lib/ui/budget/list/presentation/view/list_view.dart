@@ -120,7 +120,7 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
           icon: Icon(
             Icons.add,
             color: AppTheme.darkBlue,
-            size: 30,
+            size: 30.0,
           ),
         ),
       ),

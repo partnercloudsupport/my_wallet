@@ -22,7 +22,7 @@ class MyWalletHome extends StatefulWidget {
 
 class MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePresenter> implements MyWalletHomeDataView, observer.DatabaseObservable {
   MyWalletState() : super(MyWalletHomePresenter());
-  final _titleStyle = TextStyle(color: AppTheme.blueGrey, fontSize: 14, fontWeight: FontWeight.bold);
+  final _titleStyle = TextStyle(color: AppTheme.blueGrey, fontSize: 14.0, fontWeight: FontWeight.bold);
   DateFormat _df = DateFormat("MMM, yyyy");
 
   final _overviewRatio = 0.15;

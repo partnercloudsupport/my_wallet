@@ -53,7 +53,7 @@ class _ChartBudgetViewState extends CleanArchitectureView<ChartBudgetView, Chart
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.all(10.0),
       child: Stack(
         children: <Widget>[
           Align(

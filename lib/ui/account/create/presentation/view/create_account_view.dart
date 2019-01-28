@@ -22,7 +22,7 @@ class _CreateAccountState extends CleanArchitectureView<CreateAccount, CreateAcc
 
   AccountType _type = AccountType.paymentAccount;
   String _name = "";
-  double _amount = 0;
+  double _amount = 0.0;
 
   init() {
     presenter.dataView = this;

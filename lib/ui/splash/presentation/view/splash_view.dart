@@ -54,7 +54,7 @@ class _SplashViewState extends CleanArchitectureView<SplashView, SplashPresenter
           ],
         ),
           Container(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(18.0),
             alignment: Alignment.bottomCenter,
             child: Text(_version == null ? "" : _version, style: TextStyle(color: AppTheme.darkBlue),),
           )
