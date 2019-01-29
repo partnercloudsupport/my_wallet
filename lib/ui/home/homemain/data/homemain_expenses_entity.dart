@@ -3,11 +3,11 @@ export 'package:my_wallet/data/data.dart';
 class ExpenseEntity {
   final int categoryId;
   final String name;
-  final double income;
-  final double expense;
   final String colorHex;
-  final double remainFactor;
+  final double transaction;
+  final double remain;
   final double budget;
+  final double remainFactor;
 
-  ExpenseEntity(this.categoryId, this.name, this.income, this.expense, this.colorHex, this.remainFactor, this.budget);
+  ExpenseEntity(this.categoryId, this.name, this.colorHex, this.transaction, this.remain, this.budget, this.remainFactor);
 }

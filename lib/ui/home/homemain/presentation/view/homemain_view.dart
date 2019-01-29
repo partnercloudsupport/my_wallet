@@ -172,7 +172,21 @@ class MyWalletState extends CleanArchitectureView<MyWalletHome, MyWalletHomePres
               ),
               onTap: () => Navigator.pushNamed(context, routes.TransactionList(_homeEntities[index].name, categoryId: _homeEntities[index].categoryId)),
               title: Text(_homeEntities[index].name, style: TextStyle(color: AppTheme.darkBlue),),
-              trailing: Text(_nf.format(_homeEntities[index].expense), style: TextStyle(color: _homeEntities[index].expense > _homeEntities[index].budget ? AppTheme.red : AppTheme.darkBlue),),
+              trailing: RichText(
+                textAlign: TextAlign.right,
+                text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: _nf.format(_homeEntities[index].transaction),
+                    style: TextStyle(color: AppTheme.darkBlue),
+                  ),
+                  TextSpan(
+                    text: "\n(${_nf.format(_homeEntities[index].remain)})",
+                    style: TextStyle(color: _homeEntities[index].remain >= 0 ? AppTheme.tealAccent : AppTheme.red),
+                  )
+                ]
+              ))
+              //Text(_nf.format(_homeEntities[index].transaction), style: TextStyle(color: _homeEntities[index].transaction > _homeEntities[index].budget ? AppTheme.red : AppTheme.darkBlue),),
             ),
           );
         },

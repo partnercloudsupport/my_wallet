@@ -42,11 +42,14 @@ class _MyWalletHomeDatabaseRepository {
       for(AppCategory cat in cats) {
         var budget = await _db.findBudget(start: start, end: end, catId: cat.id);
 
-        var remainFactor = 1 - (budget == null || budget.budgetPerMonth == 0 ? 0.0 : cat.expense/budget.budgetPerMonth);
+        var transaction = cat.categoryType == CategoryType.expense ? cat.expense : cat.income;
+
+        var remainFactor = 1 - (budget == null || budget.budgetPerMonth == 0 ? 0.0 : transaction/budget.budgetPerMonth);
+        var remain = (budget == null ? 0.0 : budget.budgetPerMonth) - transaction;
 
         if(remainFactor < 0) remainFactor = 0.0;
 
-        homeEntities.add(ExpenseEntity(cat.id, cat.name, cat.income, cat.expense, cat.colorHex, remainFactor, budget != null ? budget.budgetPerMonth : 0.0));
+        homeEntities.add(ExpenseEntity(cat.id, cat.name, cat.colorHex, transaction, remain, budget != null ? budget.budgetPerMonth : 0.0, remainFactor));
       }
     }
 
