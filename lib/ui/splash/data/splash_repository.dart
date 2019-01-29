@@ -23,7 +23,7 @@ class SplashRepository extends CleanArchitectureRepository {
 
   Future<AppDetail> loadAppData() async {
     FirebaseApp _app = await FirebaseApp.configure(
-        name: Platform.isIOS ? "MyWallet" : "My Wallet",
+        name: fbConfig.firebase_app_name,
         options: Platform.isIOS
             ? const FirebaseOptions(
           googleAppID: fbConfig.firebase_ios_app_id,

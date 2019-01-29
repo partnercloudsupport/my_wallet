@@ -120,18 +120,13 @@ Future<void> _addSubscriptions() async {
   })));
 
   _delaySync(initiate: true);
-}
 
-//Future<void> _sync(
-//    List<int> items,
-//    String table,
-//    Function(DocumentSnapshot snapshot) onUpdated) async {
-//  for(int id in items) {
-//    var snapshot = await _firestore.collection(table).document("$id").get();
-//
-//    onUpdated(snapshot);
-//  }
-//}
+  do {
+    await Future.delayed(Duration(seconds: 2), () {
+      debugPrint("Waiting for time sync");
+    });
+  } while(_timerSync != null);
+}
 
 void _delaySync({bool initiate = false}) {
   if(!initiate) {
