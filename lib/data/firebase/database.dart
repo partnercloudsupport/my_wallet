@@ -132,11 +132,13 @@ void _delaySync({bool initiate = false}) {
   if(!initiate) {
     if (_timerSync == null) return;
     if (!_timerSync.isActive) return;
+  }
 
+  if(_timerSync != null) {
     _timerSync.cancel();
   }
 
-  _timerSync = new Timer(Duration(seconds: 1), () async {
+  _timerSync = new Timer(Duration(seconds: 3), () async {
     Map<String, String> tables = {
       tblAccount : "table_accounts",
       tblTransaction : "table_transactions",

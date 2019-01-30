@@ -1094,70 +1094,71 @@ class _Database {
 
       if (item != null) {
         item.putIfAbsent(_updated, () => DateTime.now().millisecondsSinceEpoch);
+        var id;
         if (item[_id] == null) {
-          var id = await _generateId(table);
+          id = await _generateId(table);
           item.putIfAbsent(_id, () => id);
+        } else {
+          id = item[_id];
         }
 
-        result = await db.insert(table, item);
+        // search for this item in the database
+        var count = await db.query(table, columns: ["COUNT($_id)"], where: "$_id = ?", whereArgs: ["$id"]);
 
-        if(result >= 0) {
-          if (table == _tableTransactions) {
-            // recalculate account balance for transaction
-            await _privateDbHelper._recalculateAccountForTransaction(db, item);
-          }
-
-          if (table == _tableAccounts) {
-            await _privateDbHelper._recalculateAccount(db, item[_id]);
-          }
-
-          if(table == _tableTransfer) {
-              await _privateDbHelper._recalculateAccount(db, item[_transferFrom]);
-              await _privateDbHelper._recalculateAccount(db, item[_transferTo]);
-          }
-
-          if(table == _tableDischargeLiability) {
-              await _privateDbHelper._recalculateAccount(db, item[_dischargeFromAcc]);
-              await _privateDbHelper._recalculateAccount(db, item[_dischargeLiabilityId]);
-          }
+        if(count != null && (count.first.values.first ?? 0) > 0) {
+          // update
+          result = await db.update(table, item, where: "$_id = ?", whereArgs: ["$id"]);
+        } else {
+          // insert
+          result = await db.insert(table, item);
         }
       }
 
       if (items != null) {
         for (item in items) {
           item.putIfAbsent(_updated, () => DateTime.now().millisecondsSinceEpoch);
+          var id;
           if (item[_id] == null) {
-            var id = await _generateId(table);
+            id = await _generateId(table);
             item.putIfAbsent(_id, () => id);
           }
 
-          var singleResult = await db.insert(table, item);
+          var count = await db.query(table, columns: ["COUNT($_id)"], where: "$_id = ?", whereArgs: ["$id"]);
+
+          var singleResult = 0;
+          if(count != null && (count.first.values.first ?? 0) > 0) {
+            // update
+            singleResult = await db.update(table, item, where: "$_id = ?", whereArgs: ["$id"]);
+          } else {
+            // insert
+            singleResult = await db.insert(table, item);
+          }
 
           if (result < 0)
             result = singleResult;
           else
             result += singleResult;
+        }
+      }
 
-          if(singleResult >= 0) {
-            if (table == _tableTransactions) {
-              // recalculate account balance for transaction
-              await _privateDbHelper._recalculateAccountForTransaction(db, item);
-            }
+      if(result > 0) {
+        if (table == _tableTransactions) {
+          // recalculate account balance for transaction
+          await _privateDbHelper._recalculateAccountForTransaction(db, item);
+        }
 
-            if(table == _tableAccounts) {
-              await _privateDbHelper._recalculateAccount(db, item[_id]);
-            }
+        if (table == _tableAccounts) {
+          await _privateDbHelper._recalculateAccount(db, item[_id]);
+        }
 
-            if(table == _tableTransfer) {
-                await _privateDbHelper._recalculateAccount(db, item[_transferFrom]);
-                await _privateDbHelper._recalculateAccount(db, item[_transferTo]);
-            }
+        if(table == _tableTransfer) {
+          await _privateDbHelper._recalculateAccount(db, item[_transferFrom]);
+          await _privateDbHelper._recalculateAccount(db, item[_transferTo]);
+        }
 
-            if(table == _tableDischargeLiability) {
-              await _privateDbHelper._recalculateAccount(db, item[_dischargeFromAcc]);
-              await _privateDbHelper._recalculateAccount(db, item[_dischargeLiabilityId]);
-            }
-          }
+        if(table == _tableDischargeLiability) {
+          await _privateDbHelper._recalculateAccount(db, item[_dischargeFromAcc]);
+          await _privateDbHelper._recalculateAccount(db, item[_dischargeLiabilityId]);
         }
       }
 
