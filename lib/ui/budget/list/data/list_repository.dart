@@ -34,11 +34,6 @@ class ListBudgetsRepository extends CleanArchitectureRepository{
   }
 
   Future<double> queryBudgetAmount(DateTime from, DateTime to) async{
-    var incomeBudget = await db.querySumAllBudgetForMonth(from, to, CategoryType.income);
-    var expenseBudget = await db.querySumAllBudgetForMonth(from, to, CategoryType.expense);
-
-    print("income budget $incomeBudget and expense $expenseBudget");
-
     var budget = await db.querySumAllBudgetForMonth(from, to, CategoryType.expense);
     return budget == null ? 0.0 : budget;
   }
