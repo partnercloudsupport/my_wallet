@@ -7,10 +7,10 @@ import 'package:my_wallet/utils.dart' as Utils;
 class ListBudgetsUseCase extends CleanArchitectureUseCase<ListBudgetsRepository> {
   ListBudgetsUseCase() : super(ListBudgetsRepository());
 
-  void loadThisMonthBudgetList(DateTime month, onNext<List<BudgetEntity>> next) async {
-    execute<List<BudgetEntity>>(repo.loadThisMonthBudgetList(month), next, (e) {
+  void loadThisMonthBudgetList(DateTime month, onNext<BudgetListEntity> next) async {
+    execute<BudgetListEntity>(repo.loadThisMonthBudgetList(month), next, (e) {
       debugPrint("Load this month budget error $e");
-      next([]);
+      next(BudgetListEntity.empty());
     });
   }
 

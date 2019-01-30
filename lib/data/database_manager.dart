@@ -165,10 +165,10 @@ Future<double> sumAllAccountBalance({List<AccountType> types}) async {
   return sum[0].values.first ?? 0.0;
 }
 
-Future<List<T>> queryCategoryWithBudgetAndTransactionsForMonth<T>(DateTime month, Function(AppCategory cat, double budgetPerMonth, double spent, double earn) conversion) async {
+Future<List<T>> queryCategoryWithBudgetAndTransactionsForMonth<T>(DateTime month, CategoryType type, Function(AppCategory cat, double budgetPerMonth, double transaction) conversion) async {
   List<T> result = [];
 
-  List<Map<String, dynamic>> cats = await db._query(_tableCategory);
+  List<Map<String, dynamic>> cats = await db._query(_tableCategory, where: "$_catCategoryType = ${type.id}");
 
   DateTime firstDay = Utils.firstMomentOfMonth(month);
   DateTime lastDay = Utils.lastDayOfMonth(month);
@@ -185,30 +185,20 @@ Future<List<T>> queryCategoryWithBudgetAndTransactionsForMonth<T>(DateTime month
                 WHERE $_budgetCategoryId = ${category.id} AND $findBudget
                 """);
 
-      var rawSpend = await db._executeSql(
-          """
-            SELECT SUM($_transAmount) 
+      var rawTransaction = await db._executeSql(
+        """
+        SELECT SUM($_transAmount) 
             FROM $_tableTransactions
             WHERE $_transCategory = ${category.id}
             AND ($_transDateTime BETWEEN ${firstDay.millisecondsSinceEpoch} AND ${lastDay.millisecondsSinceEpoch})
-            AND $_transType in ${TransactionType.typeExpense.map((f) => "${f.id}").toString()}
-          """
-      );
-      var rawEarn = await db._executeSql(
-          """
-          SELECT SUM($_transAmount) 
-            FROM $_tableTransactions
-            WHERE $_transCategory = ${category.id}
-            AND ($_transDateTime BETWEEN ${firstDay.millisecondsSinceEpoch} AND ${lastDay.millisecondsSinceEpoch})
-            AND $_transType in ${TransactionType.typeIncome.map((f) => "${f.id}").toString()}
-          """
+            AND $_transType in ${type.id == CategoryType.expense.id ? TransactionType.typeExpense.map((f) => "${f.id}").toString() : TransactionType.typeIncome.map((f) => "${f.id}").toString()}
+        """
       );
 
-      var spent = rawSpend.first.values.first ?? 0.0;
-      var earn = rawEarn.first.values.first ?? 0.0;
+      var transaction = rawTransaction.first.values.first ?? 0.0;
       var budgetPerMonth = rawBudgetPerMonth.first.values.first ?? 0.0;
 
-      result.add(conversion(category, budgetPerMonth, spent, earn));
+      result.add(conversion(category, budgetPerMonth, transaction));
     }
   }
 
@@ -589,17 +579,15 @@ Future<Budget> findBudget({int catId, DateTime start, DateTime end}) async {
     return null;
 }
 
-Future<double> querySumAllBudgetForMonth(DateTime start, DateTime end) async {
+Future<double> querySumAllBudgetForMonth(DateTime start, DateTime end, CategoryType type) async {
   var monthStart = Utils.firstMomentOfMonth(start).millisecondsSinceEpoch;
   var monthEnd = end == null ? null : Utils.lastDayOfMonth(end).millisecondsSinceEpoch;
 
-  var findBudget = "";
+  var findBudget = _compileFindBudgetSqlQuery(monthStart, monthEnd);
 
-  findBudget = _compileFindBudgetSqlQuery(monthStart, monthEnd);
+  var listMap = await db._executeSql("SELECT SUM($_budgetPerMonth) FROM $_tableBudget WHERE $findBudget AND $_budgetCategoryId IN (SELECT $_id from $_tableCategory WHERE $_catCategoryType = ${type.id})");
 
-  var listMap = await db._query(_tableBudget, where: "$findBudget", columns: [ 'SUM($_budgetPerMonth)']);
-
-  double amount = listMap.first.values.first ?? 0.0;
+   double amount = listMap.first.values.first ?? 0.0;
   return amount;
 }
 

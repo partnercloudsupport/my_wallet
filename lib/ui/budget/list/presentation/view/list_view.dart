@@ -20,7 +20,7 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
 
   var _tables = [observer.tableBudget, observer.tableCategory, observer.tableTransactions];
 
-  var _budgetList = <BudgetEntity>[];
+  BudgetListEntity _budgetList = BudgetListEntity.empty();
   var _nf = NumberFormat("\$##0.00");
 
   var _month = DateTime.now();
@@ -81,25 +81,73 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
             _amount = total;
             loadData();
           }),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text("Total ${_nf.format(_amount)}", style: Theme.of(context).textTheme.title,),
-          ),
+//          Padding(
+//            padding: EdgeInsets.all(8.0),
+//            child: Text("Total ${_nf.format(_amount)}", style: Theme.of(context).textTheme.title,),
+//          ),
           Expanded(
-            child: GridView.builder(
-              shrinkWrap: true,
-              primary: true,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: crossAxisCount),
-              itemCount: _budgetList.length + 1,
-              itemBuilder: (context, index) {
-                if (index == _budgetList.length) return _btnAddBudget(padding);
+            child: ListView(
+              children: <Widget>[
+                _buildTitle(CategoryType.expense, _budgetList.totalExpense, _budgetList.expenseBudget),
+                _buildGrid(_budgetList.expense, padding),
+                _buildTitle(CategoryType.income, _budgetList.totalIncome, _budgetList.incomeBudget),
+                _buildGrid(_budgetList.income, padding)
+              ],
+            )
+          )
+        ],
+      ),
+    );
+  }
 
-                return _budgetItem(index, padding);
-              },
+  Widget _buildTitle(CategoryType type, double total, double budget) {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            type.name,
+            style: Theme.of(context).textTheme.title,
+            textAlign: TextAlign.center,
+          ),
+          RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: _nf.format(total),
+                  style: Theme.of(context).textTheme.title.apply(color: type == CategoryType.expense ? AppTheme.red : AppTheme.tealAccent)
+                ),
+                TextSpan(
+                  text: " / ${_nf.format(budget)}",
+                  style: Theme.of(context).textTheme.title
+                ),
+              ]
             ),
           )
         ],
       ),
+      alignment: Alignment.topCenter,
+      decoration: BoxDecoration(
+        color: AppTheme.transparent,
+        border: Border.all(color: AppTheme.white)
+      ),
+      padding: EdgeInsets.all(8.0),
+      margin: EdgeInsets.only(top: 8.0,),
+    );
+  }
+
+  Widget _buildGrid(List<BudgetEntity> entities, double padding) {
+    return GridView.builder(
+      shrinkWrap: true,
+      primary: false,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: crossAxisCount),
+      itemCount: (entities == null ? 0 : entities.length) + 1,
+      itemBuilder: (context, index) {
+        if (index == (entities == null ? 0 : entities.length)) return _btnAddBudget(padding);
+
+        return _budgetItem(entities[index], padding);
+      },
     );
   }
 
@@ -127,9 +175,9 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
     );
   }
 
-  Widget _budgetItem(int index, padding) {
+  Widget _budgetItem(BudgetEntity entity, double padding) {
     return InkWell(
-      onTap: () => Navigator.pushNamed(context, routes.EditBudget(categoryId: _budgetList[index].categoryId, month: _month)),
+      onTap: () => Navigator.pushNamed(context, routes.EditBudget(categoryId: entity.categoryId, month: _month)),
       child: Center(
         child: Stack(
           children: <Widget>[
@@ -142,10 +190,10 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
                     child: ClipRect(
                       child: Align(
                         alignment: Alignment.bottomCenter,
-                        heightFactor: _budgetList == null ? 0.0 : _budgetList[index].total == 0 ? 0.0 : _budgetList[index].spent / _budgetList[index].total,
+                        heightFactor: _budgetList == null ? 0.0 : entity.total == 0 ? 0.0 : entity.transaction / entity.total,
                         child: Container(
                           alignment: Alignment.center,
-                          decoration: BoxDecoration(shape: BoxShape.circle, color: Color(AppTheme.hexToInt(_budgetList[index].colorHex))),
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: Color(AppTheme.hexToInt(entity.colorHex))),
                         ),
                       ),
                     ),
@@ -156,7 +204,7 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
                   ),
                   Center(
                     child: Text(
-                      "${_nf.format(_budgetList[index].total)}",
+                      "${_nf.format(entity.total)}",
                       style: Theme.of(context).textTheme.subhead,
                     ),
                   )
@@ -166,8 +214,8 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
             Align(
                 alignment: Alignment.bottomCenter,
                 child: Text(
-                  _budgetList[index].categoryName,
-                  style: Theme.of(context).textTheme.title.apply(color: Color(AppTheme.hexToInt(_budgetList[index].colorHex))),
+                  entity.categoryName,
+                  style: Theme.of(context).textTheme.title.apply(color: Color(AppTheme.hexToInt(entity.colorHex))),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
@@ -179,7 +227,7 @@ class _ListBudgetsState extends CleanArchitectureView<ListBudgets, ListBudgetsPr
   }
 
   @override
-  void onBudgetLoaded(List<BudgetEntity> list) {
+  void onBudgetLoaded(BudgetListEntity list) {
     setState(() => _budgetList = list);
   }
 
