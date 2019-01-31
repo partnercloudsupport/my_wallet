@@ -24,6 +24,18 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
     });
   }
 
+  void loadSelectedAccount(int accountId, onNext<Account> next) {
+    execute(repo.loadAccount(accountId), next, (e) {
+      print(e);
+    });
+  }
+
+  void loadSelectedCategory(int categoryId, onNext<AppCategory> next) {
+    execute(repo.loadCategoryForId(categoryId), next, (e) {
+      print(e);
+    });
+  }
+
   void loadTransactionDetail(int id, onNext<TransactionDetail> next, onError error) {
     execute(repo.loadTransactionDetail(id), next, error);
   }

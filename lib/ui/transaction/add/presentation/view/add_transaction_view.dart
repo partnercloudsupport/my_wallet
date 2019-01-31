@@ -10,8 +10,10 @@ import 'package:flutter/scheduler.dart';
 
 class AddTransaction extends StatefulWidget {
   final int transactionId;
+  final int accountId;
+  final int categoryId;
 
-  AddTransaction({this.transactionId});
+  AddTransaction({this.transactionId, this.categoryId, this.accountId});
 
   @override
   State<StatefulWidget> createState() {
@@ -82,6 +84,14 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
       presenter.loadTransactionDetail(widget.transactionId);
     } else {
       presenter.loadCurrentUserName();
+    }
+
+    if(widget.accountId != null) {
+      presenter.loadSelectedAccount(widget.accountId);
+    }
+
+    if(widget.categoryId != null) {
+      presenter.loadSelectedCategory(widget.categoryId);
     }
   }
 
@@ -345,6 +355,16 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   void onCategoryListLoaded(List<AppCategory> value) {
     setState(() => this._categoryList = value);
     if(_categoryKey.currentContext != null) _categoryKey.currentState.updateData(value);
+  }
+
+  @override
+  void onSelectedAccountFound(Account selectedAccount) {
+    setState(() => _account = selectedAccount);
+  }
+
+  @override
+  void onSelectedCategoryFound(AppCategory selectedCategory) {
+    setState(() => _category = selectedCategory);
   }
 
   @override

@@ -62,10 +62,26 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
 
   @override
   Widget build(BuildContext context) {
+    var platform = Theme.of(context).platform;
+
     return PlainScaffold(
       appBar: MyWalletAppBar(
         title: widget.title,
       ),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.all(platform == TargetPlatform.iOS ? 10.0 : 0.0),
+        child: RoundedButton(
+          onPressed: () => Navigator.pushNamed(context, routes.AddTransactionWithParam(accountId: widget.accountId, categoryId: widget.categoryId)),
+          child: Container(
+            margin: EdgeInsets.all(10.0),
+            child: Text(
+              "Add Transaction",
+            ),
+          ),
+          color: AppTheme.pinkAccent,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: ListView.builder(
           itemCount: _entities.length + 2,
           itemBuilder: (context, index) {
@@ -86,13 +102,6 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
                 },
                 selectedDateTime: _day,
                 markedDatesMap: _markedDates,
-//                markedDateIconBuilder: (data) => Align(
-//                  child: FittedBox(
-//                      child: Text("$data",
-//                        style: Theme.of(context).textTheme.caption.apply(color: AppTheme.soulRed, fontSizeFactor: 0.8),
-//                      overflow: TextOverflow.fade,)),
-//                  alignment: Alignment.bottomCenter,),
-//                markedDateShowIcon: true,
                 weekendTextStyle: Theme.of(context).textTheme.title.apply(color: AppTheme.pinkAccent),
                 height: 430.0,
                 todayButtonColor: AppTheme.fadedRed,
@@ -118,7 +127,7 @@ class _TransactionListState extends CleanArchitectureView<TransactionList, Trans
                 subtitle: Text(_df.format(item.dateTime), style: Theme.of(context).textTheme.body2.apply(color: Colors.grey),),
                 trailing: Text("${_nf.format(item.amount)}", style: TextStyle(color: Color(item.transactionColor)),),
                 onTap: () {
-                  if(item.isUsualTransaction) Navigator.pushNamed(context, routes.EditTransaction(item.id));
+                  if(item.isUsualTransaction) Navigator.pushNamed(context, routes.AddTransactionWithParam(transactionId: item.id));
                 },
               ),
               color: index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.2),

@@ -6,6 +6,8 @@ import 'package:my_wallet/data/firebase/database.dart' as _fdb;
 import 'package:my_wallet/utils.dart' as Utils;
 export 'package:my_wallet/ui/home/homemain/data/homemain_expenses_entity.dart';
 
+import 'dart:core';
+
 class MyWalletHomeRepository extends CleanArchitectureRepository {
   final _MyWalletHomeDatabaseRepository _dbRepo = _MyWalletHomeDatabaseRepository();
   final _MyWalletHomeFirebaseRepository _fbRepo = _MyWalletHomeFirebaseRepository();
@@ -49,7 +51,9 @@ class _MyWalletHomeDatabaseRepository {
 
         if(remainFactor < 0) remainFactor = 0.0;
 
-        homeEntities.add(ExpenseEntity(cat.id, cat.name, cat.colorHex, transaction, remain, budget != null ? budget.budgetPerMonth : 0.0, remainFactor));
+        if(cat.categoryType == CategoryType.income) remain = remain.abs();
+
+        homeEntities.add(ExpenseEntity(cat.id, cat.name, cat.colorHex, transaction, remain, budget != null ? budget.budgetPerMonth : 0.0, remainFactor, cat.categoryType));
       }
     }
 

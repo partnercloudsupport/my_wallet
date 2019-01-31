@@ -115,8 +115,34 @@ class MyApp extends StatelessWidget {
   }
 
   Widget _getParamRoute(String name) {
-    if (name.startsWith(routes.AddTransaction)) {
-      return AddTransaction(transactionId: int.parse(name.replaceFirst("${routes.AddTransaction}/", "")),);
+    if (name.startsWith("${routes.AddTransaction}")) {
+      List<String> ids = name.split("/");
+      // get all data out
+      int transactionId;
+      try {
+        transactionId = int.parse(ids[1]);
+
+        return AddTransaction(transactionId: transactionId,);
+      } catch(e) {
+        print("No transaction ID $name");
+      }
+
+      int accountId;
+      try {
+        accountId = int.parse(ids[2]);
+
+        return AddTransaction(accountId: accountId);
+      } catch(e) {
+        print("no account ID $name");
+      }
+
+      int categoryId;
+      try {
+        categoryId = int.parse(ids[3]);
+        return AddTransaction(categoryId: categoryId);
+      } catch(e) {
+        print("no category id $name");
+      }
     }
 
     if(name.startsWith(routes.TransactionListAccount)) {

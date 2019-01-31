@@ -32,8 +32,8 @@ class routes {
   static const Liability = "Liability";
   static const Pay = "PayLiability";
 
-  static String EditTransaction(int id) {
-    return "$AddTransaction/$id";
+  static String AddTransactionWithParam({int transactionId, int accountId, int categoryId}) {
+    return "$AddTransaction/$transactionId/$accountId/$categoryId";
   }
 
   static String TransactionList(String title, {int accountId, int categoryId, DateTime datetime}) {
