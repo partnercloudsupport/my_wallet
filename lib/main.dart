@@ -20,6 +20,7 @@ import 'package:my_wallet/ui/user/login/presentation/view/login_view.dart';
 import 'package:my_wallet/ui/user/register/presentation/view/register_view.dart';
 import 'package:my_wallet/ui/user/homeprofile/main/presentation/view/homeprofile_view.dart';
 import 'package:my_wallet/ui/user/detail/presentation/view/detail_view.dart';
+import 'package:my_wallet/ui/user/verify/presentation/view/verify_view.dart';
 
 import 'package:my_wallet/ui/budget/list/presentation/view/list_view.dart';
 import 'package:my_wallet/ui/budget/detail/presentation/view/detail_view.dart';
@@ -76,6 +77,10 @@ class MyApp extends StatelessWidget {
               return UserDetail();
             case routes.Login:
               return Login();
+            case routes.RequestValidation:
+              return RequestValidation();
+            case routes.ValidationProcessing:
+              return RequestValidation(isProcessing: true,);
             case routes.MyHome:
               return MyWalletHome(key: homeKey,);
             case routes.Register:

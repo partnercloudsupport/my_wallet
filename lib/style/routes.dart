@@ -19,6 +19,8 @@ class routes {
   static const UserProfile = "UserProfile";
 
   static const Login = "Login";
+  static const RequestValidation = "RequestValidation";
+  static const ValidationProcessing = "ValidationProcessing";
   static const HomeProfile = "HomeProfile";
   static const MyHome = "MyHome";
   static const Register = "Register";

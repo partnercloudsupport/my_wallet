@@ -153,8 +153,14 @@ class _LoginState extends CleanArchitectureView<Login, LoginPresenter> implement
   }
 
   @override
-  void onSignInSuccess(bool hasDisplayName) {
-    presenter.checkUserHome();
+  void onSignInSuccess(LoginResult user) {
+    do {
+      if(!user.isVerified) {
+        Navigator.pushNamed(context, routes.RequestValidation);
+        break;
+      }
+      presenter.checkUserHome();
+    } while (false);
   }
 
   @override

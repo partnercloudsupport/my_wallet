@@ -42,6 +42,10 @@ class RegisterRepository extends CleanArchitectureRepository {
   Future<void> saveUserReference(String uuid) async {
     return _fbRepo.saveUserReference(uuid);
   }
+
+  Future<void> sendVerificationEmail() {
+    return _fbRepo.sendVerificationEmail();
+  }
 }
 
 class _RegisterFirebaseRepository {
@@ -84,5 +88,9 @@ class _RegisterFirebaseRepository {
     SharedPreferences pref = await SharedPreferences.getInstance();
 
     await pref.setString(UserUUID, uuid);
+  }
+
+  Future<void> sendVerificationEmail() {
+    return fm.sendValidationEmail();
   }
 }

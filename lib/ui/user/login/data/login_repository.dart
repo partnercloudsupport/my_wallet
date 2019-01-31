@@ -6,12 +6,15 @@ import 'package:my_wallet/data/data.dart';
 import 'package:my_wallet/utils.dart' as Utils;
 import 'package:my_wallet/shared_pref/shared_preference.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:my_wallet/ui/user/login/data/login_exception.dart';
+import 'package:my_wallet/ui/user/login/domain/login_exception.dart';
 import 'package:flutter/services.dart';
 import 'dart:math';
 
+import 'package:my_wallet/ui/user/login/data/login_entity.dart';
+
 export 'package:my_wallet/data/data.dart';
-export 'package:my_wallet/ui/user/login/data/login_exception.dart';
+export 'package:my_wallet/ui/user/login/domain/login_exception.dart';
+export 'package:my_wallet/ui/user/login/data/login_entity.dart';
 
 class LoginRepository extends CleanArchitectureRepository{
   final _LoginFirebaseRepository _fbRepo = _LoginFirebaseRepository();

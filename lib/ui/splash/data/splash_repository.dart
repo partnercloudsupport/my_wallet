@@ -59,13 +59,11 @@ class SplashRepository extends CleanArchitectureRepository {
 
     await fdb.init(_app, homeProfile: profile);
 
+    print("user verification ${user != null && user.isVerified}");
     return AppDetail(
         user != null && user.uuid != null && user.uuid.isNotEmpty,
+        user != null && user.isVerified,
         profile != null && profile.isNotEmpty
     );
-  }
-
-  @override
-  Future<bool> dispose() {
   }
 }

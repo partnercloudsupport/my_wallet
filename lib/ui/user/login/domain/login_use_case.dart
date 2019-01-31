@@ -4,9 +4,9 @@ import 'package:my_wallet/ca/domain/ca_use_case.dart';
 class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
   LoginUseCase() : super(LoginRepository());
 
-  void signIn(email, password, onNext<bool> onNext, onError onError) {
+  void signIn(email, password, onNext<LoginResult> onNext, onError onError) {
     execute(Future(() async {
-      var result = false;
+      LoginResult result;
       do {
         await repo.validateEmail(email);
         await repo.validatePassword(password);
@@ -17,7 +17,7 @@ class LoginUseCase extends CleanArchitectureUseCase<LoginRepository>{
 
         await repo.saveUserReference(user.uuid);
 
-        result = (user.displayName != null && user.displayName.isNotEmpty);
+        result = LoginResult(user.displayName, user.isVerified);
       } while(false);
       return result;
     }), onNext, (e) => handleError(onError, e));

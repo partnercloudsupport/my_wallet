@@ -74,8 +74,14 @@ class _SplashViewState extends CleanArchitectureView<SplashView, SplashPresenter
         routeName = routes.Login;
         break;
       }
+
       if (!detail.hasUser) {
         routeName = routes.Login;
+        break;
+      }
+
+      if (!detail.isValidated) {
+        routeName = routes.RequestValidation;
         break;
       }
 
@@ -95,6 +101,8 @@ class _SplashViewState extends CleanArchitectureView<SplashView, SplashPresenter
     if(_errorKey.currentContext != null) {
       _errorKey.currentState.stopRetry();
     }
+
+    print("Error $e");
 
     setState(() => _error = e.toString());
   }

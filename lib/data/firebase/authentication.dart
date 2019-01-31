@@ -92,6 +92,10 @@ Future<bool> registerEmail(String email, String password, {String displayName}) 
   return _lock.synchronized(() async => await _auth.createUserWithEmailAndPassword(email: email, password: password, displayName: displayName) != null);
 }
 
+Future<bool> sendValidationEmail() {
+  return _lock.synchronized(() => _auth.sendVerification());
+}
+
 //Future<bool> updateDisplayName(String displayName) async {
 //  return _lock.synchronized(() async {
 //    FirebaseUser user = await _auth.currentUser();

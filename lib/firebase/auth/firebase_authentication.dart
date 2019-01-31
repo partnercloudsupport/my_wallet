@@ -51,6 +51,29 @@ class FirebaseAuthentication {
     return user;
   }
 
+  Future<bool> sendVerification() async {
+    var result = false;
+    do {
+      String refreshToken = await getRefreshToken();
+
+      if(refreshToken == null || refreshToken.isEmpty) break;
+
+      // exchange for idToken
+      String firebaseToken = await _exchangeForIdToken(refreshToken);
+      String url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getOobConfirmationCode?key=$apiKey";
+
+      var response = await post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: '{"requestType" : "VERIFY_EMAIL", "idToken": "$firebaseToken"}'
+      );
+    } while(false);
+
+    return result;
+  }
+
   Future<FirebaseUser> signInWithEmailAndPassword({@required String email, @required String password}) async {
     FirebaseUser user;
     do {
@@ -97,7 +120,6 @@ class FirebaseAuthentication {
       String token = await _exchangeForIdToken(refreshToken);
 
       user = await getUserData(token);
-
     } while (false);
 
     return user;
@@ -209,8 +231,9 @@ class FirebaseUser {
   String phoneNumber;
 
   FirebaseUser._(Map<String, dynamic> map) {
+    // print all key/value pair in map
     isAnonymous = map['isAnonymous'];
-    isEmailVerified = map['emailVerified'];
+    isEmailVerified = map['emailVerified'] ?? false;
     creationTimestamp = map['createdAt'] != null ? int.parse("${map['createdAt']}") : null;
     lastSignInTimestamp = map['lastLoginAt'] != null ? int.parse("${map['lastLoginAt']}") : null;
     providerId = map['providerId'];

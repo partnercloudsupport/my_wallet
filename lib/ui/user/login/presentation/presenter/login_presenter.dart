@@ -13,11 +13,11 @@ class LoginPresenter extends CleanArchitecturePresenter<LoginUseCase, LoginDataV
     useCase.checkUserHome(dataView.onUserHomeResult, (e) {});
   }
 
-  void signInWithGoogle() {
-    useCase.signInWithGoogle(dataView.onSignInSuccess, dataView.onSignInFailed);
-  }
-
-  void signInWithFacebook() {
-    useCase.signInWithFacebook(dataView.onSignInSuccess, dataView.onSignInFailed);
-  }
+//  void signInWithGoogle() {
+//    useCase.signInWithGoogle(dataView.onSignInSuccess, dataView.onSignInFailed);
+//  }
+//
+//  void signInWithFacebook() {
+//    useCase.signInWithFacebook(dataView.onSignInSuccess, dataView.onSignInFailed);
+//  }
 }
