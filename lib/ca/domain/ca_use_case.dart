@@ -8,6 +8,9 @@ export 'package:rxdart/rxdart.dart';
 
 import 'package:flutter/foundation.dart';
 export 'package:flutter/foundation.dart';
+
+import 'package:flutter/scheduler.dart';
+
 /// Free flow, use your repo as you wish in your own usecase, and return data as you need
 class CleanArchitectureUseCase<T extends CleanArchitectureRepository> {
   final T repo;
@@ -16,7 +19,7 @@ class CleanArchitectureUseCase<T extends CleanArchitectureRepository> {
 
   void execute<T>(Future<T> task, onNext<T> next, onError error) {
     if(task != null) {
-      Observable(Stream.fromFuture(task)).listen((data) => next(data), onError: (e, stacktrace) {
+      SchedulerBinding.instance.addPostFrameCallback((_) => Observable(Stream.fromFuture(task)).listen((data) => next(data), onError: (e, stacktrace) {
         debugPrint(stacktrace.toString());
 
         if (error != null) {
@@ -26,7 +29,7 @@ class CleanArchitectureUseCase<T extends CleanArchitectureRepository> {
             error(Exception(e.toString()));
           }
         }
-      });
+      }));
     } else {
       debugPrint("task is null: $task ${this.toString()}");
     }
