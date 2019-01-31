@@ -268,8 +268,36 @@ Future<List<Account>> queryAccountsExcept(List<int> exceptAccountId) async {
   }
 
   return null;
-
 }
+
+Future<Account> loadLastUsedAccountForCategory({int categoryId}) async {
+  String where;
+
+  if(categoryId != null) where = "$_transCategory = $categoryId";
+
+  var rawAccountId = await db._query(_tableTransactions, columns: [_transAcc, "MAX($_transDateTime)"], where: where);
+
+  Account account;
+
+  do {
+    if(rawAccountId == null) break;
+    if(rawAccountId.isEmpty) break;
+
+    var accountId = rawAccountId.first[_transAcc];
+
+    if(accountId == null) break;
+
+    var rawAccount = await db._query(_tableAccounts, where: "$_id = $accountId");
+
+    if(rawAccount == null) break;
+    if(rawAccount.isEmpty) break;
+
+    account = _toAccount(rawAccount.first);
+  } while(false);
+
+  return account;
+}
+
 Future<List<AppTransaction>> queryTransactions({int id}) async {
   String where;
 
@@ -314,6 +342,21 @@ Future<List<AppTransaction>> queryTransactionForAccount(int accountId, DateTime 
   List<Map<String, dynamic>> map = await db._query(_tableTransactions, where: "$_transAcc = $accountId AND ($_transDateTime BETWEEN ${startOfDay.millisecondsSinceEpoch} AND ${endOfDay.millisecondsSinceEpoch})");
 
   return map == null ? [] : map.map((f) => _toTransaction(f)).toList();
+}
+
+Future<AppTransaction> queryLastTransaction({int categoryId}) async {
+  var where = "";
+  if(categoryId != null) where = "$_transCategory = $categoryId";
+  var trans = await db._executeSql("SELECT *, MAX($_transDateTime) FROM $_tableTransactions${where.isNotEmpty ? "WHERE $where" : ""}");
+
+  debugPrint("trans $trans");
+
+  if(trans != null && trans.isNotEmpty) {
+    debugPrint("return transaction");
+    return _toTransaction(trans.first);
+  }
+
+  return null;
 }
 
 Future<List<Transfer>> queryTransfer({int account, DateTime day}) async {
@@ -1083,7 +1126,13 @@ class _Database {
   Future<List<Map<String, dynamic>>> _query(String table, {String where, List whereArgs, String orderBy, List<String> columns}) async {
       if(!db.isOpen) db = await _openDatabase();
 
-      List<Map<String, dynamic>> map = await db.query(table, where: where, whereArgs: whereArgs, orderBy: orderBy, columns: columns);
+      List<Map<String, dynamic>> map;
+      try {
+        map = await db.query(table, where: where, whereArgs: whereArgs, orderBy: orderBy, columns: columns);
+      } catch(e, stacktrace) {
+        print("$e - Error with query for table $table with where clause $where and arguments $whereArgs for columns $columns");
+        print(stacktrace);
+      }
 
       return map;
   }

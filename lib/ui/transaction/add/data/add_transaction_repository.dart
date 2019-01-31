@@ -13,17 +13,21 @@ class AddTransactionRepository extends CleanArchitectureRepository {
   Future<List<Account>> loadAccounts() {
     return _dbRepo.loadAccounts();
   }
-
-  Future<List<AppCategory>> loadCategory(CategoryType type) {
-    return _dbRepo.loadCategory(type);
-  }
-
+  
   Future<Account> loadAccount(int accountId) {
     return _dbRepo.loadAccount(accountId);
   }
 
-  Future<AppCategory> loadCategoryForId(int categoryId) {
-    return _dbRepo.loadSelectedCategory(categoryId);
+  Future<Account> loadLastUsedAccountForCategory(int categoryId) {
+    return _dbRepo.loadLastUsedAccountForCategory(categoryId);
+  }
+
+  Future<List<AppCategory>> loadCategories(CategoryType type) {
+    return _dbRepo.loadCategories(type);
+  }
+
+  Future<AppCategory> loadCategory(int categoryId) {
+    return _dbRepo.loadCategory(categoryId);
   }
 
   Future<TransactionDetail> loadTransactionDetail(int id) {
@@ -92,18 +96,22 @@ class _AddTransactionDatabaseRepository {
     return _db.queryAccounts(type: AccountType.paymentAccount);
   }
 
-  Future<List<AppCategory>> loadCategory(CategoryType type) {
-    return _db.queryCategory(type: type);
-  }
-
   Future<Account> loadAccount(int accountId) async {
     var accounts = await _db.queryAccounts(id: accountId);
-
+    
     return accounts == null || accounts.isEmpty ? null : accounts.first;
   }
 
-  Future<AppCategory> loadSelectedCategory(int categoryid) async {
-    var categories = await _db.queryCategory(id: categoryid);
+  Future<Account> loadLastUsedAccountForCategory(int categoryId) {
+    return _db.loadLastUsedAccountForCategory(categoryId: categoryId);
+  }
+
+  Future<List<AppCategory>> loadCategories(CategoryType type) {
+    return _db.queryCategory(type: type);
+  }
+
+  Future<AppCategory> loadCategory(int categoryId) async {
+    var categories = await _db.queryCategory(id: categoryId);
 
     return categories == null || categories.isEmpty ? null : categories.first;
   }

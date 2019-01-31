@@ -13,6 +13,9 @@ class TransactionDetail {
 
   TransactionDetail(this.id, this.dateTime, this.account, this.category, this.amount, this.type, this.user, this.desc);
 
+  static TransactionDetail preset({int id, DateTime dateTime, Account account, AppCategory category, double amount, TransactionType type, UserDetail userDetail, String desc }) {
+    return TransactionDetail(id, dateTime ?? DateTime.now(), account, category, amount ?? 0.0, type ?? TransactionType.expenses, userDetail, desc);
+  }
 }
 
 class UserDetail {

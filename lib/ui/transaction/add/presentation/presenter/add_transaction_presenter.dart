@@ -14,20 +14,16 @@ class AddTransactionPresenter extends CleanArchitecturePresenter<AddTransactionU
     useCase.loadCategory(_type, dataView.onCategoryListLoaded);
   }
 
-  void loadSelectedAccount(int accountId) {
-    useCase.loadSelectedAccount(accountId, dataView.onSelectedAccountFound);
-  }
-
-  void loadSelectedCategory(int categoryid) {
-    useCase.loadSelectedCategory(categoryid, dataView.onSelectedCategoryFound);
-  }
-
   void loadTransactionDetail(int id) {
     useCase.loadTransactionDetail(id, dataView.onLoadTransactionDetail, dataView.onLoadTransactionFailed);
   }
 
+  void loadPresetDetail(int accountId, int categoryId) {
+    useCase.loadPresetDetail(accountId, categoryId, dataView.onLoadTransactionDetail, dataView.onLoadTransactionFailed);
+  }
+
   void loadCurrentUserName() {
-    useCase.loadCurrentUserName(dataView.onUserDetailLoaded);
+    useCase.loadCurrentUserName(dataView.updateUserDisplayName);
   }
 
   void saveTransaction(

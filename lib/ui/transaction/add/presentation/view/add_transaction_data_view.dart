@@ -5,14 +5,12 @@ abstract class AddTransactionDataView extends DataView {
   void onAccountListLoaded(List<Account> value);
   void onCategoryListLoaded(List<AppCategory> value);
 
-  void onSelectedAccountFound(Account selectedAccount);
-  void onSelectedCategoryFound(AppCategory selectedCategory);
-
   void onSaveTransactionSuccess(bool result);
   void onSaveTransactionFailed(Exception e);
 
   void onLoadTransactionDetail(TransactionDetail detail);
   void onLoadTransactionFailed(Exception e);
 
-  void onUserDetailLoaded(UserDetail user);
+  // on database update
+  void updateUserDisplayName(UserDetail detail);
 }

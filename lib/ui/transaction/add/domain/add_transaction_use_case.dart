@@ -17,34 +17,43 @@ class AddTransactionUseCase extends CleanArchitectureUseCase<AddTransactionRepos
       var categoryType = CategoryType.expense;
       if(TransactionType.isIncome(_type)) categoryType = CategoryType.income;
 
-      return repo.loadCategory(categoryType);
+      return repo.loadCategories(categoryType);
     }), next, (e) {
       debugPrint("Load category error $e");
       next([]);
     });
   }
 
-  void loadSelectedAccount(int accountId, onNext<Account> next) {
-    execute(repo.loadAccount(accountId), next, (e) {
-      print(e);
-    });
-  }
-
-  void loadSelectedCategory(int categoryId, onNext<AppCategory> next) {
-    execute(repo.loadCategoryForId(categoryId), next, (e) {
-      print(e);
-    });
-  }
-
   void loadTransactionDetail(int id, onNext<TransactionDetail> next, onError error) {
     execute(repo.loadTransactionDetail(id), next, error);
   }
+  
+  void loadPresetDetail(int accountId, int categoryId, onNext<TransactionDetail> next, onError error) {
+    execute(Future(() async {
+      // load user detail
+      UserDetail userDetail = await repo.loadCurrentUserName();
+      
+      // load account
+      Account account;
+      if(accountId != null) {
+        account = await repo.loadAccount(accountId);
+      } else {
+        // load last used account for category
+        account = await repo.loadLastUsedAccountForCategory(categoryId);
+      }
+      
+      // load category
+      AppCategory category;
+      if(categoryId != null) {
+        category = await repo.loadCategory(categoryId);
+      }
+
+      return TransactionDetail.preset(account: account, category: category, userDetail: userDetail);
+    }), next, error);
+  }
 
   void loadCurrentUserName(onNext<UserDetail> next) {
-    execute(repo.loadCurrentUserName(), next, (e) {
-      debugPrint("Load current user error $e");
-      next(null);
-    });
+    execute(repo.loadCurrentUserName(), next, (e) {});
   }
 
   void saveTransaction(int _id,TransactionType _type, Account _account, AppCategory _category, double _amount, DateTime _date, String _desc, onNext<bool> next, onError error) async {

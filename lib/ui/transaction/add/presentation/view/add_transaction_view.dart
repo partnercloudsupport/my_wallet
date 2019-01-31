@@ -58,14 +58,16 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   void onDatabaseUpdate(String table) {
     debugPrint("on database update $table");
 
-    if(table == observer.tableAccount) presenter.loadAccounts();
+    if(table == observer.tableAccount) {
+      presenter.loadAccounts();
+    }
 
     if (table == observer.tableCategory) presenter.loadCategory(_type);
 
     if(table == observer.tableTransactions || table == observer.tableUser) {
       if(widget.transactionId == null) {
         presenter.loadCurrentUserName();
-      } else {
+      } else if(!_isSaving){
         presenter.loadTransactionDetail(widget.transactionId);
       }
     }
@@ -83,15 +85,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
     if(widget.transactionId != null) {
       presenter.loadTransactionDetail(widget.transactionId);
     } else {
-      presenter.loadCurrentUserName();
-    }
-
-    if(widget.accountId != null) {
-      presenter.loadSelectedAccount(widget.accountId);
-    }
-
-    if(widget.categoryId != null) {
-      presenter.loadSelectedCategory(widget.categoryId);
+      presenter.loadPresetDetail(widget.accountId, widget.categoryId);
     }
   }
 
@@ -358,16 +352,6 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   }
 
   @override
-  void onSelectedAccountFound(Account selectedAccount) {
-    setState(() => _account = selectedAccount);
-  }
-
-  @override
-  void onSelectedCategoryFound(AppCategory selectedCategory) {
-    setState(() => _category = selectedCategory);
-  }
-
-  @override
   void onSaveTransactionSuccess(bool result) {
     _dismissDialog();
     Navigator.pop(context);
@@ -395,7 +379,7 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   @override
   void onLoadTransactionDetail(TransactionDetail detail) {
     setState(() {
-      _type = detail.type;
+      _type = detail.type ;
       _date = detail.dateTime;
       _account = detail.account;
       _category = detail.category;
@@ -409,16 +393,16 @@ class _AddTransactionState extends CleanArchitectureView<AddTransaction, AddTran
   void onLoadTransactionFailed(Exception e) {
   }
 
-  @override
-  void onUserDetailLoaded(UserDetail user) {
-    setState(() => _user = user);
-  }
-
   void _dismissDialog() {
     _isSaving = false;
     if(_alertDialog.currentContext != null) {
       // alert dialog is showing
       Navigator.pop(context);
     }
+  }
+
+  @override
+  void updateUserDisplayName(UserDetail detail) {
+    setState(() => _user = detail);
   }
 }
