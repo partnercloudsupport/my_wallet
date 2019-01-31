@@ -64,6 +64,9 @@ Future<void> setupDatabase(final String homeKey) async {
 
 Future<void> _addSubscriptions() async {
   subs.putIfAbsent(tblAccount, () => _firestore.collection(tblAccount).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    if(change == null) return;
+    if(change.document == null) return;
+
     switch(change.type) {
       case DocumentChangeType.added: _onAccountAdded(change.document); break;
       case DocumentChangeType.modified: _onAccountChanged(change.document); break;
@@ -72,6 +75,9 @@ Future<void> _addSubscriptions() async {
   })));
 
   subs.putIfAbsent(tblBudget, () =>_firestore.collection(tblBudget).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    if(change == null) return;
+    if(change.document == null) return;
+
     switch(change.type) {
       case DocumentChangeType.added: _onBudgetAdded(change.document); break;
       case DocumentChangeType.modified: _onBudgetChanged(change.document); break;
@@ -80,6 +86,9 @@ Future<void> _addSubscriptions() async {
   })));
 
   subs.putIfAbsent(tblCategory, () => _firestore.collection(tblCategory).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    if(change == null) return;
+    if(change.document == null) return;
+
     switch(change.type) {
       case DocumentChangeType.added: _onCategoryAdded(change.document); break;
       case DocumentChangeType.modified: _onCategoryChanged(change.document); break;
@@ -88,6 +97,9 @@ Future<void> _addSubscriptions() async {
   })));
 
   subs.putIfAbsent(tblTransaction, () => _firestore.collection(tblTransaction).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    if(change == null) return;
+    if(change.document == null) return;
+
     switch(change.type) {
       case DocumentChangeType.added: _onTransactionAdded(change.document); break;
       case DocumentChangeType.modified: _onTransactionChanged(change.document); break;
@@ -96,6 +108,9 @@ Future<void> _addSubscriptions() async {
   })));
 
   subs.putIfAbsent(tblUser, () => _firestore.collection(tblUser).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    if(change == null) return;
+    if(change.document == null) return;
+
     switch(change.type) {
       case DocumentChangeType.added: _onUserAdded(change.document); break;
       case DocumentChangeType.modified: _onUserChanged(change.document); break;
@@ -104,6 +119,9 @@ Future<void> _addSubscriptions() async {
   })));
 
   subs.putIfAbsent(tblTransfer, () => _firestore.collection(tblTransfer).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    if(change == null) return;
+    if(change.document == null) return;
+
     switch(change.type) {
       case DocumentChangeType.added: _onTransferAdded(change.document); break;
       case DocumentChangeType.modified: _onTransferChanged(change.document); break;
@@ -112,6 +130,9 @@ Future<void> _addSubscriptions() async {
   })));
 
   subs.putIfAbsent(tblDischargeOfLiability, () => _firestore.collection(tblDischargeOfLiability).snapshots().listen((f) => f.documentChanges.forEach((change) {
+    if(change == null) return;
+    if(change.document == null) return;
+
     switch(change.type) {
       case DocumentChangeType.added: _onDischargeOfLiabilityAdded(change.document); break;
       case DocumentChangeType.modified: _onDischargeOfLiabilityChanged(change.document); break;
