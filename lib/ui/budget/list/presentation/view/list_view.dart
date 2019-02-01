@@ -271,10 +271,6 @@ class _MonthSummaryState extends State<_MonthSummary> {
     setState(() => this.summary = summary);
 
     this._month = month;
-
-    if(summary != null && summary.isNotEmpty) {
-      widget.onMonthSelected(summary[0].month, summary[0].total);
-    }
   }
 
   @override
