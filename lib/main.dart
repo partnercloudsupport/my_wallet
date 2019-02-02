@@ -129,7 +129,7 @@ class MyApp extends StatelessWidget {
 
         return AddTransaction(transactionId: transactionId,);
       } catch(e) {
-        print("No transaction ID $name");
+        debugPrint("No transaction ID $name");
       }
 
       int accountId;
@@ -138,7 +138,7 @@ class MyApp extends StatelessWidget {
 
         return AddTransaction(accountId: accountId);
       } catch(e) {
-        print("no account ID $name");
+        debugPrint("no account ID $name");
       }
 
       int categoryId;
@@ -146,8 +146,10 @@ class MyApp extends StatelessWidget {
         categoryId = int.parse(ids[3]);
         return AddTransaction(categoryId: categoryId);
       } catch(e) {
-        print("no category id $name");
+        debugPrint("no category id $name");
       }
+
+      return AddTransaction();
     }
 
     if(name.startsWith(routes.TransactionListAccount)) {
