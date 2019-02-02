@@ -1,8 +1,22 @@
 import 'package:intl/intl.dart';
 export 'package:intl/intl.dart';
 
-const maxMonthSupport = 12;
 var df = DateFormat("MMM, yyyy");
+
+enum Month {
+  January,
+  February,
+  March,
+  April,
+  May,
+  June,
+  July,
+  August,
+  September,
+  October,
+  November,
+  December,
+}
 
 DateTime nextMonthOf(DateTime time) {
   return monthsAfter(time, 1);
